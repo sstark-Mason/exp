@@ -1,0 +1,13 @@
+---
+title: "Game Intro"
+---
+<script>
+  import ComprehensionQuestion from "$svexplib/Questions/ComprehensionQuestion.svelte";
+  import { goto } from "$app/navigation";
+</script>
+
+# Game ready
+
+When you're ready to begin the game, please click the "Next" button below.
+
+<button id="next-button" onclick={() => goto('../game')}>Next</button>

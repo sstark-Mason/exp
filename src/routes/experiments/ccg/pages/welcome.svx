@@ -1,0 +1,15 @@
+<script>
+  import ComprehensionQuestion from "$svexplib/Questions/ComprehensionQuestion.svelte";
+  import RequiredQuestion from "$svexplib/Questions/RequiredQuestion.svelte";
+  import { goto } from "$app/navigation";
+</script>
+
+# Welcome
+
+Before continuing, please enter your prolific ID below. This is necessary to ensure you receive payment for your participation.
+
+[Placeholder]
+
+<br>
+
+<button id="next-button" onclick={() => goto('comprehension-intro')}>Next</button>

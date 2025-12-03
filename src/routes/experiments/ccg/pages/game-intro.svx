@@ -1,0 +1,50 @@
+---
+title: "Game Intro"
+---
+<script>
+  import ComprehensionQuestion from "$svexplib/Questions/ComprehensionQuestion.svelte";
+  import { goto } from "$app/navigation";
+</script>
+# Game Explanation
+
+This experiment features a **coordination game**. You will play multiple rounds of this game.
+
+Game rounds:
+- Each round has two players (you and another participant). Both players will be given two options to choose between.
+- If both players choose the same option, you both win points. If you choose different options, neither player wins points.
+- At the end of the experiment, your points will be totalled and added to your final payment.
+
+<br>
+
+Example round:
+
+[Game round]
+
+
+
+
+<ComprehensionQuestion
+  qid="cq1.1"
+  text="What is the main goal in each round of the game?"
+  reset={false}
+  answers={[
+    { text: "To choose the same option as the other player.", isCorrect: true },
+    { text: "To choose a different option than the other player.", isCorrect: false },
+    { text: "To choose my favorite option.", isCorrect: false },
+  ]}
+  continueButtonId="next-button"
+/>
+
+<ComprehensionQuestion
+  qid="cq1.2"
+  text="Who is the other player in a game round?"
+  reset={false}
+  answers={[
+    { text: "Another participant in this experiment.", isCorrect: true },
+    { text: "A professional e-sports player.", isCorrect: false },
+    { text: "A computer program.", isCorrect: false },
+  ]}
+  continueButtonId="next-button"
+/>
+
+<button id="next-button" onclick={() => goto('game-ready')}>Next</button>

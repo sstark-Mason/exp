@@ -1,0 +1,32 @@
+<script lang="ts">
+    import ComprehensionQuestion from "$svexplib/Questions/ComprehensionQuestion.svelte";
+</script>
+
+# Home page
+
+<a href="experiments/ccg/welcome">CCG Experiment</a>
+
+<ComprehensionQuestion
+  qid="cq0.1"
+  text="What is the purpose of using comprehension questions?"
+  reset={true}
+  answers={[
+    { text: "To make sure I understand the instructions.", isCorrect: true },
+    { text: "To trick me into choosing a wrong answer.", isCorrect: false },
+    { text: "To perform a ritual in the cult of social sciences.", isCorrect: false },
+  ]}
+  continueButtonId="next-button"
+/>
+
+<ComprehensionQuestion
+  qid="cq0.2"
+  text="Which actions give you a higher bonus payment?"
+  reset={true}
+  answers={[
+    { text: "Selecting only correct answers.", isCorrect: true },
+    { text: "Not selecting any incorrect answers.", isCorrect: true },
+    { text: "Selecting any incorrect answers.", isCorrect: false },
+    { text: "Selecting no answers at all.", isCorrect: false },
+  ]}
+  continueButtonId="next-button"
+/>

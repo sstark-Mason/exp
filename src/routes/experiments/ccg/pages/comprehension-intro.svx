@@ -1,0 +1,60 @@
+
+---
+title: "Overview"
+---
+<script>
+  import ComprehensionQuestion from "$svexplib/Questions/ComprehensionQuestion.svelte";
+  import RequiredQuestion from "$svexplib/Questions/RequiredQuestion.svelte";
+  import { goto } from "$app/navigation";
+</script>
+
+# Overview
+
+We use comprehension questions to ensure that you understand the instructions.
+
+Details:
+- You will receive a small bonus payment based on correctly answering these questions.
+- The fewer incorrect answers you select, the higher your bonus payment will be.
+- To continue, you must select **all correct answers** and **no incorrect answers**.
+- On future pages, you will **not** be able to reset your answers.
+
+<br>
+
+<ComprehensionQuestion
+  qid="cq0.1"
+  text="What is the purpose of using comprehension questions?"
+  reset={true}
+  answers={[
+    { text: "To make sure I understand the instructions.", isCorrect: true },
+    { text: "To trick me into choosing a wrong answer.", isCorrect: false },
+    { text: "To perform a ritual in the cult of social sciences.", isCorrect: false },
+  ]}
+  continueButtonId="next-button"
+/>
+
+<ComprehensionQuestion
+  qid="cq0.2"
+  text="Which actions give you a higher bonus payment?"
+  reset={true}
+  answers={[
+    { text: "Selecting only correct answers.", isCorrect: true },
+    { text: "Not selecting any incorrect answers.", isCorrect: true },
+    { text: "Selecting any incorrect answers.", isCorrect: false },
+    { text: "Selecting no answers at all.", isCorrect: false },
+  ]}
+  continueButtonId="next-button"
+/>
+
+<RequiredQuestion
+  qid="rq1"
+  text="Indicate when you understand and are ready to continue."
+  answers={[
+    { text: "I understand and I'm ready to continue." },
+  ]}
+  checkBoxType="checkbox"
+  continueButtonId="next-button"
+/>
+
+<br>
+
+<button id="next-button" onclick={() => goto('game-intro')}>Next</button>
