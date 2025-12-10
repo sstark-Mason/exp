@@ -11,6 +11,7 @@ export async function load({ params }) {
             metadata: post.metadata
         };
     } catch (e) {
-        throw error(404, 'Page not found');
+        debug(`Failed to load CCG page for slug: ${params.slug}`, e);
+        throw error(e.status || 500, `Could not load page: ${params.slug}`);
     }
 }

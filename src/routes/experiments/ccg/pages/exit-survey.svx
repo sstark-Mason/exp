@@ -6,8 +6,8 @@ title: "Game Intro"
   import { goto } from "$app/navigation";
 </script>
 
-# Game ready
+# Some more questions before we finish
 
-When you're ready to begin the game, please click the "Next" button below.
 
-<button id="next-button" onclick={() => goto('game-play')}>Next</button>
+
+<button id="next-button" onclick={() => goto('/site')}>Exit</button>

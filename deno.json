@@ -1,0 +1,6 @@
+{
+  "imports": {
+    "@std/fs": "jsr:@std/fs@^1.0.20",
+    "@udibo/deno-mcp": "jsr:@udibo/deno-mcp@^0.1.1"
+  }
+}

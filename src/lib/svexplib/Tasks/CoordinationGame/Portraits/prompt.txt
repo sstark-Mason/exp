@@ -1,0 +1,5 @@
+Please generate a semi-professional headshot with the following characteristics:
+- Gender: Male
+- Outfit: Business casual, plain, dark grey
+- Background: Light grey
+- Distance: (need to normalize shots)

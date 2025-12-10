@@ -1,0 +1,11 @@
+<script>
+  import { goto } from "$app/navigation";
+  import CoordinationGame from "$svexplib/Tasks/CoordinationGame/CoordinationGame.svelte";
+</script>
+
+## Coordination Game
+<CoordinationGame/>
+
+<br><br><br>
+
+<button id="next-button" onclick={() => goto('exit-survey')}>Next</button>
