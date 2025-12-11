@@ -30,10 +30,11 @@ export class ComprehensionQuestionManager {
     }
   }
 
+
   private constructor(pageId: string, continueButtonId: string | null = null) {
     this.pageId = pageId;
     this.questions = new PersistedState<ComprehensionQuestion[]>(
-      "comprehensionQuestions",
+      `comprehensionQuestions-${this.pageId}`,
       [],
     ).current;
     this.setContinueButtonElement(continueButtonId);
@@ -62,7 +63,6 @@ export class ComprehensionQuestionManager {
   }
 
   public registerQuestion(qid: string, hash: string) {
-
     const existingQuestion = this.questions.find((q) => q.hash === hash);
     if (existingQuestion) {
       log("Question already registered:", hash);
@@ -70,7 +70,7 @@ export class ComprehensionQuestionManager {
       log("Registering new question:", hash);
       this.questions.push({ qid, hash, isPassed: false });
       new PersistedState<ComprehensionQuestion[]>(
-        "comprehensionQuestions",
+        `comprehensionQuestions-${this.pageId}`,
         this.questions,
       ).current = this.questions;
     }
