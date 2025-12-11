@@ -1,5 +1,28 @@
 <script lang="ts">
 
+    import debugLib from "debug";
+    const debug = debugLib("exp:ccg:routing");
+    import { PressedKeys } from "runed";
+    const keys = new PressedKeys();
+    let debugEnabled = false;
+
+    keys.onKeys(["d", "e", "b", "u", "g"], () => {
+        toggleDebug();
+    });
+
+    function toggleDebug() {
+        debugEnabled = !debugEnabled;
+        if (debugEnabled) {
+            debugLib.enable("exp:*");
+            localStorage.debug = "exp:*";
+            debug("Debug mode enabled");
+        } else {
+            debugLib.disable();
+            localStorage.debug = "";
+            console.log("Debug mode disabled");
+        }
+    }
+
     let { children } = $props();
 
 </script>

@@ -6,6 +6,14 @@ title: "Overview"
   import ComprehensionQuestion from "$svexplib/Questions/ComprehensionQuestion.svelte";
   import RequiredQuestion from "$svexplib/Questions/RequiredQuestion.svelte";
   import { goto } from "$app/navigation";
+
+  function next() {
+    const expProgress = JSON.parse(localStorage.getItem("expProgress"));
+    expProgress.push({ route: "game-intro", permitted: true });
+    localStorage.setItem("expProgress", JSON.stringify(expProgress));
+
+    goto('game-intro');
+  }
 </script>
 
 # Overview
@@ -57,4 +65,4 @@ Details:
 
 <br>
 
-<button id="next-button" onclick={() => goto('game-intro')}>Next</button>
+<button id="next-button" onclick={() => next()}>Next</button>

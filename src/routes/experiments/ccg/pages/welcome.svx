@@ -2,14 +2,23 @@
   import ComprehensionQuestion from "$svexplib/Questions/ComprehensionQuestion.svelte";
   import RequiredQuestion from "$svexplib/Questions/RequiredQuestion.svelte";
   import { goto } from "$app/navigation";
+
+  function next() {
+    const expProgress = JSON.parse(localStorage.getItem("expProgress") || '[{"route":"welcome","permitted":true}]');
+    expProgress.push({ route: "comprehension-intro", permitted: true });
+    localStorage.setItem("expProgress", JSON.stringify(expProgress));
+
+    goto('comprehension-intro');
+  }
 </script>
 
 # Welcome
 
 Before continuing, please enter your prolific ID below. This is necessary to ensure you receive payment for your participation.
 
-[Placeholder]
+<input type="text" id="prolific-id" placeholder="Enter your Prolific ID here" style="width: 300px; padding: 8px; margin-top: 10px;" />
+<!-- Send to db and return confirmation to ensure it's collected -->
 
-<br>
+<br><br><br>
 
-<button id="next-button" onclick={() => goto('comprehension-intro')}>Next</button>
+<button id="next-button" onclick={() => next()}>Next</button>

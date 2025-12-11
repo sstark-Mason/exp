@@ -1,6 +1,12 @@
 <script>
   import { goto } from "$app/navigation";
   import CoordinationGame from "$svexplib/Tasks/CoordinationGame/CoordinationGame.svelte";
+  function next() {
+    const expProgress = JSON.parse(localStorage.getItem("expProgress"));
+    expProgress.push({ route: "exit-survey", permitted: true });
+    localStorage.setItem("expProgress", JSON.stringify(expProgress));
+    goto('exit-survey');
+  }
 </script>
 
 ## Coordination Game
@@ -8,4 +14,4 @@
 
 <br><br><br>
 
-<button id="next-button" onclick={() => goto('exit-survey')}>Next</button>
+<button id="next-button" onclick={() => next()}>Next</button>

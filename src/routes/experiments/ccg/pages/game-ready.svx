@@ -4,10 +4,19 @@ title: "Game Intro"
 <script>
   import ComprehensionQuestion from "$svexplib/Questions/ComprehensionQuestion.svelte";
   import { goto } from "$app/navigation";
+
+  function next() {
+    const expProgress = JSON.parse(localStorage.getItem("expProgress"));
+    expProgress.push({ route: "game-play", permitted: true });
+    localStorage.setItem("expProgress", JSON.stringify(expProgress));
+
+    goto('game-play');
+  }
+
 </script>
 
 # Game ready
 
 When you're ready to begin the game, please click the "Next" button below.
 
-<button id="next-button" onclick={() => goto('game-play')}>Next</button>
+<button id="next-button" onclick={() => next()}>Next</button>
