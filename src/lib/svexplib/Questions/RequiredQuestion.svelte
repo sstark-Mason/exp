@@ -27,6 +27,7 @@
     text: string;
     answers: answerOption[];
     checkBoxType: string;
+    pageId: string;
     continueButtonId: string | null;
     manager?: ComprehensionQuestionManager;
   }
@@ -42,21 +43,49 @@
     text,
     answers: answerOptions,
     checkBoxType,
+    pageId: getPageIdFromURL(),
     continueButtonId: continueButtonId || null,
     manager: undefined,
   };
+
+  function getPageIdFromURL(): string {
+    const url = new URL(window.location.href);
+    return url.pathname;
+  }
 
   const selectedAnswers = new PersistedState<string[]>(
     `${qid}-selected`,
     [],
   );
 
+  function serializeQuestion(question: RequiredQuestion): string {
+    return JSON.stringify({
+      qid: question.qid,
+      text: question.text,
+      answerOptions: question.answers.map((ans) => ({
+        text: ans.text,
+      })),
+    });
+  }
+
+  function hashString(str: string): string {
+    let hash = 0;
+    for (const char of str) {
+      hash = (hash << 5) - hash + char.charCodeAt(0);
+      hash |= 0;
+    }
+    return hash.toString();
+  }
+
+  const hash = hashString(serializeQuestion(question));
+
   onMount(() => {
     log(`Mounting RequiredQuestion with qid: ${question.qid}`);
     question.manager = ComprehensionQuestionManager.getInstance(
+      question.pageId,
       question.continueButtonId,
     );
-    question.manager.registerQuestion(question.qid);
+    question.manager.registerQuestion(question.qid, hash);
 
     // Restore selected answers from persisted state
     for (const cid of selectedAnswers.current) {
@@ -69,7 +98,7 @@
     }
 
     const isAnySelected = selectedAnswers.current.length > 0;
-    question.manager.updateQuestionStatus(question.qid, isAnySelected);
+    question.manager.updateQuestionStatus(hash, isAnySelected);
   });
 
   function answerClicked(cid: string) {
@@ -89,7 +118,7 @@
     // Notify the manager about the answer selection
     if (question.manager) {
       const isAnySelected = question.answers.some((a) => a.isSelected);
-      question.manager.updateQuestionStatus(question.qid, isAnySelected);
+      question.manager.updateQuestionStatus(hash, isAnySelected);
     }
   }
 </script>

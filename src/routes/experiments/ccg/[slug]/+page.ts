@@ -11,7 +11,18 @@ export async function load({ params }) {
             metadata: post.metadata
         };
     } catch (e) {
-        debug(`Failed to load CCG page for slug: ${params.slug}`, e);
-        throw error(e.status || 500, `Could not load page: ${params.slug}`);
+        // Log detailed error for debugging
+        debug(`Failed to load CCG page for slug: ${params.slug}`, {
+            error: e.message,
+            stack: e.stack,
+            status: e.status || 500,
+            slug: params.slug
+        });
+        
+        // Throw a more specific error message
+        const errorMessage = e.status === 404 
+            ? `Page not found: ${params.slug}. Check if the SVX file exists.` 
+            : `Server error loading page: ${params.slug}. Details: ${e.message}`;
+        throw error(e.status || 500, errorMessage);
     }
 }

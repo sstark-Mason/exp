@@ -3,11 +3,16 @@ import { PersistedState } from "runed";
 import debug from "debug";
 const log = debug("exp:ComprehensionQuestionManager");
 
-type ComprehensionQuestion = Record<string, boolean>;
+interface ComprehensionQuestion {
+  qid: string;
+  hash: string;
+  isPassed: boolean;
+}
 
 export class ComprehensionQuestionManager {
-  static instance: ComprehensionQuestionManager;
-  private questions: Record<string, ComprehensionQuestion> = {};
+  static instances: Map<string, ComprehensionQuestionManager> = new Map();
+  private pageId: string;
+  private questions: ComprehensionQuestion[] = [];
   private continueButtonId: string | null = null;
 
   public setContinueButtonElement(id: string | null) {
@@ -25,49 +30,67 @@ export class ComprehensionQuestionManager {
     }
   }
 
-  private constructor(continueButtonId: string | null = null) {
-    // Private constructor to prevent direct instantiation
-    this.questions = new PersistedState<Record<string, ComprehensionQuestion>>(
+  private constructor(pageId: string, continueButtonId: string | null = null) {
+    this.pageId = pageId;
+    this.questions = new PersistedState<ComprehensionQuestion[]>(
       "comprehensionQuestions",
-      {},
+      [],
     ).current;
     this.setContinueButtonElement(continueButtonId);
     log(
-      "ComprehensionQuestionManager initialized with questions:",
+      `ComprehensionQuestionManager initialized with questions for pageId: ${this.pageId}`,
       this.questions,
     );
   }
 
   public static getInstance(
+    pageId: string,
     continueButtonId: string | null,
   ): ComprehensionQuestionManager {
-    if (!ComprehensionQuestionManager.instance) {
-      ComprehensionQuestionManager.instance = new ComprehensionQuestionManager(
-        continueButtonId,
+    if (!ComprehensionQuestionManager.instances.has(pageId)) {
+      ComprehensionQuestionManager.instances.set(
+        pageId,
+        new ComprehensionQuestionManager(pageId, continueButtonId),
       );
     }
-    return ComprehensionQuestionManager.instance;
+    const instance = ComprehensionQuestionManager.instances.get(pageId)!;
+    // Update button ID if provided (in case it's called multiple times)
+    if (continueButtonId) {
+      instance.setContinueButtonElement(continueButtonId);
+    }
+    return instance;
   }
 
-  public registerQuestion(qid: string) {
-    if (this.questions[qid]) {
-      log("Question already registered:", qid);
+  public registerQuestion(qid: string, hash: string) {
+
+    const existingQuestion = this.questions.find((q) => q.hash === hash);
+    if (existingQuestion) {
+      log("Question already registered:", hash);
     } else {
-      log("Registering new question:", qid);
-      this.questions[qid] = { isPassed: false };
+      log("Registering new question:", hash);
+      this.questions.push({ qid, hash, isPassed: false });
+      new PersistedState<ComprehensionQuestion[]>(
+        "comprehensionQuestions",
+        this.questions,
+      ).current = this.questions;
     }
   }
 
-  public updateQuestionStatus(qid: string, isPassed: boolean) {
-    this.questions[qid].isPassed = isPassed;
-    log(`Updated question ${qid} status to:`, isPassed);
-    this.enableContinueButton(this.allQuestionsPassed());
+  public updateQuestionStatus(hash: string, isPassed: boolean) {
+    const question = this.questions.find((q) => q.hash === hash);
+    if (question) {
+      question.isPassed = isPassed;
+      log(`Updated question ${question.qid} status to: ${isPassed}`);
+      this.enableContinueButton(this.allQuestionsPassed());
+    } else {
+      log("Question not found for hash:", hash);
+    }
   }
 
   private allQuestionsPassed(): boolean {
-    for (const qid in this.questions) {
-      if (!this.questions[qid].isPassed) {
-        log(`Question ${qid} not passed. Returning false...`);
+    for (const question of this.questions) {
+      if (!question.isPassed) {
+        log(`Question ${question.qid} not passed. Returning false...`);
         return false;
       }
     }
@@ -82,7 +105,7 @@ export class ComprehensionQuestionManager {
         button.disabled = !enabled;
         log(`Continue button ${enabled ? "enabled" : "disabled"}.`);
       } else {
-        log("Continue button element not found with ID:", this.continueButtonId);
+        log(`Continue button element not found with ID: ${this.continueButtonId}`);
       }
     }
   }

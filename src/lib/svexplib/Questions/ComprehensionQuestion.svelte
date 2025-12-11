@@ -27,6 +27,7 @@
     allowReset: boolean;
     answerOptions: AnswerOption[];
     isPassed: boolean;
+    pageId: string;
     continueButtonId: string | null;
     manager?: ComprehensionQuestionManager | null;
   }
@@ -44,9 +45,15 @@
     allowReset: reset || false,
     answerOptions,
     isPassed: false,
+    pageId: getPageIdFromURL(),
     continueButtonId: continueButtonId || null,
     manager: null,
   };
+
+  function getPageIdFromURL(): string {
+    const url = new URL(window.location.href);
+    return url.pathname;
+  }
 
   let correctAnswers: string[] = answerOptions.filter((ans) =>
     ans.isCorrect
@@ -126,7 +133,7 @@
         const input = document.getElementById(ans.cid!) as HTMLInputElement;
         input.disabled = true;
         answerLabelClasses[ans.cid].push("disabled");
-        question.manager?.updateQuestionStatus(question.qid, true);
+        question.manager?.updateQuestionStatus(hash, true);
       }
     } else {
       const allCorrectSelected = correctAnswers.every((cid) =>
@@ -159,7 +166,7 @@
       answerLabelClasses[ans.cid] = [];
     }
 
-    question.manager?.updateQuestionStatus(question.qid, false);
+    question.manager?.updateQuestionStatus(hash, false);
   }
 
   function shuffle<T>(arr: T[]): T[] {
@@ -171,13 +178,38 @@
     return a;
   }
 
+  
+  function serializeQuestion(question: ComprehensionQuestion): string {
+    return JSON.stringify({
+      qid: question.qid,
+      text: question.text,
+      answerOptions: question.answerOptions.map((ans) => ({
+        text: ans.text,
+        isCorrect: ans.isCorrect,
+      })),
+    });
+  }
+
+  function hashString(str: string): string {
+    let hash = 0;
+    for (const char of str) {
+      hash = (hash << 5) - hash + char.charCodeAt(0);
+      hash |= 0;
+    }
+    return hash.toString();
+  }
+
+  const hash = hashString(serializeQuestion(question));
+
   question.answerOptions = shuffle(question.answerOptions);
 
   onMount(() => {
     question.manager = ComprehensionQuestionManager.getInstance(
+      question.pageId,
       question.continueButtonId,
     );
-    question.manager.registerQuestion(question.qid);
+
+    question.manager.registerQuestion(question.qid, hash);
 
     selectedAnswers = _selectedAnswers.current;
     for (const cid of revealedAnswers.current) {
