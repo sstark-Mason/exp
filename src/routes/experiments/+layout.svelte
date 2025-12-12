@@ -4,7 +4,9 @@
     const debug = debugLib("exp:ccg:routing");
     import { PressedKeys } from "runed";
     const keys = new PressedKeys();
-    let debugEnabled = false;
+    let debugEnabled = true;
+    debugLib.enable("exp:*");
+    localStorage.debug = "exp:*";
 
     keys.onKeys(["d", "e", "b", "u", "g"], () => {
         toggleDebug();

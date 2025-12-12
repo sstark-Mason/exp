@@ -301,122 +301,65 @@
 <br>
 
 <style>
-  :global([data-theme="light"]) {
-    --choice-hover-bg: #d4e8fc; /* Unselected choice hover bg */
-    --color-correct: #0b7f00;
-    --color-correct-bg: #d4edda;
-    --color-correct-text: #155724;
-    --color-incorrect: #ff0000;
-    --color-incorrect-bg: #f8d7da;
-    --color-incorrect-hover: #f5c6cb;
-    /* --color-correct-border: #28a745; */
-    /* --color-incorrect-border: #dc3545; */
-    --color-incorrect-text: #721c24;
+
+  /* Default (light) theme styles */
+  :global(:root) {
+    --cq-choice-correct-text-color: black;
+    --cq-choice-incorrect-text-color: black;
+    --cq-choice-correct-bg: forestgreen;
+    --cq-choice-incorrect-bg: lightcoral;
+    --cq-choice-hover: grey;
+    --cq-choice-incorrect-hover: darkred;
   }
 
-  :global([data-theme="dark"]) {
-    --color-correct: #0b7f00; /* Lighter green for dark bg */
-    --color-incorrect: #f87171; /* Lighter red for dark bg */
-    --color-correct-bg: #007812; /* Dark gray bg for correct */
-    --color-incorrect-hover: #4b5563; /* Even darker on hover */
-    /* --color-correct-border: #4ade80; */
-    --color-incorrect-bg: #7c0000;
-    /* --color-incorrect-border: #8a1b1b; */
-    --color-incorrect-text: #ffffff;
-    --color-incorrect-hover: #b91c1c;
-    --choice-hover-bg: #374151; /* Dark hover bg */
-
-    /* button {
-        background-color: #374151;
-        color: #e5e7eb;
-        border: 1px solid #6b7280;
-    } */
+  /* Dark theme styles */
+  :global(.dark) {
+    --cq-choice-correct-text-color: black;
+    --cq-choice-incorrect-text-color: black;
+    --cq-choice-correct-bg: forestgreen;
+    --cq-choice-incorrect-bg: lightcoral;
+    --cq-choice-hover: grey;
+    --cq-choice-incorrect-hover: darkred;
   }
-
-  :global([data-theme="dark"]) .cq-choice {
-    color: #e5e7eb; /* Light text for labels in dark mode */
-    border-color: #6b7280; /* Subtle border */
-  }
-
-  :global([data-theme="dark"]) h3 {
-    color: #f9fafb; /* Light heading text */
-  }
-
-  :global([data-theme="dark"]) button:hover {
-    background-color: #4b5563;
-  }
-
-  /* :root {
-      --color-correct: #28a745;
-      --color-incorrect: #dc3545;
-      --color-correct-bg: #d4edda;
-      --color-incorrect-bg: #f8d7da;
-      --color-incorrect-hover: #f5c6cb;
-      --color-correct-border: #28a745;
-      --color-incorrect-border: #dc3545;
-      --color-incorrect-text: #721c24;
-      --choice-hover-bg: #d4e8fc;
-  } */
-
-  /* .color-blind {
-      --color-correct: #0072B2;
-      --color-incorrect: #E69F00;
-      --color-correct-bg: #cce6ff;
-      --color-incorrect-bg: #fff2cc;
-      --color-incorrect-hover: #ffe599;
-      --color-correct-border: #0072B2;
-      --color-incorrect-border: #E69F00;
-      --color-incorrect-text: #7f6000;
-      --choice-hover-bg: #e0e0e0;
-  } */
 
   .cq-choice {
+    color: --cq-choice-text-color;
     font-size: 1.1em;
     margin: 1px;
     padding: 2px;
     border-radius: 4px;
     display: inline-block;
     cursor: pointer;
-  }
-  .cq-choice:hover {
-    background-color: var(--choice-hover-bg);
+    &.disabled {
+      opacity: 0.6;
+    }
+    &:hover:not(.disabled) {
+      background-color: var(--cq-choice-hover);
+    }
   }
 
   .cq-choice-correct.disabled {
-    background-color: var(--color-correct-bg);
-    border: 1px solid var(--color-correct-border);
+    background-color: var(--cq-choice-correct-bg);
+    color: var(--cq-choice-correct-text-color);
     opacity: 1;
   }
 
-  .cq-choice-incorrect:not(.disabled) {
-    background-color: var(--color-incorrect-bg);
-    border: 1px solid var(--color-incorrect-border);
-    color: var(--color-incorrect-text);
-  }
-  .cq-choice-incorrect:not(.disabled):hover {
-    background-color: var(--color-incorrect-hover);
-  }
-  .cq-choice-incorrect.disabled {
-    opacity: 0.6;
-    background-color: var(--color-incorrect-bg);
-    border: 1px solid var(--color-incorrect-border);
-    color: var(--color-incorrect-text);
+  .cq-choice-incorrect {
+    background-color: var(--cq-choice-incorrect-bg);
+    color: var(--cq-choice-incorrect-text-color);
+    &:not(.disabled) {
+      &:hover {
+        background-color: var(--cq-choice-incorrect-hover);
+        color: white;
+      }
+    }
+    &.disabled {
+      opacity: 0.4; /* May want different opacities for light and dark themes */
+    }
   }
 
   .disabled {
     pointer-events: none;
-    opacity: 0.6;
-  }
-
-  button {
-    cursor: pointer;
-    margin-top: 0px;
-    margin-bottom: 6px;
-  }
-
-  h3 {
-    margin-bottom: 0.3em; /* Adjust as needed, or set to 0 */
-    padding-bottom: 0; /* In case padding is applied by a global style */
   }
 
   .cq-input-wrapper {
@@ -430,7 +373,7 @@
 
   .cq-input-wrapper:has(.cq-icon-overlay.correct) input,
   .cq-input-wrapper:has(.cq-icon-overlay.incorrect) input {
-    opacity: 0;
+    opacity: 0; /* Hides the checkbox/radio */
   }
 
   .cq-icon-overlay {
@@ -445,16 +388,31 @@
     top: 0px;
     left: -5.5px;
   }
+
   .cq-icon-overlay.correct {
     color: var(--color-correct, green);
     position: absolute;
     width: 100%;
     height: 100%;
   }
+
   .cq-icon-overlay.incorrect {
     color: var(--color-incorrect, red);
     position: absolute;
     width: 100%;
     height: 100%;
   }
+
+  button {
+    cursor: pointer;
+    margin-top: 0px;
+    margin-bottom: 6px;
+  }
+
+  h3 {
+    margin-bottom: 0.3em; /* Adjust as needed, or set to 0 */
+    padding-bottom: 0; /* In case padding is applied by a global style */
+  }
+
+
 </style>

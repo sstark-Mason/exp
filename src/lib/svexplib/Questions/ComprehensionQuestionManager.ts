@@ -1,4 +1,3 @@
-import { onDestroy, onMount } from "svelte";
 import { PersistedState } from "runed";
 import debug from "debug";
 const log = debug("exp:ComprehensionQuestionManager");
