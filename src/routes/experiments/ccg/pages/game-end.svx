@@ -1,0 +1,22 @@
+---
+title: "Game Intro"
+---
+<script>
+  import { goto } from "$app/navigation";
+
+  function next() {
+    const expProgress = JSON.parse(localStorage.getItem("expProgress"));
+    expProgress.push({ route: "exit-survey", permitted: true });
+    localStorage.setItem("expProgress", JSON.stringify(expProgress));
+
+    goto('exit-survey');
+  }
+
+</script>
+
+# Game end
+
+You've completed all rounds of the coordination game. Continue to the next page when you're ready.
+
+
+<button id="next-button" onclick={() => next()}>Next</button>

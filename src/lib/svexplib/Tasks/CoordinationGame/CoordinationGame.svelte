@@ -1,6 +1,7 @@
 <script lang="ts">
   import { onDestroy, onMount } from "svelte";
   import { PersistedState } from "runed";
+  import { goto } from "$app/navigation";
   import debugLib from "debug";
   const debug = debugLib("svexplib:CoordinationGame");
 
@@ -9,8 +10,17 @@
   import portrait2 from "./Portraits/blurred/2.webp";
   import portrait3 from "./Portraits/blurred/3.webp";
   import portrait4 from "./Portraits/blurred/4.webp";
+  import portrait5 from "./Portraits/blurred/5.webp";
+  import portrait6 from "./Portraits/blurred/6.webp";
+  import portrait8 from "./Portraits/blurred/8.webp";
+  import portrait8_1 from "./Portraits/blurred/8.1.webp";
+  import portrait9 from "./Portraits/blurred/9.webp";
+  import portrait10 from "./Portraits/blurred/10.webp";
+  import portrait11 from "./Portraits/blurred/11.webp";
+  import portrait12 from "./Portraits/blurred/12.webp";
+  import portrait13 from "./Portraits/blurred/13.webp";
   let portraits: string[] = [];
-  portraits = [portrait1, portrait2, portrait3, portrait4];
+  portraits = [portrait1, portrait2, portrait3, portrait4, portrait5, portrait6, portrait8, portrait8_1, portrait9, portrait10, portrait11, portrait12, portrait13];
   debug("Loaded portraits:", portraits);
 
   onMount(() => {
@@ -64,7 +74,7 @@
     [option1, option2] = drawChoices();
     if (!option1 || !option2) {
       debug("No more choices available.");
-      return;
+      next();
     }
 
     const randPortrait = portraits[Math.floor(Math.random() * portraits.length)];
@@ -102,6 +112,13 @@
     // return [randomized[0], randomized[1]];
     let draw = possible_combinations.pop();
     return draw ? draw : ["", ""];
+  }
+
+  function next() {
+    const expProgress = JSON.parse(localStorage.getItem("expProgress")!);
+    expProgress.push({ route: "game-end", permitted: true });
+    localStorage.setItem("expProgress", JSON.stringify(expProgress));
+    goto('game-end');
   }
 
 </script>
