@@ -1,7 +1,6 @@
 <script lang="ts">
   import { onDestroy, onMount } from "svelte";
   import { PersistedState } from "runed";
-  import { goto } from "$app/navigation";
   import debugLib from "debug";
   const debug = debugLib("svexplib:CoordinationGame");
 
@@ -24,10 +23,7 @@
   debug("Loaded portraits:", portraits);
 
   onMount(() => {
-    
-
     [option1, option2] = drawChoices();
-
   });
 
   interface player {
@@ -70,27 +66,38 @@
     newRound();
   }
 
+  let { onGameEnd } = $props();
+
   function newRound() {
     [option1, option2] = drawChoices();
     if (!option1 || !option2) {
-      debug("No more choices available.");
-      next();
+      debug("Exhausted possible combinations.");
+      onGameEnd?.();
+      // Only repeats if component still exists after onGameEnd()
+      shuffleNewGame();
+      newRound();
+    } else {
+      const randPortrait = portraits[Math.floor(Math.random() * portraits.length)];
+      player2.avatar = randPortrait;
     }
-
-    const randPortrait = portraits[Math.floor(Math.random() * portraits.length)];
-    player2.avatar = randPortrait;
   }
 
   // let option_pool: string[] = ['♂', '♀', '⚥', '⚢', '⚣', '⚧', '♃', '♁', '☿', '☆', '☽', '☉', '☾', '♆', '♇', '♄', '♅', '☊', '☋', '☌', '☍', '⚸', '⚹', '⚺', '⚻', '⚼', '⚽', '⚾', '♔', '♕', '♖', '♗', '♘', '♙', '♚', '♛', '♜', '♝', '♞', '♟', '🐱‍👤',];
 
-  const option_pool: string[] = ["♂", "♀", "♃", "☆", "♅"];
+  
   let possible_combinations: [string, string][] = [];
-  for (let i = 0; i < option_pool.length; i++) {
-    for (let j = 0; j < option_pool.length; j++) {
-      if (i !== j) {
-        possible_combinations.push([option_pool[i], option_pool[j]]);
+
+  function shuffleNewGame() {
+    const option_pool: string[] = ["♂", "♀", "♃", "☆", "♅"];
+    for (let i = 0; i < option_pool.length; i++) {
+      for (let j = 0; j < option_pool.length; j++) {
+        if (i !== j) {
+          possible_combinations.push([option_pool[i], option_pool[j]]);
+        }
       }
     }
+    possible_combinations.sort(() => 0.5 - Math.random());
+    debug("Possible combinations:", possible_combinations);
   }
 
   const gameRoundHistory = new PersistedState<gameRound[]>(
@@ -98,9 +105,7 @@
     [],
   );
 
-  possible_combinations.sort(() => 0.5 - Math.random());
-
-  debug("Possible combinations:", possible_combinations);
+  shuffleNewGame();
 
   let option1: string = $state("");
   let option2: string = $state("");
@@ -112,13 +117,6 @@
     // return [randomized[0], randomized[1]];
     let draw = possible_combinations.pop();
     return draw ? draw : ["", ""];
-  }
-
-  function next() {
-    const expProgress = JSON.parse(localStorage.getItem("expProgress")!);
-    expProgress.push({ route: "game-end", permitted: true });
-    localStorage.setItem("expProgress", JSON.stringify(expProgress));
-    goto('game-end');
   }
 
 </script>

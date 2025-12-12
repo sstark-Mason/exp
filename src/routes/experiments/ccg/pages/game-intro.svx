@@ -2,8 +2,9 @@
 title: "Game Intro"
 ---
 <script>
-  import ComprehensionQuestion from "$svexplib/Questions/ComprehensionQuestion.svelte";
   import { goto } from "$app/navigation";
+  import ComprehensionQuestion from "$svexplib/Questions/ComprehensionQuestion.svelte";
+  import CoordinationGame from "$svexplib/Tasks/CoordinationGame/CoordinationGame.svelte";
 
   function next() {
     const expProgress = JSON.parse(localStorage.getItem("expProgress"));
@@ -12,7 +13,15 @@ title: "Game Intro"
 
     goto('game-ready');
   }
+
+  let gameKey = 0;
+
+  function restartGame() {
+    gameKey += 1;
+  }
+
 </script>
+
 # Game Explanation
 
 This experiment features a **coordination game**. You will play multiple rounds of this game.
@@ -24,12 +33,14 @@ Game rounds:
 
 <br>
 
-Example round:
+## Example game
 
-[Game round]
+<CoordinationGame onGameEnd={restartGame} key={gameKey} />
+
+<br><br><br>
 
 
-
+## Comprehension questions
 
 <ComprehensionQuestion
   qid="cq1.1"

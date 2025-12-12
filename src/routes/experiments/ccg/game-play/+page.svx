@@ -1,6 +1,7 @@
 <script>
   import { goto } from "$app/navigation";
   import CoordinationGame from "$svexplib/Tasks/CoordinationGame/CoordinationGame.svelte";
+
   function next() {
     const expProgress = JSON.parse(localStorage.getItem("expProgress"));
     expProgress.push({ route: "game-end", permitted: true });
@@ -12,7 +13,7 @@
 
 ## Coordination Game
 
-<CoordinationGame/>
+<CoordinationGame onGameEnd={next}/>
 
 <!-- <br><br><br> -->
 
