@@ -1,11 +1,15 @@
----
-title: "Game Intro"
----
-<script>
-  import ComprehensionQuestion from "$svexplib/Questions/ComprehensionQuestion.svelte";
+<script lang="ts">
   import { goto } from "$app/navigation";
+  import { PersistedState } from "runed";
+  import ChoosePortrait from "$svexplib/Tasks/CoordinationGame/ChooseAvatar.svelte";
+  const selectedAvatar = new PersistedState<string | null>("ccg-selected-avatar", null);
+  const alreadySelected = selectedAvatar.current !== null;
 
   function next() {
+    if (selectedAvatar.current === null) {
+      alert("Please select a portrait before proceeding.");
+      return;
+    }
     const expProgress = JSON.parse(localStorage.getItem("expProgress"));
     expProgress.push({ route: "game-play", permitted: true });
     localStorage.setItem("expProgress", JSON.stringify(expProgress));
@@ -15,7 +19,16 @@ title: "Game Intro"
 
 </script>
 
-# Game ready
+# Portrait Selection
+
+{#if !alreadySelected}
+  <p>Please choose a portrait to represent yourself in the game.</p>
+  <ChoosePortrait />
+  <br><br>
+{/if}
+
+
+## Game Ready
 
 When you're ready to begin the game, please click the "Next" button below.
 

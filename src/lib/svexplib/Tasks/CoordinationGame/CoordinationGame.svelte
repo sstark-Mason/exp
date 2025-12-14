@@ -4,6 +4,8 @@
   import debugLib from "debug";
   const debug = debugLib("svexplib:CoordinationGame");
 
+  const selectedAvatar = new PersistedState<string | null>("ccg-selected-avatar", null);
+
   // Keep the single import for the first portrait (if needed)
   import portrait1 from "./Portraits/blurred/1.webp";
   import portrait2 from "./Portraits/blurred/2.webp";
@@ -42,7 +44,7 @@
 
   let player1: player = $state({
     id: "player 1",
-    avatar: portraits[Math.floor(Math.random() * portraits.length)],
+    avatar: selectedAvatar.current ?? portraits[Math.floor(Math.random() * portraits.length)],
     gender: 0,
   });
 

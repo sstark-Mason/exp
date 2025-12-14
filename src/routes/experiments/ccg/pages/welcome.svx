@@ -1,7 +1,19 @@
 <script>
   import ComprehensionQuestion from "$svexplib/Questions/ComprehensionQuestion.svelte";
   import RequiredQuestion from "$svexplib/Questions/RequiredQuestion.svelte";
+  import { onMount } from "svelte";
   import { goto } from "$app/navigation";
+  import { PersistedState } from "runed";
+
+  const pID = new PersistedState("pID");
+
+  onMount(() => {
+    // Assuming prolific ID (pID) is given as url param PROLIFIC_PID
+    if (typeof window === "undefined") return; // SSR guard
+    if (pID.current) return; // pID already set
+    const urlParams = new URLSearchParams(window.location.search);
+    pID.current = urlParams.get("PROLIFIC_PID") || "";
+  });
 
   function next() {
     const expProgress = JSON.parse(localStorage.getItem("expProgress") || '[{"route":"welcome","permitted":true}]');
@@ -9,15 +21,19 @@
     localStorage.setItem("expProgress", JSON.stringify(expProgress));
 
     goto('comprehension-intro');
+
   }
 </script>
 
 # Welcome
 
-Before continuing, please enter your prolific ID below. This is necessary to ensure you receive payment for your participation.
+Before continuing, please confirm your prolific ID below. This is necessary to ensure you receive payment for your participation.
 
-<input type="text" id="prolific-id" placeholder="Enter your Prolific ID here" style="width: 300px; padding: 8px; margin-top: 10px;" />
+<!-- <input type="text" id="prolific-id" placeholder="Enter your Prolific ID here" style="width: 300px; padding: 8px; margin-top: 10px;" /> -->
 <!-- Send to db and return confirmation to ensure it's collected -->
+
+<input type="text" bind:value={pID.current} placeholder="Enter your Prolific ID here" style="width: 300px; padding: 8px; margin-top: 10px;" />
+
 
 <br><br><br>
 
