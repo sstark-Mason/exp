@@ -2,12 +2,16 @@
 
     import debugLib from "debug";
     const debug = debugLib("exp:ccg:routing");
+    let debugEnabled = false;
+    import { PUBLIC_ENV } from '$env/static/public';
+    if (PUBLIC_ENV === 'dev') {
+        debugLib.enable("exp:*");
+        localStorage.debug = "exp:*";
+        debugEnabled = true;
+    }
+    
     import { PressedKeys } from "runed";
     const keys = new PressedKeys();
-    let debugEnabled = true;
-    debugLib.enable("exp:*");
-    localStorage.debug = "exp:*";
-
     keys.onKeys(["d", "e", "b", "u", "g"], () => {
         toggleDebug();
     });

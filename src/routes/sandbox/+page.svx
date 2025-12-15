@@ -1,7 +1,38 @@
 <script lang="ts">
-    import ChoosePortrait from "$svexplib/Tasks/CoordinationGame/ChooseAvatar.svelte";
+    let value = $state();
+    // import { env } from '$env/dynamic/public';
+    import { PUBLIC_ENV } from '$env/static/public';
+    console.log(`Public Env Variable: ${PUBLIC_ENV}`);
+    
 </script>
 
-# Sandbox
+<input type="range" min="0" max="100" step="1" bind:value={value} list="markers" />
+<datalist id="markers">
+  <option value="0"></option>
+  <option value="25"></option>
+  <option value="50"></option>
+  <option value="75"></option>
+  <option value="100"></option>
+</datalist>
 
-<ChoosePortrait />
+Value: {value}
+
+<style>
+
+datalist {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  writing-mode: vertical-lr;
+  width: 200px;
+}
+
+option {
+  padding: 0;
+}
+
+input[type="range"] {
+  width: 200px;
+  margin: 0;
+}
+</style>
