@@ -1,21 +1,6 @@
 <script lang="ts">
     let value = $state();
-    // import { env } from '$env/dynamic/public';
-    // try {
-    //   import { PUBLIC_ENV } from '$env/static/public';
-    //   console.log(`Public Env Variable: ${PUBLIC_ENV}`);
-    // } catch (e) {
-    //   console.log("Failed import { PUBLIC_ENV } from '$env/static/public'");
-    // }
-
-    // try {
-    //   const env = Deno.env.get('PUBLIC_ENV');
-    //   console.log(`Deno Env Variable: ${env}`);
-    // }
-    // catch (e) {
-    //   console.log("Failed Deno.env.get('PUBLIC_ENV')");
-    // }
-
+    
     import { PUBLIC_ENV } from '$env/static/public';
     console.log(`PUBLIC_ENV: ${PUBLIC_ENV}`);
     
