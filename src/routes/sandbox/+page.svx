@@ -1,9 +1,23 @@
 <script lang="ts">
     let value = $state();
     // import { env } from '$env/dynamic/public';
-    import { PUBLIC_ENV } from '$env/static/public';
-    console.log(`Public Env Variable: ${PUBLIC_ENV}`);
+    try {
+      import { PUBLIC_ENV } from '$env/static/public';
+      console.log(`Public Env Variable: ${PUBLIC_ENV}`);
+    } catch (e) {
+      console.log("Failed import { PUBLIC_ENV } from '$env/static/public'");
+    }
+
+    try {
+      const env = Deno.env.get('PUBLIC_ENV');
+      console.log(`Deno Env Variable: ${env}`);
+    }
+    catch (e) {
+      console.log("Failed Deno.env.get('PUBLIC_ENV')");
+    }
     
+    
+
 </script>
 
 <input type="range" min="0" max="100" step="1" bind:value={value} list="markers" />
