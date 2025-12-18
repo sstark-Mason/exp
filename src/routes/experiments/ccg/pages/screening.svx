@@ -1,0 +1,48 @@
+<script lang="ts">
+  import { onMount } from "svelte";
+  import { goto } from "$app/navigation";
+  import { PersistedState } from "runed";
+  import ScreeningTask from "$svexplib/Tasks/ScreeningMatching/ScreeningMatching.svelte";
+
+  let allCategorized = $state(false);
+  let allCorrect = $state(false);
+
+  function next() {
+    
+    console.log("All categorized:", allCategorized);
+    console.log("All correct:", allCorrect);
+
+    if (allCorrect) {
+      const expProgress = JSON.parse(localStorage.getItem("expProgress"));
+      expProgress.push({ route: "comprehension-intro", permitted: true });
+      localStorage.setItem("expProgress", JSON.stringify(expProgress));
+      goto('comprehension-intro');
+    } else {
+      const expProgress = JSON.parse(localStorage.getItem("expProgress"));
+      expProgress.push({ route: "exit-survey", permitted: true });
+      localStorage.setItem("expProgress", JSON.stringify(expProgress));
+      goto('exit-survey');
+    }
+
+  }
+</script>
+
+<ScreeningTask
+  items={[
+    { value: "♂", categories: ["Male"] },
+    { value: "♀", categories: ["Female"] },
+    { value: "♃", categories: ["Planet"] },
+    { value: "☆", categories: ["Planet"] },
+    { value: "♅", categories: ["Planet"] },
+    { value: "👗", categories: ["Female"] },
+    { value: "🏈", categories: ["Male"] },
+    { value: "💅", categories: ["Female"] },
+    { value: "💪", categories: ["Male"] },
+  ]}
+  numCategories={3}
+  onAllCategorized={(val: boolean) => allCategorized = val}
+  onAllCorrect={(val: boolean) => allCorrect = val} />
+
+<br>
+
+<button disabled={!allCategorized} onclick={() => next()}>Submit</button>

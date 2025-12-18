@@ -17,10 +17,10 @@
 
   function next() {
     const expProgress = JSON.parse(localStorage.getItem("expProgress") || '[{"route":"welcome","permitted":true}]');
-    expProgress.push({ route: "comprehension-intro", permitted: true });
+    expProgress.push({ route: "screening", permitted: true });
     localStorage.setItem("expProgress", JSON.stringify(expProgress));
 
-    goto('comprehension-intro');
+    goto('screening');
 
   }
 </script>

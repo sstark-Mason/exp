@@ -13,7 +13,9 @@
 	},
 	"dependencies": {
 		"debug": "^4.4.3",
-		"runed": "^0.37.0"
+		"ml-hclust": "^4.0.0",
+		"runed": "^0.37.0",
+		"svelte-drag-and-drop-actions": "^1.0.2"
 	},
 	"devDependencies": {
 		"@deno/svelte-adapter": "^0.1.0",

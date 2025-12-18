@@ -6,7 +6,9 @@ title: "Game Intro"
   import { goto } from "$app/navigation";
 </script>
 
-# Some more questions before we finish
+# Thank you for taking part in our study!
+
+## Some more questions before we finish
 
 
 

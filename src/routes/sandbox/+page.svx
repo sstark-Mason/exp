@@ -2,11 +2,26 @@
     let value = $state();
     
     import { PUBLIC_ENV } from '$env/static/public';
+    import { goto } from '$app/navigation';
+    import debugLib from "debug";
+
     console.log(`PUBLIC_ENV: ${PUBLIC_ENV}`);
-    
-    
+
+    if (PUBLIC_ENV === 'dev') {
+        debugLib.enable("*");
+        localStorage.debug = "*";
+    }
+
+    import ScreeningTask from '$svexplib/Tasks/ScreeningMatching/ScreeningMatching.svelte';
+    import TowerOfHanoi from '$svexplib/Games/TowerofHanoi.svelte';
+
 
 </script>
+
+
+
+<br><br>
+
 
 <input type="range" min="0" max="100" step="1" bind:value={value} list="markers" />
 <datalist id="markers">
@@ -18,6 +33,10 @@
 </datalist>
 
 Value: {value}
+
+<br><br>
+
+<TowerOfHanoi />
 
 <style>
 
