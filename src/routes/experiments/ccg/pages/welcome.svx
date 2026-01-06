@@ -17,10 +17,29 @@
 
   function next() {
     const expProgress = JSON.parse(localStorage.getItem("expProgress") || '[{"route":"welcome","permitted":true}]');
-    expProgress.push({ route: "screening", permitted: true });
-    localStorage.setItem("expProgress", JSON.stringify(expProgress));
+    
+    if (!pID.current || pID.current.trim() === "") {
+      alert("Please enter your Prolific ID before continuing.");
+      return;
+    }
 
-    goto('screening');
+    if (!expProgress.find((entry) => entry.route === "screening")) {
+      expProgress.push({ route: "screening", permitted: true });
+      localStorage.setItem("expProgress", JSON.stringify(expProgress));
+      goto('screening');
+    } else if (expProgress.find((entry) => entry.route === "screening" && entry.permitted)) {
+      goto('screening');
+    } else if (expProgress.find((entry) => entry.route === "screening" && !entry.permitted)) {
+      if (expProgress.find((entry) => entry.route === "comprehension-intro" && entry.permitted)) {
+        goto('comprehension-intro');
+      } else if (expProgress.find((entry) => entry.route === "exit-survey" && entry.permitted)) {
+        goto('exit-survey');
+      } else {
+        alert("Unknown navigation state. Please close this tab and try again.");
+      }
+    }
+    
+    
 
   }
 </script>
@@ -34,7 +53,13 @@ Before continuing, please confirm your prolific ID below. This is necessary to e
 
 <input type="text" bind:value={pID.current} placeholder="Enter your Prolific ID here" style="width: 300px; padding: 8px; margin-top: 10px;" />
 
+<br><br>
 
-<br><br><br>
+<details>
+  <summary>I don't have a Prolific ID.</summary>
+  <p>If you're here for testing, use "test-XXXX", where XXXX can be any four digits.</p>
+</details>
+
+<br><br>
 
 <button id="next-button" onclick={() => next()}>Next</button>
