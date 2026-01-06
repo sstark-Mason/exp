@@ -35,7 +35,12 @@ Game rounds:
 
 ## Example game
 
-<CoordinationGame onGameEnd={restartGame} key={gameKey} />
+<CoordinationGame
+  payoffSuccessHigh={2}
+  payoffSuccessLow={1}
+  onGameEnd={restartGame}
+  key={gameKey}
+/>
 
 <br><br><br>
 
