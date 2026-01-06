@@ -13,7 +13,11 @@
 
 ## Coordination Game
 
-<CoordinationGame onGameEnd={next}/>
+<CoordinationGame
+  payoffSuccessHigh={2} 
+  payoffSuccessLow={1}
+  onGameEnd={next}
+/>
 
 <!-- <br><br><br> -->
 

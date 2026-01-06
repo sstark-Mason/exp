@@ -24,6 +24,12 @@
   portraits = [portrait1, portrait2, portrait3, portrait4, portrait5, portrait6, portrait8, portrait8_1, portrait9, portrait10, portrait11, portrait12, portrait13];
   debug("Loaded portraits:", portraits);
 
+  let { payoffSuccessHigh, payoffSuccessLow, onGameEnd }: {
+    payoffSuccessHigh: number;
+    payoffSuccessLow: number;
+    onGameEnd?: () => void;
+  } = $props();  
+
   onMount(() => {
     [option1, option2] = drawChoices();
   });
@@ -39,7 +45,10 @@
     player2: player;
     option1: string;
     option2: string;
-    choice1: string;
+    payoffSuccessHigh: number;
+    payoffSuccessLow: number;
+    chosen: string;
+    
   }
 
   let player1: player = $state({
@@ -54,21 +63,21 @@
     gender: 1,
   });
 
-  function clickedChoice(choice: string) {
-    debug(`Clicked choice: ${choice}`);
+  function clickedChoice(chosen: string) {
+    debug(`Clicked choice: ${chosen}`);
 
     gameRoundHistory.current.push({
       player1,
       player2,
       option1,
       option2,
-      choice1: choice,
+      payoffSuccessHigh,
+      payoffSuccessLow,
+      chosen: chosen,
     });
 
     newRound();
   }
-
-  let { onGameEnd } = $props();
 
   function newRound() {
     [option1, option2] = drawChoices();
@@ -124,25 +133,65 @@
 </script>
 
 <div class="ccg-game-round">
-  <img src={player1.avatar} alt="Player 1 Portrait" class="player-avatar" />
+  <div class="ccg-choices"> 
+    <img src={player1.avatar} alt="Player 1 Portrait" class="player-avatar" />
 
-  <button class="choice-button" onclick={() => clickedChoice(option1)}>
-    {option1}
-  </button>
+    <button class="choice-button" onclick={() => clickedChoice(option1)}>
+      {option1}
+    </button>
 
-  <button class="choice-button" onclick={() => clickedChoice(option2)}>
-    {option2}
-  </button>
+    <button class="choice-button" onclick={() => clickedChoice(option2)}>
+      {option2}
+    </button>
 
-  <img src={player2.avatar} alt="Player 2 Portrait" class="player-avatar" />
+    <img src={player2.avatar} alt="Player 2 Portrait" class="player-avatar" />
+  </div>
+
+  <div class="ccg-payoffs">
+    <table>
+      <thead>
+        <tr>
+          <th></th>
+          <th>They choose {option1}</th>
+          <th>They choose {option2}</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <th>You choose {option1}</th>
+          <td>(<span class="your-payoff">{payoffSuccessHigh}</span>, <span class="their-payoff">{payoffSuccessLow}</span>)</td>
+          <td>(0, 0)</td>
+        </tr>
+        <tr>
+          <th>You choose {option2}</th>
+          <td>(0, 0)</td>
+          <td>(<span class="your-payoff">{payoffSuccessLow}</span>, <span class="their-payoff">{payoffSuccessHigh}</span>)</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 </div>
 
 <style>
   .ccg-game-round {
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
     gap: 20px;
+  }
+
+  .ccg-choices {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+  }
+
+  .ccg-payoffs {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
   }
 
   .choice-button {
@@ -167,5 +216,29 @@
     border-radius: 10%;
     width: 100px;
     height: 100px;
+  }
+
+  .ccg-payoffs table {
+    table-layout: fixed;
+    border-collapse: collapse;
+    width: auto;
+    
+  }
+
+  .ccg-payoffs th, .ccg-payoffs td {
+    border: 1px solid black;
+    padding: 5px 10px;
+    text-align: center;
+    font-size: 1.1em;
+    font-weight: normal;
+  }
+
+  .your-payoff {
+    font-weight: normal;
+    text-decoration-line: underline;
+  }
+
+  .their-payoff {
+    font-weight: normal;
   }
 </style>

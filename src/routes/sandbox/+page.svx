@@ -14,11 +14,17 @@
 
     import ScreeningTask from '$svexplib/Tasks/ScreeningMatching/ScreeningMatching.svelte';
     import TowerOfHanoi from '$svexplib/Games/TowerofHanoi.svelte';
+    import CoordinationGame from '$svexplib/Tasks/CoordinationGame/CoordinationGame.svelte';
 
 
 </script>
 
 
+<!-- <CoordinationGame 
+    payoffSuccessHigh={2} 
+    payoffSuccessLow={1} 
+    onGameEnd={() => goto('/sandbox')}
+/> -->
 
 <br><br>
 
