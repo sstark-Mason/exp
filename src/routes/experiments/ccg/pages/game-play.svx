@@ -4,13 +4,17 @@
   import { PUBLIC_ENV } from '$env/static/public';
   import { gotoNextPermittedRoute, setRoutePermission, PermissionState } from "$svexplib/Tools/RouteProgression";
   import { routeOrder } from "../routeOrder";
+  import debugLib from "debug";
+  const debug = debugLib("exp:ccg:game-play");
 
   function next() {
+    debug("Game play completed. Proceeding to game-end.");
     setRoutePermission("game-play", PermissionState.NoLongerPermitted);
     gotoNextPermittedRoute("game-play", routeOrder);
   }
 
   function skip() {
+    debug("Game play skipped. Proceeding to game-end.");
     setRoutePermission("game-play", PermissionState.NoLongerPermitted);
     gotoNextPermittedRoute("game-play", routeOrder);
   }

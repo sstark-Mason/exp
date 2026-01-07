@@ -4,9 +4,10 @@ title: "Game Intro"
 <script>
   import { goto } from "$app/navigation";
   import { gotoNextPermittedRoute } from "$svexplib/Tools/RouteProgression";
+  import { routeOrder } from "../routeOrder";
 
   function next() {
-    gotoNextPermittedRoute("game-end");
+    gotoNextPermittedRoute("game-end", routeOrder);
   }
 
 </script>
