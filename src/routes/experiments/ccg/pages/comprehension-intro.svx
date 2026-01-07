@@ -7,18 +7,17 @@ title: "Overview"
   import RequiredQuestion from "$svexplib/Questions/RequiredQuestion.svelte";
   import { goto } from "$app/navigation";
   import { PUBLIC_ENV } from '$env/static/public';
+  import { gotoNextPermittedRoute } from "$svexplib/Tools/RouteProgression";
+  import { routeOrder } from "../routeOrder";
 
   function next() {
-    const expProgress = JSON.parse(localStorage.getItem("expProgress"));
-    expProgress.push({ route: "game-intro", permitted: true });
-    localStorage.setItem("expProgress", JSON.stringify(expProgress));
-    goto('game-intro');
+    gotoNextPermittedRoute("comprehension-intro", routeOrder);
   }
 
   function skip() {
-    next();
+    gotoNextPermittedRoute("comprehension-intro", routeOrder);
   }
-  
+
 </script>
 
 # Overview

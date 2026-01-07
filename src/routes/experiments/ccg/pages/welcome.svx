@@ -4,6 +4,8 @@
   import { onMount } from "svelte";
   import { goto } from "$app/navigation";
   import { PersistedState } from "runed";
+  import { getRoutePermission, setRoutePermission, gotoNextPermittedRoute } from "$svexplib/Tools/RouteProgression";
+  import { routeOrder } from "../routeOrder";
   import { PUBLIC_ENV } from '$env/static/public';
 
   const pID = new PersistedState("pID");
@@ -21,31 +23,35 @@
       alert("Please enter your Prolific ID before continuing.");
       return;
     }
-    navigate();    
+    gotoNextPermittedRoute("welcome", routeOrder);
+    
   }
 
   function skip() {
     pID.current = "dev-0000";
-    navigate();
+    gotoNextPermittedRoute("welcome", routeOrder);
   }
 
   function navigate() {
-    const expProgress = JSON.parse(localStorage.getItem("expProgress") || '[{"route":"welcome","permitted":true}]');
-    if (!expProgress.find((entry) => entry.route === "screening")) {
-      expProgress.push({ route: "screening", permitted: true });
-      localStorage.setItem("expProgress", JSON.stringify(expProgress));
-      goto('screening');
-    } else if (expProgress.find((entry) => entry.route === "screening" && entry.permitted)) {
-      goto('screening');
-    } else if (expProgress.find((entry) => entry.route === "screening" && !entry.permitted)) {
-      if (expProgress.find((entry) => entry.route === "comprehension-intro" && entry.permitted)) {
-        goto('comprehension-intro');
-      } else if (expProgress.find((entry) => entry.route === "exit-survey" && entry.permitted)) {
-        goto('exit-survey');
-      } else {
-        alert("Unknown navigation state. Please close this tab and try again.");
-      }
-    }
+
+
+
+    // const expProgress = JSON.parse(localStorage.getItem("expProgress") || '[{"route":"welcome","permitted":true}]');
+    // if (!expProgress.find((entry) => entry.route === "screening")) {
+    //   expProgress.push({ route: "screening", permitted: true });
+    //   localStorage.setItem("expProgress", JSON.stringify(expProgress));
+    //   goto('screening');
+    // } else if (expProgress.find((entry) => entry.route === "screening" && entry.permitted)) {
+    //   goto('screening');
+    // } else if (expProgress.find((entry) => entry.route === "screening" && !entry.permitted)) {
+    //   if (expProgress.find((entry) => entry.route === "comprehension-intro" && entry.permitted)) {
+    //     goto('comprehension-intro');
+    //   } else if (expProgress.find((entry) => entry.route === "exit-survey" && entry.permitted)) {
+    //     goto('exit-survey');
+    //   } else {
+    //     alert("Unknown navigation state. Please close this tab and try again.");
+    //   }
+    // }
   }
 </script>
 

@@ -24,7 +24,13 @@
   function navigate() {
     avatarIsFinalized.current = true;
     const expProgress = JSON.parse(localStorage.getItem("expProgress"));
-    expProgress.push({ route: "game-play", permitted: true });
+    const playEntry = expProgress.find((entry) => entry.route === "game-intro");
+    if (!playEntry) {
+      expProgress.push({ route: "game-play", permitted: true });
+    } else if (playEntry) {
+      playEntry.permitted = false;
+    }
+    
     localStorage.setItem("expProgress", JSON.stringify(expProgress));
 
     goto('game-play');

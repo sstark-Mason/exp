@@ -6,8 +6,8 @@ title: "Game Intro"
   import ComprehensionQuestion from "$svexplib/Questions/ComprehensionQuestion.svelte";
   import CoordinationGame from "$svexplib/Tasks/CoordinationGame/CoordinationGame.svelte";
   import { PUBLIC_ENV } from '$env/static/public';
-
-  
+  import { gotoNextPermittedRoute } from "$svexplib/Tools/RouteProgression";
+  import { routeOrder } from "../routeOrder";
 
   let gameKey = 0;
 
@@ -16,15 +16,11 @@ title: "Game Intro"
   }
 
   function next() {
-    const expProgress = JSON.parse(localStorage.getItem("expProgress"));
-    expProgress.push({ route: "game-ready", permitted: true });
-    localStorage.setItem("expProgress", JSON.stringify(expProgress));
-
-    goto('game-ready');
+    gotoNextPermittedRoute("game-intro", routeOrder);
   }
 
   function skip() {
-    next();
+    gotoNextPermittedRoute("game-intro", routeOrder);
   }
 
 </script>

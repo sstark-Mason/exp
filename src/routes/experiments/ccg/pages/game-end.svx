@@ -3,13 +3,10 @@ title: "Game Intro"
 ---
 <script>
   import { goto } from "$app/navigation";
+  import { gotoNextPermittedRoute } from "$svexplib/Tools/RouteProgression";
 
   function next() {
-    const expProgress = JSON.parse(localStorage.getItem("expProgress"));
-    expProgress.push({ route: "exit-survey", permitted: true });
-    localStorage.setItem("expProgress", JSON.stringify(expProgress));
-
-    goto('exit-survey');
+    gotoNextPermittedRoute("game-end");
   }
 
 </script>

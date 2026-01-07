@@ -2,20 +2,17 @@
   import { goto } from "$app/navigation";
   import CoordinationGame from "$svexplib/Tasks/CoordinationGame/CoordinationGame.svelte";
   import { PUBLIC_ENV } from '$env/static/public';
+  import { gotoNextPermittedRoute, setRoutePermission, PermissionState } from "$svexplib/Tools/RouteProgression";
+  import { routeOrder } from "../routeOrder";
 
   function next() {
-    const expProgress = JSON.parse(localStorage.getItem("expProgress"));
-    expProgress.push({ route: "game-end", permitted: true });
-    const playEntry = expProgress.find((entry) => entry.route === "game-play");
-    if (playEntry) {
-      playEntry.permitted = false;
-    }
-    localStorage.setItem("expProgress", JSON.stringify(expProgress));
-    goto('game-end');
+    setRoutePermission("game-play", PermissionState.NoLongerPermitted);
+    gotoNextPermittedRoute("game-play", routeOrder);
   }
 
   function skip() {
-    next();
+    setRoutePermission("game-play", PermissionState.NoLongerPermitted);
+    gotoNextPermittedRoute("game-play", routeOrder);
   }
 
 </script>

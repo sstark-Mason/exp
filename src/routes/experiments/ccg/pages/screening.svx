@@ -3,40 +3,32 @@
   import { goto } from "$app/navigation";
   import { PersistedState } from "runed";
   import ScreeningTask from "$svexplib/Tasks/ScreeningMatching/ScreeningMatching.svelte";
+  import { getRoutePermission, setRoutePermission, gotoNextPermittedRoute, PermissionState } from "$svexplib/Tools/RouteProgression";
+  import { routeOrder } from "../routeOrder";
   import { PUBLIC_ENV } from '$env/static/public';
+  import debugLib from "debug";
+  const debug = debugLib("exp:ccg:screening");
 
   let allCategorized = $state(false);
   let allCorrect = $state(false);
 
   function next() {
-    console.log("All categorized:", allCategorized);
-    console.log("All correct:", allCorrect);
-    navigate();
+    debug(`Screening completed. allCategorized: ${allCategorized}, allCorrect: ${allCorrect}`);
+    setRoutePermission("screening", PermissionState.NoLongerPermitted);
+    if (!allCorrect) {
+      setRoutePermission("exit-survey", PermissionState.Permitted);
+    }
+    gotoNextPermittedRoute("screening", routeOrder);
   }
 
   function skip() {
     allCategorized = true;
     allCorrect = true;
-    navigate();
+    setRoutePermission("screening", PermissionState.NoLongerPermitted);
+    debug("Skipping screening. Marked as NoLongerPermitted.");
+    gotoNextPermittedRoute("screening", routeOrder);
   }
 
-  function navigate() {
-    const expProgress = JSON.parse(localStorage.getItem("expProgress"));
-    const screeningEntry = expProgress.find((entry) => entry.route === "screening");
-    if (screeningEntry) {
-      screeningEntry.permitted = false;
-    }
-
-    if (allCorrect) {
-      expProgress.push({ route: "comprehension-intro", permitted: true });
-      localStorage.setItem("expProgress", JSON.stringify(expProgress));
-      goto('comprehension-intro');
-    } else {
-      expProgress.push({ route: "exit-survey", permitted: true });
-      localStorage.setItem("expProgress", JSON.stringify(expProgress));
-      goto('exit-survey');
-    }
-  }
 </script>
 
 <ScreeningTask
