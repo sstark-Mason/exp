@@ -5,6 +5,15 @@ title: "Game Intro"
   import { goto } from "$app/navigation";
   import ComprehensionQuestion from "$svexplib/Questions/ComprehensionQuestion.svelte";
   import CoordinationGame from "$svexplib/Tasks/CoordinationGame/CoordinationGame.svelte";
+  import { PUBLIC_ENV } from '$env/static/public';
+
+  
+
+  let gameKey = 0;
+
+  function restartGame() {
+    gameKey += 1;
+  }
 
   function next() {
     const expProgress = JSON.parse(localStorage.getItem("expProgress"));
@@ -14,10 +23,8 @@ title: "Game Intro"
     goto('game-ready');
   }
 
-  let gameKey = 0;
-
-  function restartGame() {
-    gameKey += 1;
+  function skip() {
+    next();
   }
 
 </script>
@@ -72,3 +79,8 @@ Game rounds:
 />
 
 <button id="next-button" onclick={() => next()}>Next</button>
+
+{#if PUBLIC_ENV === 'dev'}
+<br><br>
+<button id="skip-button" onclick={() => skip()}>Skip</button>
+{/if}

@@ -4,6 +4,7 @@
   import { onMount } from "svelte";
   import { goto } from "$app/navigation";
   import { PersistedState } from "runed";
+  import { PUBLIC_ENV } from '$env/static/public';
 
   const pID = new PersistedState("pID");
 
@@ -16,13 +17,20 @@
   });
 
   function next() {
-    const expProgress = JSON.parse(localStorage.getItem("expProgress") || '[{"route":"welcome","permitted":true}]');
-    
     if (!pID.current || pID.current.trim() === "") {
       alert("Please enter your Prolific ID before continuing.");
       return;
     }
+    navigate();    
+  }
 
+  function skip() {
+    pID.current = "dev-0000";
+    navigate();
+  }
+
+  function navigate() {
+    const expProgress = JSON.parse(localStorage.getItem("expProgress") || '[{"route":"welcome","permitted":true}]');
     if (!expProgress.find((entry) => entry.route === "screening")) {
       expProgress.push({ route: "screening", permitted: true });
       localStorage.setItem("expProgress", JSON.stringify(expProgress));
@@ -38,9 +46,6 @@
         alert("Unknown navigation state. Please close this tab and try again.");
       }
     }
-    
-    
-
   }
 </script>
 
@@ -63,3 +68,8 @@ Before continuing, please confirm your prolific ID below. This is necessary to e
 <br><br>
 
 <button id="next-button" onclick={() => next()}>Next</button>
+
+{#if PUBLIC_ENV === 'dev'}
+<br><br>
+<button id="skip-button" onclick={() => skip()}>Skip</button>
+{/if}

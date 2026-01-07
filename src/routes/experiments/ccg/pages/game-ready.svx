@@ -2,6 +2,7 @@
   import { goto } from "$app/navigation";
   import { PersistedState } from "runed";
   import ChoosePortrait from "$svexplib/Tasks/CoordinationGame/ChooseAvatar.svelte";
+  import { PUBLIC_ENV } from '$env/static/public';
   const selectedAvatar = new PersistedState<string | null>("ccg-selected-avatar", null);
   const avatarIsFinalized = new PersistedState<boolean>("ccg-avatar-selected", false);
 
@@ -10,6 +11,17 @@
       alert("Please select a portrait before proceeding.");
       return;
     }
+    navigate();
+  }
+
+  function skip() {
+    if (selectedAvatar.current === null) {
+      selectedAvatar.current = "";
+    }
+    navigate();
+  }
+
+  function navigate() {
     avatarIsFinalized.current = true;
     const expProgress = JSON.parse(localStorage.getItem("expProgress"));
     expProgress.push({ route: "game-play", permitted: true });
@@ -34,3 +46,8 @@
 When you're ready to begin the game, please click the "Next" button below.
 
 <button id="next-button" onclick={() => next()}>Next</button>
+
+{#if PUBLIC_ENV === 'dev'}
+<br><br>
+<button id="skip-button" onclick={() => skip()}>Skip</button>
+{/if}
