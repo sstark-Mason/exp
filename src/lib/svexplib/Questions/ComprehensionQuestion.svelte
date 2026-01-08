@@ -1,16 +1,19 @@
 <script lang="ts">
   import { onDestroy, onMount } from "svelte";
   import { ComprehensionQuestionManager } from "./ComprehensionQuestionManager.ts";
+  import { page } from "$app/state";
+  import { marked } from "marked";
 
   import { PersistedState } from "runed";
-  import debug from "debug";
-  const log = debug("exp:ComprehensionQuestion");
+  import debugLib from "debug";
+  const debug = debugLib("exp:ComprehensionQuestion");
 
-  let { qid, text, reset, answers, continueButtonId }: {
+  let { qid, text, reset, answers, fmt, continueButtonId }: {
     qid: string;
     text: string;
     reset?: boolean;
     answers: { text: string; isCorrect: boolean }[];
+    fmt?: "markdown" | "html" | "";
     continueButtonId?: string | null;
   } = $props();
 
@@ -45,15 +48,10 @@
     allowReset: reset || false,
     answerOptions,
     isPassed: false,
-    pageId: getPageIdFromURL(),
+    pageId: page.url.pathname,
     continueButtonId: continueButtonId || null,
     manager: null,
   };
-
-  function getPageIdFromURL(): string {
-    const url = new URL(window.location.href);
-    return url.pathname;
-  }
 
   let correctAnswers: string[] = answerOptions.filter((ans) =>
     ans.isCorrect
@@ -84,8 +82,8 @@
 
   function answerClicked(cid: string) {
     const input = document.getElementById(cid) as HTMLInputElement;
-    log("Answer clicked:", cid);
-    log("Selected (checked): ", input.checked);
+    debug("Answer clicked:", cid);
+    debug("Selected (checked): ", input.checked);
 
     revealedAnswers.current.push(cid);
 
@@ -127,7 +125,7 @@
       selectedAnswers.every((cid) => correctAnswers.includes(cid)) &&
       selectedAnswers.length === correctAnswers.length;
     if (onlyCorrectSelected) {
-      log(`${question.qid}: all correct answers selected.`);
+      debug(`${question.qid}: all correct answers selected.`);
       question.isPassed = true;
       for (const ans of question.answerOptions) {
         const input = document.getElementById(ans.cid!) as HTMLInputElement;
@@ -241,15 +239,20 @@
   });
 </script>
 
-<h3>{question.text}</h3>
+<span class="question-text">
+  {#if fmt === "markdown"}
+    {@html marked.parse(question.text)}
+    <br>
+  {:else if fmt === "html"}
+    {@html question.text}
+    <br>
+  {:else}
+    <h3>{question.text}</h3>
+  {/if}
+</span>
+
 {#if question.allowReset}
-  <button
-    onclick={() => {
-      resetQuestion();
-    }}
-  >
-    Reset
-  </button><br>
+  <button onclick={() => { resetQuestion(); }}>Reset</button><br>
 {/if}
 
 {#each question.answerOptions as answer}
@@ -295,7 +298,13 @@
     for={answer.cid}
     class="cq-choice {answerLabelClasses[answer.cid] ? answerLabelClasses[answer.cid].join(' ') : ''}"
   >
+  {#if fmt === "markdown"}
+    {@html marked.parse(answer.text)}
+  {:else if fmt === "html"}
+    {@html answer.text}
+  {:else}
     {answer.text}
+  {/if}
   </label><br>
 {/each}
 <br>

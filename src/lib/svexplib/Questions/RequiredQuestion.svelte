@@ -1,12 +1,11 @@
 <script lang="ts">
   import { onDestroy, onMount } from "svelte";
   import { ComprehensionQuestionManager } from "./ComprehensionQuestionManager.ts";
+  import { page } from "$app/state";
 
   import { PersistedState } from "runed";
-  import debug from "debug";
-  const log = debug("exp:RequiredQuestion");
-
-  // let { qid, text, answers, checkBoxType, continueButtonId } : { qid: string; text: string; answers: string[]; checkBoxType: string; continueButtonId: string; } = $props();
+  import debugLib from "debug";
+  const debug = debugLib("exp:RequiredQuestion");
 
   let { qid, text, answers, checkBoxType, continueButtonId }: {
     qid: string;
@@ -43,15 +42,10 @@
     text,
     answers: answerOptions,
     checkBoxType,
-    pageId: getPageIdFromURL(),
+    pageId: page.url.pathname,
     continueButtonId: continueButtonId || null,
     manager: undefined,
   };
-
-  function getPageIdFromURL(): string {
-    const url = new URL(window.location.href);
-    return url.pathname;
-  }
 
   const selectedAnswers = new PersistedState<string[]>(
     `${qid}-selected`,
@@ -80,7 +74,7 @@
   const hash = hashString(serializeQuestion(question));
 
   onMount(() => {
-    log(`Mounting RequiredQuestion with qid: ${question.qid}`);
+    debug(`Mounting RequiredQuestion with qid: ${question.qid}`);
     question.manager = ComprehensionQuestionManager.getInstance(
       question.pageId,
       question.continueButtonId,
@@ -102,11 +96,11 @@
   });
 
   function answerClicked(cid: string) {
-    log(`Answer clicked: ${cid} for question: ${question.qid}`);
+    debug(`Answer clicked: ${cid} for question: ${question.qid}`);
     const ans = question.answers.find((a) => a.cid === cid);
     if (ans) {
       ans.isSelected = !ans.isSelected;
-      log(`Answer ${ans.text} isSelected: ${ans.isSelected}`);
+      debug(`Answer ${ans.text} isSelected: ${ans.isSelected}`);
       
       if (ans.isSelected) {
         selectedAnswers.current = [...selectedAnswers.current, cid];

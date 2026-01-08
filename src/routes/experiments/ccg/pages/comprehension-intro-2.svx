@@ -1,0 +1,36 @@
+<script lang="ts">
+    import ComprehensionQuestion from "$svexplib/Questions/ComprehensionQuestion2.svelte";
+
+    let disabled = $state<boolean>(true);
+
+    function next() {
+    }
+
+</script>
+
+
+# Comprehension Questions Introduction
+
+<ComprehensionQuestion
+    qText="This is a sample **comprehension question** using *Markdown* formatting."
+    choices={[
+        { text: "This is the **first** answer choice.", isCorrect: true },
+        { text: "This is the *second* answer choice.", isCorrect: false },
+        { text: "This is the _third_ answer choice.", isCorrect: false },
+        { text: "This is the <span style='color: red;'>red</span> answer choice.", isCorrect: false },
+    ]}
+    fmt="markdown"
+/>
+
+<ComprehensionQuestion
+    qText="This is a sample **comprehension question** using *Markdown* formatting."
+    choices={[
+        { text: "This is the **first** answer choice.", isCorrect: true },
+        { text: "This is the *second* answer choice.", isCorrect: false },
+        { text: "This is the _third_ answer choice.", isCorrect: false },
+        { text: "This is the <span style='color: red;'>red</span> answer choice.", isCorrect: false },
+    ]}
+    fmt="markdown"
+/>
+
+<button id="next-button" disabled={disabled} onclick={() => next()}>Next</button>
