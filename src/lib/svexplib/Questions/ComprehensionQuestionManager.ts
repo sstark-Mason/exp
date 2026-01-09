@@ -29,7 +29,6 @@ export class ComprehensionQuestionManager {
     }
   }
 
-
   private constructor(pageId: string, continueButtonId: string | null = null) {
     this.pageId = pageId;
     this.questions = new PersistedState<ComprehensionQuestion[]>(
@@ -99,12 +98,16 @@ export class ComprehensionQuestionManager {
 
   private enableContinueButton(enabled: boolean) {
     if (this.continueButtonId) {
-      const button = document.getElementById(this.continueButtonId) as HTMLButtonElement;
+      const button = document.getElementById(
+        this.continueButtonId,
+      ) as HTMLButtonElement;
       if (button) {
         button.disabled = !enabled;
         log(`Continue button ${enabled ? "enabled" : "disabled"}.`);
       } else {
-        log(`Continue button element not found with ID: ${this.continueButtonId}`);
+        log(
+          `Continue button element not found with ID: ${this.continueButtonId}`,
+        );
       }
     }
   }
