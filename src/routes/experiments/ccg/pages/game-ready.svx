@@ -1,15 +1,17 @@
 <script lang="ts">
   import { goto } from "$app/navigation";
   import { PersistedState } from "runed";
-  import ChoosePortrait from "$svexplib/Tasks/CoordinationGame/ChooseAvatar.svelte";
+  import SelectAvatar from "$svexplib/Games/CoordinationGame/SelectAvatar.svelte";
   import { PUBLIC_ENV } from '$env/static/public';
   import { getRoutePermission, setRoutePermission, gotoNextPermittedRoute, PermissionState } from "$svexplib/Tools/RouteProgression";
   import { routeOrder } from "../routeOrder";
-  const selectedAvatar = new PersistedState<string | null>("ccg-selected-avatar", null);
+  import debugLib from "debug";
+  const debug = debugLib("exp:GameReady");
+  const selectedAvatarName = new PersistedState<string | null>("ccg-selected-avatar", null);
   const avatarIsFinalized = new PersistedState<boolean>("ccg-avatar-selected", false);
 
   function next() {
-    if (selectedAvatar.current === null) {
+    if (selectedAvatarName.current === null) {
       alert("Please select a portrait before proceeding.");
       return;
     }
@@ -18,8 +20,8 @@
   }
 
   function skip() {
-    if (selectedAvatar.current === null) {
-      selectedAvatar.current = "";
+    if (selectedAvatarName.current === null) {
+      selectedAvatarName.current = "";
     }
     setRoutePermission('game-ready', PermissionState.NoLongerPermitted);
     gotoNextPermittedRoute('game-ready', routeOrder);
@@ -31,7 +33,12 @@
 
 {#if !avatarIsFinalized.current}
   <p>Please choose a portrait to represent yourself in the game.</p>
-  <ChoosePortrait />
+  <SelectAvatar
+    onAvatarSelection={(avatar) => {
+      debug(`Selected avatar: ${avatar}`);
+      selectedAvatarName.current = avatar;
+    }}
+  />
   <br><br>
 {/if}
 

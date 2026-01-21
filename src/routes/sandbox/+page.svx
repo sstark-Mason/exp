@@ -19,11 +19,11 @@
 
     import SampleDataInjector from '$svexplib/Tasks/CoordinationGame/injectSampleData.svelte';
 
-    import { ccgPermutations } from '$svexplib/Tools/Permutator.ts';
+    import { allccgPermutations } from '$svexplib/Tools/Permutator.ts';
 
     const players = ['fem1', 'fem2', 'masc1', 'masc2'];
     const choices = ['Blue', 'Pink', 'Green', 'Yellow'];
-    const permutations = ccgPermutations(players, choices);
+    const permutations = allccgPermutations(players, choices);
     debug(permutations);
 
 </script>

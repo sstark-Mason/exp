@@ -4,7 +4,9 @@ title: "Game Intro"
 <script>
   import { goto } from "$app/navigation";
   import ComprehensionQuestion from "$svexplib/Questions/ComprehensionQuestion.svelte";
-  import CoordinationGame from "$svexplib/Tasks/CoordinationGame/CoordinationGame.svelte";
+  import PracticeCoordinationGame from "$svexplib/Games/CoordinationGame/PracticeCoordinationGame.svelte";
+  import { choiceSetSymbols, choiceSetColorsUnicode } from '$svexplib/Games/CoordinationGame/CoordinationGameBase.ts';
+
   import { PUBLIC_ENV } from '$env/static/public';
   import { gotoNextPermittedRoute } from "$svexplib/Tools/RouteProgression";
   import { routeOrder } from "../routeOrder";
@@ -38,11 +40,9 @@ Game rounds:
 
 ## Example game
 
-<CoordinationGame
-  payoffSuccessHigh={2}
-  payoffSuccessLow={1}
-  onGameEnd={restartGame}
-  key={gameKey}
+<PracticeCoordinationGame
+    player1Name={"fem1"}
+    choiceSet={choiceSetColorsUnicode}
 />
 
 <br><br><br>

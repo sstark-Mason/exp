@@ -7,7 +7,7 @@ export function getPermutations<T>(arrays: T[][]): T[][] {
   );
 }
 
-export function ccgPermutations<T>(avatars: T[], choices: T[]): T[][] {
+export function allccgPermutations<T>(avatars: T[], choices: T[]): T[][] {
     // 1. Pick p1 from avatars
     // 2. For that p1, pick p2 from avatars (can be same as p1)
     // 3. For those avatars, pick choice1 from choices

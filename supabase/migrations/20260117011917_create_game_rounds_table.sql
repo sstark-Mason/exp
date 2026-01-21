@@ -2,7 +2,7 @@ CREATE TABLE IF NOT EXISTS public.game_rounds (
     rid BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
     created_at_time TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     completed_at_time TIMESTAMPTZ,
-    player_1_uid UUID REFERENCES public.subjects(uid) NOT NULL,
+    player_1_uid UUID REFERENCES public.subjects(uid) NOT NULL DEFAULT auth.uid(),
     player_1_avatar TEXT NOT NULL,
     player_2_avatar TEXT NOT NULL,
     choice_option_1 TEXT NOT NULL,

@@ -67,3 +67,7 @@ export async function updateDb(table: string, updates: Record<string, any>): Pro
 export function getSupabase() {
     return supabase;
 }
+
+export function getCurrentSession() {
+    return supabase.auth.getSession();
+}

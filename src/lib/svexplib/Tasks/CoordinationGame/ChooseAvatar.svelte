@@ -43,8 +43,6 @@
 
 </script>
 
-
-
 <div class="avatar-grid">
   {#each portraits as portrait, i}
     <button 

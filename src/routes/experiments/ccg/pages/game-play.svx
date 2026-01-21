@@ -6,12 +6,15 @@
   import { routeOrder } from "../routeOrder";
   import { PersistedState } from "runed";
   import { getSupabase } from "$lib/db/db_ccg_client.ts";
+  import { choiceSetSymbols, choiceSetColorsUnicode } from '$svexplib/Games/CoordinationGame/CoordinationGameBase.ts';
+  import LiveCoordinationGame from '$svexplib/Games/CoordinationGame/LiveCoordinationGame.svelte';
   import debugLib from "debug";
   const debug = debugLib("exp:ccg:game-play");
 
+  const selectedAvatarName = new PersistedState("ccg-selected-avatar", "");
+
   function next() {
     debug("Game play completed. Proceeding to game-end.");
-    insertGameRoundsToDb();
     setRoutePermission("game-play", PermissionState.NoLongerPermitted);
     gotoNextPermittedRoute("game-play", routeOrder);
   }
@@ -22,44 +25,15 @@
     gotoNextPermittedRoute("game-play", routeOrder);
   }
 
-  async function insertGameRoundsToDb() {
-    const db_uid = new PersistedState("db_uid");
-    debug(`db_uid current value: ${JSON.stringify(db_uid.current)}`);
-    if (!db_uid.current) {
-      debug("No db_uid found; cannot save game round history.");
-      return;
-    }
-    const supabase = getSupabase();
-    const gameRoundHistory = new PersistedState("ccg-game-round-history", []);
-    debug(`Game round history to insert: `, JSON.stringify(gameRoundHistory.current));
-    const rows = gameRoundHistory.current.map(round => ({
-      player_1_uid: db_uid.current,
-      player_1_avatar: round.player1.avatar,
-      player_2_avatar: round.player2.avatar,
-      choice_option_1: round.option1,
-      choice_option_2: round.option2,
-      choice_payoff_1: round.payoffSuccessHigh,
-      choice_payoff_2: round.payoffSuccessLow,
-      player_1_chose: round.chosen,
-    }))
-
-    const { error } = await supabase
-      .from('game_rounds')
-      .insert(rows);
-
-    if (error) {
-      debug("Error saving game round history to database:", error);
-    }
-  }
-
 </script>
 
 ## Coordination Game
 
-<CoordinationGame
-  payoffSuccessHigh={2} 
-  payoffSuccessLow={1}
-  onGameEnd={next}
+<LiveCoordinationGame
+    player1Name={selectedAvatarName.current}
+    choiceSet={choiceSetColorsUnicode}
+    maxRounds={48}
+    onGameEnd={next}
 />
 
 {#if PUBLIC_ENV === 'dev'}

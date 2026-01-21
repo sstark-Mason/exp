@@ -1,0 +1,7 @@
+Please generate a semi-professional head shot with the following characteristics:
+- Gender: Male.
+- Outfit: Business casual, plain, dark grey.
+- Background: Light grey.
+- Framing: Tight. Frame from the top of the head (leaving a little room, the "headroom") down to the collarbone or just below.
+- Lens: Use an 85mm lens.
+- Posture: Full face/square on.
