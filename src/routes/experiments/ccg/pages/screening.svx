@@ -6,6 +6,7 @@
   import { getRoutePermission, setRoutePermission, gotoNextPermittedRoute, PermissionState } from "$svexplib/Tools/RouteProgression";
   import { routeOrder } from "../routeOrder";
   import { PUBLIC_ENV } from '$env/static/public';
+  import { updateDb } from "$lib/db/db_ccg_client.ts";
   import debugLib from "debug";
   const debug = debugLib("exp:ccg:screening");
 
@@ -17,11 +18,15 @@
     setRoutePermission("screening", PermissionState.NoLongerPermitted);
     if (!allCorrect) {
       setRoutePermission("exit-survey", PermissionState.Permitted);
+      updateDb("subjects", { screening_passed: false });
     }
+    updateDb("subjects", { screening_passed: true });
     gotoNextPermittedRoute("screening", routeOrder);
   }
 
   function skip() {
+    if (PUBLIC_ENV !== 'dev') { console.log("Nice try, but skipping is not allowed."); return; }
+    updateDb("subjects", { screening_passed: true });
     allCategorized = true;
     allCorrect = true;
     setRoutePermission("screening", PermissionState.NoLongerPermitted);

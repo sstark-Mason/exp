@@ -60,6 +60,7 @@ Game rounds:
     { text: "To choose my favorite option.", isCorrect: false },
   ]}
   continueButtonId="next-button"
+  dbColumn="cq_game_1"
 />
 
 <ComprehensionQuestion
@@ -72,6 +73,7 @@ Game rounds:
     { text: "A computer program.", isCorrect: false },
   ]}
   continueButtonId="next-button"
+  dbColumn="cq_game_2"
 />
 
 <button id="next-button" onclick={() => next()}>Next</button>

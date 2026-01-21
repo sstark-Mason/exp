@@ -18,7 +18,8 @@
   import portrait12 from "./Portraits/blurred/12.webp";
   import portrait13 from "./Portraits/blurred/13.webp";
   let portraits: string[] = [];
-  portraits = [portrait1, portrait2, portrait3, portrait4, portrait5, portrait6, portrait8, portrait8_1, portrait9, portrait10, portrait11, portrait12, portrait13];
+  // portraits = [portrait1, portrait2, portrait3, portrait4, portrait5, portrait6, portrait8, portrait8_1, portrait9, portrait10, portrait11, portrait12, portrait13];
+  portraits = [portrait1, portrait6];
   debug("Loaded portraits:", portraits);
   portraits = shuffleArray(portraits);
 

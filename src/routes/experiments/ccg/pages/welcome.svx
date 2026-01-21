@@ -6,9 +6,14 @@
   import { PersistedState } from "runed";
   import { getRoutePermission, setRoutePermission, gotoNextPermittedRoute } from "$svexplib/Tools/RouteProgression";
   import { routeOrder } from "../routeOrder";
+  import { newDbKey } from "$lib/db/db_ccg_client.ts";
   import { PUBLIC_ENV } from '$env/static/public';
+  import { enhance } from '$app/forms';
+  import debugLib from "debug";
+  const debug = debugLib("exp:Welcome");
 
   const pID = new PersistedState("pID");
+  const db_uid = new PersistedState("db_uid");
 
   onMount(() => {
     // Assuming prolific ID (pID) is given as url param PROLIFIC_PID
@@ -18,41 +23,40 @@
     pID.current = urlParams.get("PROLIFIC_PID") || "";
   });
 
-  function next() {
+  async function next() {
     if (!pID.current || pID.current.trim() === "") {
       alert("Please enter your Prolific ID before continuing.");
       return;
     }
-    gotoNextPermittedRoute("welcome", routeOrder);
+
+    if (!db_uid.current) {
+      db_uid.current = await newDbKey(pID.current);
+    }
+
+    debug(`Prolific ID entered: ${pID.current}, assigned db_uid: ${JSON.stringify(db_uid.current)}`);
     
-  }
-
-  function skip() {
-    pID.current = "dev-0000";
     gotoNextPermittedRoute("welcome", routeOrder);
   }
 
-  function navigate() {
-
-
-
-    // const expProgress = JSON.parse(localStorage.getItem("expProgress") || '[{"route":"welcome","permitted":true}]');
-    // if (!expProgress.find((entry) => entry.route === "screening")) {
-    //   expProgress.push({ route: "screening", permitted: true });
-    //   localStorage.setItem("expProgress", JSON.stringify(expProgress));
-    //   goto('screening');
-    // } else if (expProgress.find((entry) => entry.route === "screening" && entry.permitted)) {
-    //   goto('screening');
-    // } else if (expProgress.find((entry) => entry.route === "screening" && !entry.permitted)) {
-    //   if (expProgress.find((entry) => entry.route === "comprehension-intro" && entry.permitted)) {
-    //     goto('comprehension-intro');
-    //   } else if (expProgress.find((entry) => entry.route === "exit-survey" && entry.permitted)) {
-    //     goto('exit-survey');
-    //   } else {
-    //     alert("Unknown navigation state. Please close this tab and try again.");
-    //   }
-    // }
+  async function skip() {
+    pID.current = "dev-0000";
+    if (!db_uid.current) {
+      db_uid.current = await newDbKey(pID.current);
+    }
+    debug(`Skipped with Prolific ID: ${pID.current}, assigned db_uid: ${JSON.stringify(db_uid.current)}`);
+    gotoNextPermittedRoute("welcome", routeOrder);
   }
+
+  function assignRandomId() {
+    pID.current = 'test-' + Math.random().toString(36).substring(2, 10);
+  }
+
+  async function testDB() {
+    assignRandomId();
+    const userId = await newDbKey(pID.current);
+    debug(`Returned userId: ${userId}`);
+  }
+
 </script>
 
 # Welcome
@@ -68,7 +72,8 @@ Before continuing, please confirm your prolific ID below. This is necessary to e
 
 <details>
   <summary>I don't have a Prolific ID.</summary>
-  <p>If you're here for testing, use "test-XXXX", where XXXX can be any four digits.</p>
+  <p>If you're here for testing, click on the button below to use a random identifier.</p>
+  <button onclick={() => assignRandomId()}>Assign Random ID</button>
 </details>
 
 <br><br>
@@ -78,4 +83,17 @@ Before continuing, please confirm your prolific ID below. This is necessary to e
 {#if PUBLIC_ENV === 'dev'}
 <br><br>
 <button id="skip-button" onclick={() => skip()}>Skip</button>
+
+<button onclick={() => testDB()}>Test DB</button>
+<br><br>
+
+<form method="POST" action="?/retryUnmatchedRounds" use:enhance={({ result }) => {
+  if (result.type === 'success') {
+    alert('Retry completed successfully.');
+  } else if (result.type === 'failure') {
+    alert(`Error: ${result.data.error}`);
+  }
+}}>
+  <button>Retry Unmatched Rounds</button>
+</form>
 {/if}

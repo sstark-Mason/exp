@@ -1,6 +1,7 @@
 <script lang="ts">
   import { onDestroy, onMount } from "svelte";
   import { PersistedState } from "runed";
+  import { getSupabase } from "$lib/db/db_ccg_client.ts";
   import debugLib from "debug";
   const debug = debugLib("svexplib:CoordinationGame");
 
@@ -21,7 +22,8 @@
   import portrait12 from "./Portraits/blurred/12.webp";
   import portrait13 from "./Portraits/blurred/13.webp";
   let portraits: string[] = [];
-  portraits = [portrait1, portrait2, portrait3, portrait4, portrait5, portrait6, portrait8, portrait8_1, portrait9, portrait10, portrait11, portrait12, portrait13];
+  // portraits = [portrait1, portrait2, portrait3, portrait4, portrait5, portrait6, portrait8, portrait8_1, portrait9, portrait10, portrait11, portrait12, portrait13];
+  portraits = [portrait1, portrait6];
   debug("Loaded portraits:", portraits);
 
   let { payoffSuccessHigh, payoffSuccessLow, onGameEnd }: {
@@ -99,7 +101,7 @@
   let possible_combinations: [string, string][] = [];
 
   function shuffleNewGame() {
-    const option_pool: string[] = ["♂", "♀", "♃", "☆", "♅"];
+    const option_pool: string[] = ["♂", "♀", "♃", "♅"]; // "☆",
     for (let i = 0; i < option_pool.length; i++) {
       for (let j = 0; j < option_pool.length; j++) {
         if (i !== j) {
@@ -121,14 +123,18 @@
   let option1: string = $state("");
   let option2: string = $state("");
 
-  
-
   function drawChoices(): [string, string] {
     // let randomized = option_pool.sort(() => 0.5 - Math.random());
     // return [randomized[0], randomized[1]];
     let draw = possible_combinations.pop();
     return draw ? draw : ["", ""];
   }
+
+  onDestroy(() => {
+    
+  });
+
+
 
 </script>
 

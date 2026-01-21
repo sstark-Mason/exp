@@ -3,18 +3,19 @@
   import { ComprehensionQuestionManager } from "./ComprehensionQuestionManager.ts";
   import { page } from "$app/state";
   import { marked } from "marked";
-
+  import { updateDb } from "$lib/db/db_ccg_client.ts";
   import { PersistedState } from "runed";
   import debugLib from "debug";
   const debug = debugLib("exp:ComprehensionQuestion");
 
-  let { qid, text, reset, answers, fmt, continueButtonId }: {
+  let { qid, text, reset, answers, fmt, continueButtonId, dbColumn }: {
     qid: string;
     text: string;
     reset?: boolean;
     answers: { text: string; isCorrect: boolean }[];
     fmt?: "markdown" | "html" | "";
     continueButtonId?: string | null;
+    dbColumn?: string | null;
   } = $props();
 
   interface AnswerOption {
@@ -32,6 +33,7 @@
     isPassed: boolean;
     pageId: string;
     continueButtonId: string | null;
+    dbColumn?: string | null;
     manager?: ComprehensionQuestionManager | null;
   }
 
@@ -50,6 +52,7 @@
     isPassed: false,
     pageId: page.url.pathname,
     continueButtonId: continueButtonId || null,
+    dbColumn: dbColumn || null,
     manager: null,
   };
 
@@ -133,6 +136,7 @@
         answerLabelClasses[ans.cid].push("disabled");
         question.manager?.updateQuestionStatus(hash, true);
       }
+      pushToDb();
     } else {
       const allCorrectSelected = correctAnswers.every((cid) =>
         selectedAnswers.includes(cid)
@@ -148,6 +152,35 @@
           }
         }
       }
+    }
+  }
+
+  function pushToDb() {
+    if (question.dbColumn) {
+      // dbValues is an array of -1, 0, and 1. 1 for correct, 0 for never selected, -1 for incorrect.
+      const dbValues: number[] = [];
+      for (const ans of answers) {
+        const answerOption = question.answerOptions.find(
+          (a) => a.text === ans.text,
+        );
+        if (answerOption) {
+          if (revealedAnswers.current.includes(answerOption.cid)) {
+            if (answerOption.isCorrect) {
+              dbValues.push(1);
+            } else {
+              dbValues.push(-1);
+            }
+          } else {
+            dbValues.push(0);
+          }
+        } else {
+          dbValues.push(0);
+        }
+      }
+
+      updateDb("subjects", { [question.dbColumn]: dbValues });
+      debug(`Pushed comprehension question ${question.qid} results to DB column ${question.dbColumn} as ${dbValues}.`);
+
     }
   }
 
@@ -230,13 +263,8 @@
       }
     }
     checkAllAnswers();
-
-
   });
 
-  onDestroy(() => {
-    // Save final state with server
-  });
 </script>
 
 <span class="question-text">

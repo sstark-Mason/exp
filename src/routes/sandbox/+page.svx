@@ -4,6 +4,7 @@
     import { PUBLIC_ENV } from '$env/static/public';
     import { goto } from '$app/navigation';
     import debugLib from "debug";
+    const debug = debugLib("sandbox");
 
     console.log(`PUBLIC_ENV: ${PUBLIC_ENV}`);
 
@@ -16,15 +17,20 @@
     import TowerOfHanoi from '$svexplib/Games/TowerofHanoi.svelte';
     import CoordinationGame from '$svexplib/Tasks/CoordinationGame/CoordinationGame.svelte';
 
+    import SampleDataInjector from '$svexplib/Tasks/CoordinationGame/injectSampleData.svelte';
+
+    import { ccgPermutations } from '$svexplib/Tools/Permutator.ts';
+
+    const players = ['fem1', 'fem2', 'masc1', 'masc2'];
+    const choices = ['Blue', 'Pink', 'Green', 'Yellow'];
+    const permutations = ccgPermutations(players, choices);
+    debug(permutations);
 
 </script>
 
-
-<!-- <CoordinationGame 
-    payoffSuccessHigh={2} 
-    payoffSuccessLow={1} 
-    onGameEnd={() => goto('/sandbox')}
-/> -->
+{#if PUBLIC_ENV === 'dev'}
+  <SampleDataInjector />
+{/if}
 
 <br><br>
 
