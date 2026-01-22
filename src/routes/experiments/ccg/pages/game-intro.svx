@@ -43,6 +43,10 @@ Game rounds:
 <PracticeCoordinationGame
     player1Name={"fem1"}
     choiceSet={choiceSetColorsUnicode}
+    outcome_c1c1={[2,1]}
+    outcome_c2c2={[1,2]}
+    outcome_c1c2={[0,0]}
+    outcome_c2c1={[0,0]}
 />
 
 <br><br><br>

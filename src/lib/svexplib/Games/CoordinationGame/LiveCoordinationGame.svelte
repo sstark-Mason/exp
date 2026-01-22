@@ -6,10 +6,14 @@
     import { PersistedState } from "runed";
     import { goto } from "$app/navigation";
 
-    let { player1Name = "fem1", choiceSet = ccg.choiceSetColorsUnicode, maxRounds = 48, onGameEnd }: { 
-        player1Name?: string,
-        choiceSet?: string[],
+    let { player1Name, choiceSet, maxRounds, outcome_c1c1, outcome_c2c2, outcome_c1c2, outcome_c2c1, onGameEnd }: { 
+        player1Name: string,
+        choiceSet: string[],
         maxRounds?: number,
+        outcome_c1c1: [number, number],
+        outcome_c2c2: [number, number],
+        outcome_c1c2: [number, number],
+        outcome_c2c1: [number, number],
         onGameEnd?: () => void
     } = $props();
 
@@ -48,18 +52,20 @@
         roundCount.current++;
         debug("Games played so far:", roundCount.current);
         const round: ccg.CoordinationGameRound = {
-            idx: roundCount.current,
             created_at_time: new Date().toISOString(),
+            round_number: roundCount.current,
             player_1_avatar: player1Name,
             player_2_avatar: currentGamePermutation ? currentGamePermutation[1] : "unknown",
             choice_option_1: currentGamePermutation ? currentGamePermutation[2] : "unknown",
             choice_option_2: currentGamePermutation ? currentGamePermutation[3] : "unknown",
-            choice_payoff_1: 2,
-            choice_payoff_2: 1,
+            outcome_c1c1: outcome_c1c1,
+            outcome_c2c2: outcome_c2c2,
+            outcome_c1c2: outcome_c1c2,
+            outcome_c2c1: outcome_c2c1,
             player_1_chose: choice,
         }
         ccg.saveGameRoundToHistory(round);
-        if (roundCount.current >= maxRounds) {
+        if (maxRounds && roundCount.current >= maxRounds) {
             debug("Max rounds reached. Ending game.");
             endGame();
             return;
@@ -69,16 +75,16 @@
 
 </script>
 
-{#if currentGamePermutation && roundCount.current < maxRounds}
+{#if currentGamePermutation && (!maxRounds || roundCount.current < maxRounds)}
 <CoordinationGameFrame
-    player1Avatar={ccg.avatarMap[currentGamePermutation[0]]}
-    player2Avatar={ccg.avatarMap[currentGamePermutation[1]]}
-    choiceOption1={currentGamePermutation[2]}
-    choiceOption2={currentGamePermutation[3]}
-    outcomeC1C1={[2, 1] as [number, number]}
-    outcomeC1C2={[0, 0] as [number, number]}
-    outcomeC2C1={[0, 0] as [number, number]}
-    outcomeC2C2={[1, 2] as [number, number]}
+    player_1_avatar={ccg.avatarMap[currentGamePermutation[0]]}
+    player_2_avatar={ccg.avatarMap[currentGamePermutation[1]]}
+    choice_option_1={currentGamePermutation[2]}
+    choice_option_2={currentGamePermutation[3]}
+    outcome_c1c1={outcome_c1c1}
+    outcome_c1c2={outcome_c1c2}
+    outcome_c2c1={outcome_c2c1}
+    outcome_c2c2={outcome_c2c2}
     onChoiceSelection={onChoiceSelection}
 />
 {/if}

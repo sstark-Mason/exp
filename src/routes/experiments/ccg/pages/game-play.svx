@@ -32,12 +32,15 @@
 <LiveCoordinationGame
     player1Name={selectedAvatarName.current}
     choiceSet={choiceSetColorsUnicode}
-    maxRounds={48}
+    maxRounds={10}
+    outcome_c1c1={[2,1]}
+    outcome_c2c2={[1,2]}
+    outcome_c1c2={[0,0]}
+    outcome_c2c1={[0,0]}
     onGameEnd={next}
 />
 
 {#if PUBLIC_ENV === 'dev'}
 <br><br>
 <button id="skip-button" onclick={() => skip()}>Skip</button>
-<button onclick={() => insertGameRoundsToDb()}>Insert Game Rounds to DB</button>
 {/if}

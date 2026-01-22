@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS  public.payoffs (
     id BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
-    uid UUID REFERENCES public.subjects(uid) NOT NULL,
+    uid UUID REFERENCES public.participants(uid) NOT NULL,
     participation_payoff NUMERIC,
     cq_payoff NUMERIC,
     game_payoff NUMERIC,
@@ -10,15 +10,21 @@ CREATE TABLE IF NOT EXISTS  public.payoffs (
 
 ALTER TABLE public.payoffs ENABLE ROW LEVEL SECURITY;
 
+CREATE INDEX IF NOT EXISTS idx_payoffs_uid ON public.payoffs (uid);
+
 CREATE POLICY "Allow self-selection of authenticated users"
     ON public.payoffs
     AS PERMISSIVE
     FOR SELECT
     TO authenticated
-USING ((auth.uid() = uid));
+USING ((select auth.uid()) = uid);
 
 CREATE OR REPLACE FUNCTION public.calculate_payoffs(uid UUID)
-RETURNS VOID AS $$
+RETURNS VOID
+LANGUAGE plpgsql
+SECURITY INVOKER
+SET search_path = public
+AS $$
 DECLARE
     participation_payoff NUMERIC := 0; -- Set participation payoff here
     cq_payoff NUMERIC;
@@ -32,10 +38,14 @@ BEGIN
     VALUES (uid, participation_payoff, cq_payoff, game_payoff, bonus_payoff,
         participation_payoff + cq_payoff + game_payoff + bonus_payoff);
 END;
-$$ LANGUAGE plpgsql;
+$$;
 
 CREATE OR REPLACE FUNCTION public.calculate_cq_score(cq_selections INT[])
-RETURNS NUMERIC AS $$
+RETURNS NUMERIC
+LANGUAGE plpgsql
+SECURITY INVOKER
+SET search_path = public
+AS $$
 DECLARE
     total_choices INT;
     total_selections INT;
@@ -48,17 +58,21 @@ BEGIN
     cq_score :=  ROUND(1 - (total_selections::NUMERIC / total_choices::NUMERIC), 4);
     return cq_score;
 END;
-$$ LANGUAGE plpgsql;
+$$;
 
 CREATE OR REPLACE FUNCTION public.calculate_cq_payoffs(uid UUID)
-RETURNS NUMERIC AS $$
+RETURNS NUMERIC
+LANGUAGE plpgsql
+SECURITY INVOKER
+SET search_path = public
+AS $$
 DECLARE
     cq_game_1 INT[];
     cq_game_2 INT[];
     total_cq_score NUMERIC;
     cq_rate NUMERIC := 0.10; -- Payoff rate per unit of CQ score
 BEGIN
-    SELECT cq_game_1, cq_game_2 INTO cq_game_1, cq_game_2 FROM public.subjects WHERE uid = uid;
+    SELECT cq_game_1, cq_game_2 INTO cq_game_1, cq_game_2 FROM public.participants WHERE uid = uid;
     SELECT ROUND(
         COALESCE(public.calculate_cq_score(cq_game_1), 0) +
         COALESCE(public.calculate_cq_score(cq_game_2), 0),
@@ -66,10 +80,14 @@ BEGIN
         ) AS total_cq_score;
     RETURN total_cq_score * cq_rate;
 END;
-$$ LANGUAGE plpgsql;
+$$;
 
 CREATE OR REPLACE FUNCTION public.calculate_game_payoffs(uid UUID)
-RETURNS NUMERIC AS $$
+RETURNS NUMERIC
+LANGUAGE plpgsql
+SECURITY INVOKER
+SET search_path = public
+AS $$
 DECLARE
     game_rate NUMERIC := 0.50; -- Payoff rate per unit of game score
     total_game_payoff NUMERIC;
@@ -80,29 +98,18 @@ BEGIN
     WHERE player_1_uid = uid;
     RETURN total_game_payoff * game_rate;
 END;
-$$ LANGUAGE plpgsql;
+$$;
 
 CREATE OR REPLACE FUNCTION public.calculate_bonus_payoffs(uid UUID)
-RETURNS NUMERIC AS $$
+RETURNS NUMERIC
+LANGUAGE plpgsql
+SECURITY INVOKER
+SET search_path = public
+AS $$
 DECLARE
     bonus_rate NUMERIC := 0.00; -- Payoff rate per unit of bonus score
     total_bonus_payoff NUMERIC;
 BEGIN
     return 0.0000; -- Currently no bonus payoffs
 END;
-$$ LANGUAGE plpgsql;
-
--- CREATE OR REPLACE FUNCTION public.recalculate_all_payoffs()
--- RETURNS VOID AS $$
--- LANGUAGE plpgsql
--- SECURITY DEFINER
--- SET search_path = public
--- AS $$
--- DECLARE
---     subject_record RECORD;
--- BEGIN
---     FOR subject_record IN SELECT uid FROM public.subjects LOOP
---         PERFORM public.calculate_payoffs(subject_record.uid);
---     END LOOP;
--- END;
--- $$;
+$$;

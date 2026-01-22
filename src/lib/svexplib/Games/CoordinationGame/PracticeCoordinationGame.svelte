@@ -4,9 +4,13 @@
     import CoordinationGameFrame from "$svexplib/Games/CoordinationGame/CoordinationGameFrame.svelte";
     import * as ccg from "$svexplib/Games/CoordinationGame/CoordinationGameBase.ts";
 
-    let { player1Name = "fem1", choiceSet = ccg.choiceSetColorsUnicode }: { 
-        player1Name?: string,
-        choiceSet?: string[],
+    let { player1Name, choiceSet, outcome_c1c1, outcome_c2c2, outcome_c1c2, outcome_c2c1 }: { 
+        player1Name: string,
+        choiceSet: string[],
+        outcome_c1c1: [number, number],
+        outcome_c2c2: [number, number],
+        outcome_c1c2: [number, number],
+        outcome_c2c1: [number, number],
     } = $props();
 
     let permutations = ccg.newPermutations(player1Name, choiceSet);
@@ -32,13 +36,13 @@
 </script>
 
 <CoordinationGameFrame
-    player1Avatar={ccg.avatarMap[currentGamePermutation[0]]}
-    player2Avatar={ccg.avatarMap[currentGamePermutation[1]]}
-    choiceOption1={currentGamePermutation[2]}
-    choiceOption2={currentGamePermutation[3]}
-    outcomeC1C1={[2, 1] as [number, number]}
-    outcomeC1C2={[0, 0] as [number, number]}
-    outcomeC2C1={[0, 0] as [number, number]}
-    outcomeC2C2={[1, 2] as [number, number]}
+    player_1_avatar={ccg.avatarMap[currentGamePermutation[0]]}
+    player_2_avatar={ccg.avatarMap[currentGamePermutation[1]]}
+    choice_option_1={currentGamePermutation[2]}
+    choice_option_2={currentGamePermutation[3]}
+    outcome_c1c1={outcome_c1c1}
+    outcome_c1c2={outcome_c1c2}
+    outcome_c2c1={outcome_c2c1}
+    outcome_c2c2={outcome_c2c2}
     onChoiceSelection={onChoiceSelection}
 />

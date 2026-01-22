@@ -1,14 +1,18 @@
 CREATE TABLE IF NOT EXISTS public.game_rounds (
     rid BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+    user_role user_role NOT NULL DEFAULT 'unspecified',
     created_at_time TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     completed_at_time TIMESTAMPTZ,
-    player_1_uid UUID REFERENCES public.subjects(uid) NOT NULL DEFAULT auth.uid(),
+    round_number INT NOT NULL,
+    player_1_uid UUID REFERENCES public.participants(uid) NOT NULL DEFAULT auth.uid(),
     player_1_avatar TEXT NOT NULL,
     player_2_avatar TEXT NOT NULL,
     choice_option_1 TEXT NOT NULL,
     choice_option_2 TEXT NOT NULL,
-    choice_payoff_1 INT NOT NULL,
-    choice_payoff_2 INT NOT NULL,
+    outcome_c1c1 INT[] NOT NULL,
+    outcome_c2c2 INT[] NOT NULL,
+    outcome_c1c2 INT[] NOT NULL,
+    outcome_c2c1 INT[] NOT NULL,
     player_1_chose TEXT NOT NULL,
     player_2_chose TEXT,
     player_1_payoff INT,
@@ -22,19 +26,22 @@ CREATE POLICY "Allow self round insertion by authenticated users"
     AS PERMISSIVE
     FOR INSERT
     TO authenticated
-WITH CHECK ((auth.uid() = player_1_uid));
+WITH CHECK ((select auth.uid()) = player_1_uid);
 
 CREATE POLICY "Allow self round selection by authenticated users"
     ON public.game_rounds
     AS PERMISSIVE
     FOR SELECT
     TO authenticated
-USING ((auth.uid() = player_1_uid));
+USING ((select auth.uid()) = player_1_uid);
 
-CREATE INDEX IF NOT EXISTS idx_game_rounds_matching ON public.game_rounds (player_1_avatar, player_2_avatar, choice_option_1, choice_option_2)
+CREATE INDEX IF NOT EXISTS idx_game_rounds_player_1_uid ON public.game_rounds (player_1_uid);
+
+CREATE INDEX IF NOT EXISTS idx_game_rounds_matching ON public.game_rounds (player_1_avatar, player_2_avatar, choice_option_1, choice_option_2, user_role)
     INCLUDE (rid, player_1_uid, player_1_chose);
-CREATE INDEX IF NOT EXISTS idx_game_rounds_unmatched ON public.game_rounds (player_1_avatar, player_2_avatar, choice_option_1, choice_option_2)
-    INCLUDE (player_1_uid, player_1_chose, choice_payoff_1, choice_payoff_2)
+
+CREATE INDEX IF NOT EXISTS idx_game_rounds_unmatched ON public.game_rounds (player_1_avatar, player_2_avatar, choice_option_1, choice_option_2, user_role)
+    INCLUDE (player_1_uid, player_1_chose, outcome_c1c1, outcome_c2c2, outcome_c1c2, outcome_c2c1)
     WHERE completed_at_time IS NULL;
 
 CREATE OR REPLACE FUNCTION public.find_matching_round(unmatched public.game_rounds)
@@ -53,6 +60,7 @@ AS $$
         AND match.player_2_avatar = unmatched.player_1_avatar
         AND match.choice_option_1 = unmatched.choice_option_2
         AND match.choice_option_2 = unmatched.choice_option_1
+        AND match.user_role = unmatched.user_role
         AND match.player_1_uid != unmatched.player_1_uid
     ORDER BY random()
     LIMIT 1;
@@ -73,13 +81,11 @@ BEGIN
         this.matched_rid := match.rid;
         this.player_2_chose := match.player_1_chose;
         this.player_1_payoff := CASE
-            WHEN this.player_1_chose = match.player_1_chose THEN
-                CASE
-                    WHEN this.player_1_chose = this.choice_option_1 THEN this.choice_payoff_1
-                    WHEN this.player_1_chose = this.choice_option_2 THEN this.choice_payoff_2
-                    ELSE -1 -- If this happens, something has gone wrong upstream
-                END
-            ELSE 0 -- Players failed to coordinate
+            WHEN this.player_1_chose = match.player_1_chose AND this.player_1_chose = this.choice_option_1 THEN this.outcome_c1c1[1]
+            WHEN this.player_1_chose = match.player_1_chose AND this.player_1_chose = this.choice_option_2 THEN this.outcome_c2c2[1]
+            WHEN this.player_1_chose != match.player_1_chose AND this.player_1_chose = this.choice_option_1 THEN this.outcome_c1c2[1]
+            WHEN this.player_1_chose != match.player_1_chose AND this.player_1_chose = this.choice_option_2 THEN this.outcome_c2c1[1]
+            ELSE -1 -- error case
         END;
     END IF;
     RETURN this;
@@ -89,6 +95,8 @@ $$;
 CREATE OR REPLACE FUNCTION public.complete_game_round_before_insert()
 RETURNS TRIGGER
 LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
 AS $$
 BEGIN
     NEW := public.complete_game_round(NEW);
@@ -104,6 +112,8 @@ EXECUTE FUNCTION public.complete_game_round_before_insert();
 CREATE OR REPLACE FUNCTION public.retry_unmatched_rounds()
 RETURNS VOID
 LANGUAGE plpgsql
+SECURITY INVOKER
+SET search_path = public
 AS $$
 BEGIN
     WITH matched_pairs AS (
@@ -118,6 +128,7 @@ BEGIN
             AND unmatched.choice_option_1 = match.choice_option_2
             AND unmatched.choice_option_2 = match.choice_option_1
             AND unmatched.player_1_uid != match.player_1_uid
+            AND unmatched.user_role = match.user_role
         WHERE unmatched.completed_at_time IS NULL
         ORDER BY unmatched.rid, random()
     )
@@ -127,15 +138,34 @@ BEGIN
         matched_rid = mp.match_rid,
         player_2_chose = mp.match_chose,
         player_1_payoff = CASE
-            WHEN unmatched.player_1_chose = mp.match_chose THEN
-                CASE
-                    WHEN unmatched.player_1_chose = unmatched.choice_option_1 THEN unmatched.choice_payoff_1
-                    WHEN unmatched.player_1_chose = unmatched.choice_option_2 THEN unmatched.choice_payoff_2
-                    ELSE -1 -- If this happens, something has gone wrong upstream
-                END
-            ELSE 0 -- Players failed to coordinate
+            WHEN unmatched.player_1_chose = mp.match_chose AND unmatched.player_1_chose = unmatched.choice_option_1 THEN unmatched.outcome_c1c1[1]
+            WHEN unmatched.player_1_chose = mp.match_chose AND unmatched.player_1_chose = unmatched.choice_option_2 THEN unmatched.outcome_c2c2[1]
+            WHEN unmatched.player_1_chose != mp.match_chose AND unmatched.player_1_chose = unmatched.choice_option_1 THEN unmatched.outcome_c1c2[1]
+            WHEN unmatched.player_1_chose != mp.match_chose AND unmatched.player_1_chose = unmatched.choice_option_2 THEN unmatched.outcome_c2c1[1]
+            ELSE -1 -- error case
         END
     FROM matched_pairs AS mp
     WHERE unmatched.rid = mp.unmatched_rid;
 END;
 $$;
+
+CREATE OR REPLACE FUNCTION public.sync_user_role_for_game_rounds()
+RETURNS TRIGGER
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+BEGIN
+    IF (OLD.user_role IS DISTINCT FROM NEW.user_role) THEN
+        UPDATE public.game_rounds
+        SET user_role = NEW.user_role
+        WHERE player_1_uid = NEW.uid;
+    END IF;
+    RETURN NEW;
+END;
+$$;
+
+CREATE TRIGGER trg_sync_user_role_for_game_rounds
+AFTER UPDATE OF user_role ON public.participants
+FOR EACH ROW
+EXECUTE FUNCTION public.sync_user_role_for_game_rounds();

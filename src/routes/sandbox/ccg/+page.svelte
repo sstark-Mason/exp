@@ -19,6 +19,10 @@
 <PracticeCoordinationGame
     player1Name={selectedAvatar.current}
     choiceSet={choiceSetColorsUnicode}
+    outcome_c1c1={[2,1]}
+    outcome_c2c2={[1,2]}
+    outcome_c1c2={[0,0]}
+    outcome_c2c1={[0,0]}
 />
 
 
@@ -26,6 +30,10 @@
     player1Name={selectedAvatar.current}
     choiceSet={choiceSetColorsUnicode}
     maxRounds={20}
+    outcome_c1c1={[5,5]}
+    outcome_c2c2={[3,3]}
+    outcome_c1c2={[0,0]}
+    outcome_c2c1={[0,0]}
     onGameEnd={() => { goto('/sandbox'); }}
 />
 

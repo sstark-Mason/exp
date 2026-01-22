@@ -1,7 +1,26 @@
 import debugLib from "debug";
 const debug = debugLib("CoordinationGameBase");
 import { PersistedState } from "runed";
-import { getSupabase, newDbKey } from "$lib/db/db_ccg_client";
+import { getSupabase, newDbKey } from "$lib/db/db_ccg_client.ts";
+
+export interface CoordinationGameRound {
+    created_at_time?: string,
+    completed_at_time?: string,
+    round_number: number,
+    player_1_uid?: string,
+    player_1_avatar: string,
+    player_2_avatar: string,
+    choice_option_1: string,
+    choice_option_2: string,
+    outcome_c1c1: [number, number],
+    outcome_c2c2: [number, number],
+    outcome_c1c2: [number, number],
+    outcome_c2c1: [number, number],
+    player_1_chose: string,
+    player_2_chose?: string,
+    player_1_payoff?: number,
+    matched_rid?: number,
+}
 
 import fem1 from "./Portraits/blurred/fem1.webp";
 import fem2 from "./Portraits/blurred/fem2.webp";
@@ -43,22 +62,7 @@ export function popRandomPermutation(permutations: string[][]): string[] | null 
     return permutation;
 }
 
-export interface CoordinationGameRound {
-    idx: number,
-    created_at_time?: string,
-    completed_at_time?: string,
-    player_1_uid?: string,
-    player_1_avatar: string,
-    player_2_avatar: string,
-    choice_option_1: string,
-    choice_option_2: string,
-    choice_payoff_1: number,
-    choice_payoff_2: number,
-    player_1_chose: string,
-    player_2_chose?: string,
-    player_1_payoff?: number,
-    matched_rid?: number,
-}
+
 
 export function saveGameRoundToHistory(round: CoordinationGameRound) {
     const gameRoundHistory = new PersistedState<CoordinationGameRound[]>("coordinationGameRoundHistory", []);
@@ -74,7 +78,7 @@ export function clearGameRoundHistory() {
 
 export async function pushGameRoundHistoryToDB() {
     const supabase = getSupabase();
-    let sb_session = await supabase.auth.getSession();
+    const sb_session = await supabase.auth.getSession();
     if (!sb_session.data.session) {
         debug("No active Supabase session; signing in anonymously.");
         const db_uid = await newDbKey("no-active-session-for-ccg");
@@ -88,13 +92,16 @@ export async function pushGameRoundHistoryToDB() {
     debug(`Pushing ${gameRoundHistory.current.length} game rounds to DB...`);
 
     const rowsToInsert = gameRoundHistory.current.map((round) => ({
+        round_number: round.round_number,
         created_at_time: round.created_at_time,
         player_1_avatar: round.player_1_avatar,
         player_2_avatar: round.player_2_avatar,
         choice_option_1: round.choice_option_1,
         choice_option_2: round.choice_option_2,
-        choice_payoff_1: round.choice_payoff_1,
-        choice_payoff_2: round.choice_payoff_2,
+        outcome_c1c1: round.outcome_c1c1,
+        outcome_c2c2: round.outcome_c2c2,
+        outcome_c1c2: round.outcome_c1c2,
+        outcome_c2c1: round.outcome_c2c1,
         player_1_chose: round.player_1_chose,
     }));
 

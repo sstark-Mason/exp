@@ -4,18 +4,28 @@
     const debug = debugLib("exp:ccgFrame");
 
     export interface CoordinationGameFrameProps {
-        player1Avatar: string; // Path to img
-        player2Avatar: string; // Path to img
-        choiceOption1: string; // Unicode char or color code
-        choiceOption2: string; // Unicode char or color code
-        outcomeC1C1: [number, number];
-        outcomeC1C2: [number, number];
-        outcomeC2C1: [number, number];
-        outcomeC2C2: [number, number];
+        player_1_avatar: string; // Path to img
+        player_2_avatar: string; // Path to img
+        choice_option_1: string; // Unicode char or color code
+        choice_option_2: string; // Unicode char or color code
+        outcome_c1c1: [number, number];
+        outcome_c2c2: [number, number];
+        outcome_c1c2: [number, number];
+        outcome_c2c1: [number, number];
         onChoiceSelection: (choice: string) => void;
     }
 
-    let { player1Avatar, player2Avatar, choiceOption1, choiceOption2, outcomeC1C1, outcomeC1C2, outcomeC2C1, outcomeC2C2, onChoiceSelection }: CoordinationGameFrameProps = $props();
+    let {
+      player_1_avatar: player1Avatar,
+      player_2_avatar: player2Avatar,
+      choice_option_1: choiceOption1,
+      choice_option_2: choiceOption2,
+      outcome_c1c1: outcomeC1C1,
+      outcome_c2c2: outcomeC2C2,
+      outcome_c1c2: outcomeC1C2,
+      outcome_c2c1: outcomeC2C1,
+      onChoiceSelection
+    }: CoordinationGameFrameProps = $props();
 
 </script>
 
@@ -50,7 +60,6 @@
                 </tr>
             </tbody>
         </table>
-
     </div>
 
 </div>
