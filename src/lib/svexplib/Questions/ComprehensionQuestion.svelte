@@ -3,7 +3,7 @@
   import { ComprehensionQuestionManager } from "./ComprehensionQuestionManager.ts";
   import { page } from "$app/state";
   import { marked } from "marked";
-  import { updateDb } from "$lib/db/db_ccg_client.ts";
+  import { supabase, db_uid } from "$lib/db/db_ccg_client.ts";
   import { PersistedState } from "runed";
   import debugLib from "debug";
   const debug = debugLib("exp:ComprehensionQuestion");
@@ -83,7 +83,7 @@
     return correctAnswersCount > 1 ? "checkbox" : "radio";
   }
 
-  function answerClicked(cid: string) {
+  async function answerClicked(cid: string) {
     const input = document.getElementById(cid) as HTMLInputElement;
     debug("Answer clicked:", cid);
     debug("Selected (checked): ", input.checked);
@@ -98,7 +98,7 @@
     _selectedAnswers.current = selectedAnswers;
 
     checkThisAnswer(cid);
-    checkAllAnswers();
+    await checkAllAnswers();
   }
 
   function checkThisAnswer(cid: string) {
@@ -123,7 +123,7 @@
     }
   }
 
-  function checkAllAnswers() {
+  async function checkAllAnswers() {
     const onlyCorrectSelected =
       selectedAnswers.every((cid) => correctAnswers.includes(cid)) &&
       selectedAnswers.length === correctAnswers.length;
@@ -136,7 +136,7 @@
         answerLabelClasses[ans.cid].push("disabled");
         question.manager?.updateQuestionStatus(hash, true);
       }
-      pushToDb();
+      await pushToDb();
     } else {
       const allCorrectSelected = correctAnswers.every((cid) =>
         selectedAnswers.includes(cid)
@@ -155,7 +155,7 @@
     }
   }
 
-  function pushToDb() {
+  async function pushToDb() {
     if (question.dbColumn) {
       // dbValues is an array of -1, 0, and 1. 1 for correct, 0 for never selected, -1 for incorrect.
       const dbValues: number[] = [];
@@ -178,9 +178,22 @@
         }
       }
 
-      updateDb("subjects", { [question.dbColumn]: dbValues });
+      if (db_uid.current) {
+        const { error } = await supabase
+          .from("participants")
+          .update({ [question.dbColumn]: dbValues })
+          .eq("uid", db_uid.current);
+        if (error) {
+          debug(
+            `Error pushing comprehension question ${question.qid} results to DB: ${error.message}`,
+          );
+        }
+      } else {
+        debug(
+          `No db_uid found; cannot push comprehension question ${question.qid} results to DB.`,
+        );
+      }
       debug(`Pushed comprehension question ${question.qid} results to DB column ${question.dbColumn} as ${dbValues}.`);
-
     }
   }
 

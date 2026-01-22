@@ -1,4 +1,4 @@
-CREATE TYPE user_role AS ENUM ('tester', 'participant', 'unspecified');
+CREATE TYPE user_role AS ENUM ('tester', 'participant', 'unspecified', 'unknown');
 
 CREATE TABLE IF NOT EXISTS public.participants (
     id BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
@@ -19,21 +19,21 @@ CREATE POLICY "Allow self-insertion of authenticated users"
     AS PERMISSIVE
     FOR INSERT
     TO authenticated
-WITH CHECK ((auth.uid() = uid));
+WITH CHECK ((select auth.uid()) = uid);
 
 CREATE POLICY "Allow self-selection of authenticated users"
     ON public.participants
     AS PERMISSIVE
     FOR SELECT
     TO authenticated
-USING ((auth.uid() = uid));
+USING ((select auth.uid()) = uid);
 
 CREATE POLICY "Allow self-updates of authenticated users"
     ON public.participants
     AS PERMISSIVE
     FOR UPDATE
     TO authenticated
-USING ((auth.uid() = uid))
-WITH CHECK ((auth.uid() = uid));
+USING ((select auth.uid()) = uid)
+WITH CHECK ((select auth.uid()) = uid);
 
 REVOKE UPDATE (user_role) ON public.participants FROM authenticated;

@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS public.game_rounds (
     rid BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
-    user_role user_role NOT NULL DEFAULT 'unspecified',
+    user_role user_role NOT NULL,
     created_at_time TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     completed_at_time TIMESTAMPTZ,
     round_number INT NOT NULL,
@@ -99,6 +99,14 @@ SECURITY DEFINER
 SET search_path = public
 AS $$
 BEGIN
+    IF NEW.user_role IS NULL THEN
+        SELECT user_role INTO NEW.user_role
+        FROM public.participants
+        WHERE uid = NEW.player_1_uid;
+        IF NOT FOUND THEN
+            NEW.user_role := 'unknown';
+        END IF;
+    END IF;
     NEW := public.complete_game_round(NEW);
     RETURN NEW;
 END;

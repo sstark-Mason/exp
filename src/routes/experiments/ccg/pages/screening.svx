@@ -6,32 +6,48 @@
   import { getRoutePermission, setRoutePermission, gotoNextPermittedRoute, PermissionState } from "$svexplib/Tools/RouteProgression";
   import { routeOrder } from "../routeOrder";
   import { PUBLIC_ENV } from '$env/static/public';
-  import { updateDb } from "$lib/db/db_ccg_client.ts";
+  import { supabase, db_uid } from "$lib/db/db_ccg_client.ts";
   import debugLib from "debug";
   const debug = debugLib("exp:ccg:screening");
 
   let allCategorized = $state(false);
   let allCorrect = $state(false);
 
-  function next() {
+  async function next() {
     debug(`Screening completed. allCategorized: ${allCategorized}, allCorrect: ${allCorrect}`);
     setRoutePermission("screening", PermissionState.NoLongerPermitted);
     if (!allCorrect) {
       setRoutePermission("exit-survey", PermissionState.Permitted);
-      updateDb("subjects", { screening_passed: false });
+      await updateDb(false);
     }
-    updateDb("subjects", { screening_passed: true });
+    await updateDb(true);
     gotoNextPermittedRoute("screening", routeOrder);
   }
 
-  function skip() {
+  async function skip() {
     if (PUBLIC_ENV !== 'dev') { console.log("Nice try, but skipping is not allowed."); return; }
-    updateDb("subjects", { screening_passed: true });
+    await updateDb(true);
     allCategorized = true;
     allCorrect = true;
     setRoutePermission("screening", PermissionState.NoLongerPermitted);
     debug("Skipping screening. Marked as NoLongerPermitted.");
     gotoNextPermittedRoute("screening", routeOrder);
+  }
+
+  async function updateDb(passed: boolean) {
+    if (!db_uid.current) {
+      debug("No db_uid found; cannot update screening results in DB.");
+      return;
+    }
+    const { error } = await supabase
+      .from("participants")
+      .update({ screening_passed: passed })
+      .eq("uid", db_uid.current);
+    if (error) {
+      debug(`Error updating screening results in DB for uid ${db_uid.current}: ${error.message}`);
+    } else {
+      debug(`Successfully updated screening results in DB for uid ${db_uid.current}: screening_passed = ${passed}`);
+    }
   }
 
 </script>
@@ -59,4 +75,5 @@
 {#if PUBLIC_ENV === 'dev'}
 <br><br>
 <button id="skip-button" onclick={() => skip()}>Skip</button>
+<button id="test-db" onclick={() => updateDb(true)}>Test DB Update</button>
 {/if}

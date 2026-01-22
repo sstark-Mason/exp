@@ -1,7 +1,7 @@
 import debugLib from "debug";
 const debug = debugLib("CoordinationGameBase");
 import { PersistedState } from "runed";
-import { getSupabase, newDbKey } from "$lib/db/db_ccg_client.ts";
+import { supabase, db_uid, newDbKey} from "$lib/db/db_ccg_client.ts";
 
 export interface CoordinationGameRound {
     created_at_time?: string,
@@ -62,8 +62,6 @@ export function popRandomPermutation(permutations: string[][]): string[] | null 
     return permutation;
 }
 
-
-
 export function saveGameRoundToHistory(round: CoordinationGameRound) {
     const gameRoundHistory = new PersistedState<CoordinationGameRound[]>("coordinationGameRoundHistory", []);
     gameRoundHistory.current.push(round);
@@ -77,23 +75,17 @@ export function clearGameRoundHistory() {
 }
 
 export async function pushGameRoundHistoryToDB() {
-    const supabase = getSupabase();
-    const sb_session = await supabase.auth.getSession();
-    if (!sb_session.data.session) {
-        debug("No active Supabase session; signing in anonymously.");
-        const db_uid = await newDbKey("no-active-session-for-ccg");
-        if (!db_uid) {
-            debug("Failed to get a database key.");
-            return;
-        }
+    if (!db_uid.current) {
+        debug("No db_uid found; signing in anonymously.");
+        db_uid.current = await newDbKey("anon-ccg-rounds", "unspecified");
     }
 
     const gameRoundHistory = new PersistedState<CoordinationGameRound[]>("coordinationGameRoundHistory", []);
     debug(`Pushing ${gameRoundHistory.current.length} game rounds to DB...`);
 
     const rowsToInsert = gameRoundHistory.current.map((round) => ({
-        round_number: round.round_number,
         created_at_time: round.created_at_time,
+        round_number: round.round_number,
         player_1_avatar: round.player_1_avatar,
         player_2_avatar: round.player_2_avatar,
         choice_option_1: round.choice_option_1,

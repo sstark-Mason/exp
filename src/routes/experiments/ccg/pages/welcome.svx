@@ -6,14 +6,14 @@
   import { PersistedState } from "runed";
   import { getRoutePermission, setRoutePermission, gotoNextPermittedRoute } from "$svexplib/Tools/RouteProgression";
   import { routeOrder } from "../routeOrder";
-  import { newDbKey } from "$lib/db/db_ccg_client.ts";
+  import { supabase, db_uid, newDbKey } from "$lib/db/db_ccg_client.ts";
   import { PUBLIC_ENV } from '$env/static/public';
   import { enhance } from '$app/forms';
   import debugLib from "debug";
   const debug = debugLib("exp:Welcome");
 
   const pID = new PersistedState("pID");
-  const db_uid = new PersistedState("db_uid");
+  const userRole = new PersistedState("user_role", "unspecified");
 
   onMount(() => {
     // Assuming prolific ID (pID) is given as url param PROLIFIC_PID
@@ -21,6 +21,7 @@
     if (pID.current) return; // pID already set
     const urlParams = new URLSearchParams(window.location.search);
     pID.current = urlParams.get("PROLIFIC_PID") || "";
+    userRole.current = urlParams.get("USER_ROLE") || "unspecified";
   });
 
   async function next() {
@@ -30,7 +31,7 @@
     }
 
     if (!db_uid.current) {
-      db_uid.current = await newDbKey(pID.current);
+      db_uid.current = await newDbKey(pID.current, userRole.current);
     }
 
     debug(`Prolific ID entered: ${pID.current}, assigned db_uid: ${JSON.stringify(db_uid.current)}`);
@@ -40,8 +41,9 @@
 
   async function skip() {
     pID.current = "dev-0000";
+    userRole.current = "tester";
     if (!db_uid.current) {
-      db_uid.current = await newDbKey(pID.current);
+      db_uid.current = await newDbKey(pID.current, userRole.current);
     }
     debug(`Skipped with Prolific ID: ${pID.current}, assigned db_uid: ${JSON.stringify(db_uid.current)}`);
     gotoNextPermittedRoute("welcome", routeOrder);
@@ -49,12 +51,6 @@
 
   function assignRandomId() {
     pID.current = 'test-' + Math.random().toString(36).substring(2, 10);
-  }
-
-  async function testDB() {
-    assignRandomId();
-    const userId = await newDbKey(pID.current);
-    debug(`Returned userId: ${userId}`);
   }
 
 </script>
@@ -81,10 +77,11 @@ Before continuing, please confirm your prolific ID below. This is necessary to e
 <button id="next-button" onclick={() => next()}>Next</button>
 
 {#if PUBLIC_ENV === 'dev'}
+
 <br><br>
+
 <button id="skip-button" onclick={() => skip()}>Skip</button>
 
-<button onclick={() => testDB()}>Test DB</button>
 <br><br>
 
 <form method="POST" action="?/retryUnmatchedRounds" use:enhance={({ result }) => {

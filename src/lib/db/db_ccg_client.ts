@@ -1,14 +1,22 @@
 import { PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_PUB_KEY } from "$env/static/public";
 import { createClient } from '@supabase/supabase-js';
+import { PersistedState } from "runed";
 import debugLib from 'debug';
 const debug = debugLib('exp:db');
 
-const supabase = createClient(PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_PUB_KEY);
+export const supabase = createClient(PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_PUB_KEY);
+export const db_uid = new PersistedState<string | null>('db_uid', null);
 
-export async function newDbKey(pid: string): Promise<string | null> {
+export async function newDbKey(pid: string, userRole: string): Promise<string | null> {
     const maxRetries = 3;
     let session = null;
     let signInError = null;
+
+    let { data: { session: existingSession }, error: sessionError } = await supabase.auth.getSession();
+    if (existingSession && !sessionError) {
+        debug('Existing session found:', existingSession);
+        return existingSession.user.id;
+    }
 
     for (let attempt = 1; attempt <= maxRetries; attempt++) {
         ({ data: { session }, error: signInError } = await supabase.auth.signInAnonymously());
@@ -29,14 +37,15 @@ export async function newDbKey(pid: string): Promise<string | null> {
     }
 
     const { error: insertError } = await supabase
-        .from('subjects')
-        .upsert([{ uid: session.user.id, pid: pid, start_time: new Date().toISOString() }]);
+        .from('participants')
+        .insert([{ pid: pid, user_role: userRole }]);
     
     if (insertError) {
         debug('Error inserting new user data in db:', insertError);
-        return session.user.id;
+        return null;
     }
 
+    db_uid.current = session.user.id;
     return session.user.id;
 }
 
@@ -46,21 +55,6 @@ export async function signOutDbKey(): Promise<boolean> {
         debug('Error signing out:', error);
         return false;
     }
-    return true;
-}
-
-
-export async function updateDb(table: string, updates: Record<string, any>): Promise<boolean> {
-    // Supabase auth magically handles which row to update (thanks, I hate it)
-    const { error: updateError } = await supabase
-        .from(table)
-        .upsert(updates)
-
-    if (updateError) {
-        debug(`Error updating response data for table ${table}: ${updateError}`);
-        return false;
-    }
-
     return true;
 }
 
