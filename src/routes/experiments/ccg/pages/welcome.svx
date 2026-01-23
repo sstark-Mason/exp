@@ -2,9 +2,8 @@
   import ComprehensionQuestion from "$svexplib/Questions/ComprehensionQuestion.svelte";
   import RequiredQuestion from "$svexplib/Questions/RequiredQuestion.svelte";
   import { onMount } from "svelte";
-  import { goto } from "$app/navigation";
   import { PersistedState } from "runed";
-  import { getRoutePermission, setRoutePermission, gotoNextPermittedRoute } from "$svexplib/Tools/RouteProgression";
+  import { gotoNextPermittedRoute } from "$svexplib/Tools/RouteProgression";
   import { routeOrder } from "../routeOrder";
   import { supabase, db_uid, newDbKey } from "$lib/db/db_ccg_client.ts";
   import { PUBLIC_ENV } from '$env/static/public';
@@ -29,28 +28,34 @@
       alert("Please enter your Prolific ID before continuing.");
       return;
     }
-
-    if (!db_uid.current) {
-      db_uid.current = await newDbKey(pID.current, userRole.current);
-    }
-
+    await submitId();
     debug(`Prolific ID entered: ${pID.current}, assigned db_uid: ${JSON.stringify(db_uid.current)}`);
-    
     gotoNextPermittedRoute("welcome", routeOrder);
   }
 
   async function skip() {
     pID.current = "dev-0000";
     userRole.current = "tester";
-    if (!db_uid.current) {
-      db_uid.current = await newDbKey(pID.current, userRole.current);
-    }
+    await submitId();
     debug(`Skipped with Prolific ID: ${pID.current}, assigned db_uid: ${JSON.stringify(db_uid.current)}`);
     gotoNextPermittedRoute("welcome", routeOrder);
   }
 
   function assignRandomId() {
     pID.current = 'test-' + Math.random().toString(36).substring(2, 10);
+  }
+
+  async function submitId() {
+    if (!pID.current || pID.current.trim() === "") {
+      alert("Please enter your Prolific ID before submitting.");
+      return;
+    }
+    if (!db_uid.current) {
+      db_uid.current = await newDbKey(pID.current, userRole.current);
+      debug(`Prolific ID submitted: ${pID.current}, assigned db_uid: ${JSON.stringify(db_uid.current)}`);
+    } else {
+      debug(`Prolific ID submitted: ${pID.current}, assigned db_uid: ${JSON.stringify(db_uid.current)}`);
+    }
   }
 
 </script>
@@ -63,6 +68,11 @@ Before continuing, please confirm your prolific ID below. This is necessary to e
 <!-- Send to db and return confirmation to ensure it's collected -->
 
 <input type="text" bind:value={pID.current} placeholder="Enter your Prolific ID here" style="width: 300px; padding: 8px; margin-top: 10px;" />
+<button onclick={() => { submitId(); }}>Submit ID</button>
+{#if (db_uid.current)}
+<br><br>
+Your Prolific ID has been recorded. Your participant code is: <strong>{db_uid.current}</strong>.
+{/if}
 
 <br><br>
 

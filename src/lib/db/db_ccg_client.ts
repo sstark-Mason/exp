@@ -12,7 +12,7 @@ export async function newDbKey(pid: string, userRole: string): Promise<string | 
     let session = null;
     let signInError = null;
 
-    let { data: { session: existingSession }, error: sessionError } = await supabase.auth.getSession();
+    const { data: { session: existingSession }, error: sessionError } = await supabase.auth.getSession();
     if (existingSession && !sessionError) {
         debug('Existing session found:', existingSession);
         return existingSession.user.id;
