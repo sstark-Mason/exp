@@ -1,14 +1,32 @@
 import { error } from "@sveltejs/kit";
 import debugLib from "debug";
+import { getNextSlug } from "../routeOrder.ts";
 const debug = debugLib("exp:ccg:[slug]:page");
+
+export const prerender = true;
+// export const trailingSlash = 'always'; // Breaks
+
+export const entries = () => {
+  return [
+    { slug: 'welcome' },
+    { slug: 'screening' },
+    { slug: 'comprehension-intro' },
+    { slug: 'game-intro' },
+    { slug: 'game-ready' },
+    { slug: 'game-play' },
+    { slug: 'game-end' },
+    { slug: 'exit-survey' },
+  ];
+};
 
 export async function load({ params }) {
   try {
     // Dynamically import the SVX file based on the slug
-    const post = await import(`$exp/ccg/pages/${params.slug}.svx`);
+    const page = await import(`$exp/ccg/pages/${params.slug}.svx`);
     return {
-      content: post.default,
-      metadata: post.metadata,
+      content: page.default,
+      metadata: page.metadata,
+      slug: params.slug,
     };
   } catch (e) {
     // Log detailed error for debugging

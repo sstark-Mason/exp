@@ -84,7 +84,7 @@ Before continuing, please confirm your prolific ID below. This is necessary to e
 
 <br><br>
 
-<form method="POST" action="?/retryUnmatchedRounds" use:enhance={({ result }) => {
+<!-- <form method="POST" action="?/retryUnmatchedRounds" use:enhance={({ result }) => {
   if (result.type === 'success') {
     alert('Retry completed successfully.');
   } else if (result.type === 'failure') {
@@ -92,5 +92,5 @@ Before continuing, please confirm your prolific ID below. This is necessary to e
   }
 }}>
   <button>Retry Unmatched Rounds</button>
-</form>
+</form> -->
 {/if}

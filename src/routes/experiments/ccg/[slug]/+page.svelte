@@ -1,5 +1,18 @@
 <script lang="ts">
-    export let data;
+    import { onMount } from 'svelte';
+    import { preloadData } from '$app/navigation';
+    import { page } from '$app/state';
+    import { getNextSlug } from '$exp/ccg/routeOrder';
+
+    let { data } = $props();
+    const nextSlug = $derived(getNextSlug(data.slug));
+
+    $effect(() => {
+        if (nextSlug) {
+            preloadData(`/experiments/ccg/${nextSlug}`);
+        }
+    });
+
 </script>
 
-<svelte:component this={data.content} />
+<data.content/>
