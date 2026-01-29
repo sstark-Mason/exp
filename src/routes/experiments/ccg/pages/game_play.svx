@@ -1,0 +1,37 @@
+<script lang="ts">
+    import { PUBLIC_ENV } from '$env/static/public';
+    import { goto } from '$app/navigation';
+    import { page } from '$app/state';
+    import * as ccg from '$lib/ccg/ccg.svelte.ts';
+    const debug = ccg.debugBase.extend(`page:${page.data.slug}.svx`);
+    const exp = ccg.getExperimentState();
+
+    import LiveCoordinationGame from '$svexplib/Games/CoordinationGame/LiveCoordinationGame.svelte';
+    import { choiceSetSymbols, choiceSetColorsUnicode } from '$svexplib/Games/CoordinationGame/CoordinationGameBase.ts';
+
+    import { PersistedState } from "runed";
+    const selectedAvatarName = new PersistedState<string | null>("ccg-selected-avatar", null);
+
+    function next() {
+        goto(exp.next(page.data.slug));
+    }
+
+</script>
+
+## Coordination Game
+
+<LiveCoordinationGame
+    player1Name={selectedAvatarName.current ?? "fem1"}
+    choiceSet={choiceSetColorsUnicode}
+    maxRounds={10}
+    outcome_c1c1={[2,1]}
+    outcome_c2c2={[1,2]}
+    outcome_c1c2={[0,0]}
+    outcome_c2c1={[0,0]}
+    onGameEnd={next}
+/>
+
+{#if PUBLIC_ENV === 'dev'}
+<br><br>
+<button id="skip-button" onclick={() => next()}>Skip</button>
+{/if}

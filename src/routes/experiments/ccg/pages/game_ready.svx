@@ -1,0 +1,59 @@
+<script lang="ts">
+    import { PUBLIC_ENV } from '$env/static/public';
+    import { goto } from '$app/navigation';
+    import { page } from '$app/state';
+    import * as ccg from '$lib/ccg/ccg.svelte.ts';
+    const debug = ccg.debugBase.extend(`page:${page.data.slug}.svx`);
+    const exp = ccg.getExperimentState();
+
+    import { PersistedState } from "runed";
+    import SelectAvatar from "$svexplib/Games/CoordinationGame/SelectAvatar.svelte";
+
+    const selectedAvatarName = new PersistedState<string | null>("ccg-selected-avatar", null);
+    const avatarIsFinalized = new PersistedState<boolean>("ccg-avatar-selected", false);
+
+    function next() {
+        if (selectedAvatarName.current === null) {
+            alert("Please select a portrait before proceeding.");
+            return;
+        }
+        avatarIsFinalized.current = true;
+        goto(exp.next(page.data.slug));
+    }
+
+    function skip() {
+        if (selectedAvatarName.current === null) {
+            selectedAvatarName.current = "fem1";
+        }
+        avatarIsFinalized.current = true;
+        goto(exp.next(page.data.slug));
+    }
+
+</script>
+
+# Avatar Selection
+
+{#if !avatarIsFinalized.current}
+  <p>Please choose a portrait to represent yourself in the game.</p>
+  <SelectAvatar
+    onAvatarSelection={(avatar) => {
+      debug(`Selected avatar: ${avatar}`);
+      selectedAvatarName.current = avatar;
+    }}
+  />
+  <br><br>
+{/if}
+
+
+## Game Ready
+
+When you're ready to begin the game, please click the "Next" button below.
+
+This is your chosen avatar: {selectedAvatarName.current} (todo: replace with image)
+
+<button id="next-button" onclick={() => next()}>Next</button>
+
+{#if PUBLIC_ENV === 'dev'}
+<br><br>
+<button id="skip-button" onclick={() => skip()}>Skip</button>
+{/if}

@@ -3,8 +3,11 @@
   import { ComprehensionQuestionManager } from "./ComprehensionQuestionManager.ts";
   import { page } from "$app/state";
   import { marked } from "marked";
+  import { supabase, db_uid } from "$lib/db/db_ccg_client.ts";
   import { PersistedState } from "runed";
-  
+  import debugLib from "debug";
+  const debug = debugLib("exp:ComprehensionQuestion");
+
   let { qid, text, reset, answers, fmt, continueButtonId, dbColumn }: {
     qid: string;
     text: string;
@@ -14,10 +17,6 @@
     continueButtonId?: string | null;
     dbColumn?: string | null;
   } = $props();
-
-  import * as ccg from "$lib/ccg/ccg.svelte.ts";
-  const debug = ccg.debugBase.extend(`ComprehensionQuestion:${qid}`);
-  const exp = ccg.getExperimentState();
 
   interface AnswerOption {
     cid: string;
@@ -156,7 +155,7 @@
     }
   }
 
-  async function pushToDb_0() {
+  async function pushToDb() {
     if (question.dbColumn) {
       // dbValues is an array of -1, 0, and 1. 1 for correct, 0 for never selected, -1 for incorrect.
       const dbValues: number[] = [];
@@ -197,31 +196,6 @@
       debug(`Pushed comprehension question ${question.qid} results to DB column ${question.dbColumn} as ${dbValues}.`);
     }
   }
-
-    async function pushToDb() {
-        if (!question.dbColumn) return;
-
-        const dbValues: number[] = [];
-        for (const ans of answers) {
-            const answerOption = question.answerOptions.find((a) => a.text === ans.text);
-            if (answerOption) {
-                if (revealedAnswers.current.includes(answerOption.cid)) {
-                    if (answerOption.isCorrect) {
-                        dbValues.push(1);
-                    } else {
-                        dbValues.push(-1);
-                    }
-                } else {
-                    dbValues.push(0);
-                }
-            } else {
-                dbValues.push(0);
-            }
-        }
-
-        exp.dbUpdateParticipant({ [question.dbColumn]: dbValues });
-        debug(`Pushed comprehension question ${question.qid} results to DB column ${question.dbColumn} as ${dbValues}.`);
-    }
 
   function resetQuestion() {
     selectedAnswers = [];

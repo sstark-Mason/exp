@@ -1,54 +1,48 @@
 <script lang="ts">
-  import { onMount } from "svelte";
-  import { goto } from "$app/navigation";
-  import { PersistedState } from "runed";
-  import ScreeningTask from "$svexplib/Tasks/ScreeningMatching/ScreeningMatching.svelte";
-  import { getRoutePermission, setRoutePermission, gotoNextPermittedRoute, PermissionState } from "$svexplib/Tools/RouteProgression";
-  import { routeOrder } from "../routeOrder";
-  import { PUBLIC_ENV } from '$env/static/public';
-  import { supabase, db_uid } from "$lib/db/db_ccg_client.ts";
-  import debugLib from "debug";
-  const debug = debugLib("exp:ccg:screening");
+    import { PUBLIC_ENV } from '$env/static/public';
+    import { goto } from '$app/navigation';
+    import { page } from '$app/state';
+    import * as ccg from '$lib/ccg/ccg.svelte.ts';
+    const debug = ccg.debugBase.extend(`page:${page.data.slug}.svx`);
+    const exp = ccg.getExperimentState();
+    
+    import ScreeningTask from "$svexplib/Tasks/ScreeningMatching/ScreeningMatching.svelte";
 
-  let allCategorized = $state(false);
-  let allCorrect = $state(false);
+    let allCategorized = $state(false);
+    let allCorrect = $state(false);
 
-  async function next() {
-    debug(`Screening completed. allCategorized: ${allCategorized}, allCorrect: ${allCorrect}`);
-    setRoutePermission("screening", PermissionState.NoLongerPermitted);
-    if (!allCorrect) {
-      setRoutePermission("exit-survey", PermissionState.Permitted);
-      await updateDb(false);
+    async function next() {
+        if (!allCategorized) {
+            debug("Not all items categorized. Cannot proceed.");
+            return;
+        }
+
+        debug(`Screening completed. allCategorized: ${allCategorized}, allCorrect: ${allCorrect}`);
+        switch (allCorrect) {
+            case true:
+                exp.dbUpdateParticipant({ screening_passed: allCorrect });
+                // exp.dbUpdateParticipant({ completed_experiment: true });
+                exp.updateRouteState('screening', 'completed');
+                exp.updateRoutePermission('screening', false);
+                goto(exp.next(page.data.slug));
+                break;
+            case false:
+                exp.dbUpdateParticipant({ screening_passed: false, completed_experiment: false });
+                exp.updateRouteState('screening', 'completed');
+                exp.updateRoutePermission('screening', false);
+                exp.updateRoutePermission('exit', true);
+                goto(exp.next(page.data.slug));
+                break;
+        }
     }
-    await updateDb(true);
-    gotoNextPermittedRoute("screening", routeOrder);
-  }
 
-  async function skip() {
-    if (PUBLIC_ENV !== 'dev') { console.log("Nice try, but skipping is not allowed."); return; }
-    await updateDb(true);
-    allCategorized = true;
-    allCorrect = true;
-    setRoutePermission("screening", PermissionState.NoLongerPermitted);
-    debug("Skipping screening. Marked as NoLongerPermitted.");
-    gotoNextPermittedRoute("screening", routeOrder);
-  }
-
-  async function updateDb(passed: boolean) {
-    if (!db_uid.current) {
-      debug("No db_uid found; cannot update screening results in DB.");
-      return;
+    async function skip() {
+        if (PUBLIC_ENV !== 'dev') { console.log("Nice try, but skipping is not allowed."); return; }
+        allCategorized = true;
+        allCorrect = true;
+        debug("Skipping screening.");
+        await next();
     }
-    const { error } = await supabase
-      .from("participants")
-      .update({ screening_passed: passed })
-      .eq("uid", db_uid.current);
-    if (error) {
-      debug(`Error updating screening results in DB for uid ${db_uid.current}: ${error.message}`);
-    } else {
-      debug(`Successfully updated screening results in DB for uid ${db_uid.current}: screening_passed = ${passed}`);
-    }
-  }
 
 </script>
 
@@ -73,7 +67,12 @@
 <button disabled={!allCategorized} onclick={() => next()}>Submit</button>
 
 {#if PUBLIC_ENV === 'dev'}
-<br><br>
-<button id="skip-button" onclick={() => skip()}>Skip</button>
-<button id="test-db" onclick={() => updateDb(true)}>Test DB Update</button>
+    <br><br>
+    <button onclick={() => skip()}>Skip</button>
+    
+
+    allCategorized: {allCategorized.toString()}  <button onclick={() => allCategorized = !allCategorized}>Toggle</button>
+
+    allCorrect: {allCorrect.toString()}  <button onclick={() => allCorrect = !allCorrect}>Toggle</button>
+    
 {/if}

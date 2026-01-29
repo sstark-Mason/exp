@@ -1,7 +1,12 @@
-import debugLib from "debug";
-const debug = debugLib("CoordinationGameBase");
+
+
+import { debugBase } from '$lib/ccg/ccg.svelte.ts';
+const debug = debugBase.extend(`CoordinationGameBase.ts`);
+
 import { PersistedState } from "runed";
-import { supabase, db_uid, newDbKey} from "$lib/db/db_ccg_client.ts";
+// import { supabase, db_uid, newDbKey} from "$lib/db/db_ccg_client.ts";
+
+const gameRoundHistory = new PersistedState<CoordinationGameRound[]>("coordinationGameRoundHistory", []);
 
 export interface CoordinationGameRound {
     created_at_time?: string,
@@ -63,26 +68,16 @@ export function popRandomPermutation(permutations: string[][]): string[] | null 
 }
 
 export function saveGameRoundToHistory(round: CoordinationGameRound) {
-    const gameRoundHistory = new PersistedState<CoordinationGameRound[]>("coordinationGameRoundHistory", []);
     gameRoundHistory.current.push(round);
     debug(`Saved game round to history. Total rounds in history: ${gameRoundHistory.current.length}`);
 }
 
 export function clearGameRoundHistory() {
-    const gameRoundHistory = new PersistedState<CoordinationGameRound[]>("coordinationGameRoundHistory", []);
     gameRoundHistory.current = [];
     debug("Cleared game round history.");
 }
 
-export async function pushGameRoundHistoryToDB() {
-    if (!db_uid.current) {
-        debug("No db_uid found; signing in anonymously.");
-        db_uid.current = await newDbKey("anon-ccg-rounds", "unspecified");
-    }
-
-    const gameRoundHistory = new PersistedState<CoordinationGameRound[]>("coordinationGameRoundHistory", []);
-    debug(`Pushing ${gameRoundHistory.current.length} game rounds to DB...`);
-
+export function marshalGameRounds() {
     const rowsToInsert = gameRoundHistory.current.map((round) => ({
         created_at_time: round.created_at_time,
         round_number: round.round_number,
@@ -97,16 +92,43 @@ export async function pushGameRoundHistoryToDB() {
         player_1_chose: round.player_1_chose,
     }));
 
-    const { error: insertError } = await supabase
-        .from('game_rounds')
-        .insert(rowsToInsert);
-
-    if (insertError) {
-        debug('Error inserting game round history to DB:', insertError);
-        return;
-    }
-
-    // Clear history to prevent double-pushing
-    gameRoundHistory.current = [];
-    debug("Cleared game round history after pushing to DB.");
+    return rowsToInsert;
 }
+
+// DEPRECATED
+// export async function pushGameRoundHistoryToDB() {
+//     if (!db_uid.current) {
+//         debug("No db_uid found; signing in anonymously.");
+//         db_uid.current = await newDbKey("anon-ccg-rounds", "unspecified");
+//     }
+
+//     const gameRoundHistory = new PersistedState<CoordinationGameRound[]>("coordinationGameRoundHistory", []);
+//     debug(`Pushing ${gameRoundHistory.current.length} game rounds to DB...`);
+
+//     const rowsToInsert = gameRoundHistory.current.map((round) => ({
+//         created_at_time: round.created_at_time,
+//         round_number: round.round_number,
+//         player_1_avatar: round.player_1_avatar,
+//         player_2_avatar: round.player_2_avatar,
+//         choice_option_1: round.choice_option_1,
+//         choice_option_2: round.choice_option_2,
+//         outcome_c1c1: round.outcome_c1c1,
+//         outcome_c2c2: round.outcome_c2c2,
+//         outcome_c1c2: round.outcome_c1c2,
+//         outcome_c2c1: round.outcome_c2c1,
+//         player_1_chose: round.player_1_chose,
+//     }));
+
+//     const { error: insertError } = await supabase
+//         .from('game_rounds')
+//         .insert(rowsToInsert);
+
+//     if (insertError) {
+//         debug('Error inserting game round history to DB:', insertError);
+//         return;
+//     }
+
+//     // Clear history to prevent double-pushing
+//     gameRoundHistory.current = [];
+//     debug("Cleared game round history after pushing to DB.");
+// }

@@ -1,12 +1,17 @@
 <script lang="ts">
-
+    import { page } from '$app/state';
+    const pid = page.url.searchParams.get('pid') || '';
+    function randPID() {
+        return 'tester-' + Math.random().toString(36).substring(2, 10);
+    }
 </script>
 
 # Home page
 
 ## Experiments
 
-- <a href="experiments/ccg/welcome">CCG Experiment</a>
+- <a href="experiments/ccg?role=participant&pid={pid}">CCG Experiment (Participants)</a>
+- <a href="experiments/ccg?role=tester&pid={randPID()}">CCG Experiment (Testers)</a>
 
 ## Other Links
 - <a href="https://svexplib.sstark-Mason.deno.net">svexplib site</a>

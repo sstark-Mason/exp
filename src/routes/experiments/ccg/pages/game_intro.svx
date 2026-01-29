@@ -1,30 +1,24 @@
----
-title: "Game Intro"
----
-<script>
-  import { goto } from "$app/navigation";
-  import ComprehensionQuestion from "$svexplib/Questions/ComprehensionQuestion.svelte";
-  import PracticeCoordinationGame from "$svexplib/Games/CoordinationGame/PracticeCoordinationGame.svelte";
-  import { choiceSetSymbols, choiceSetColorsUnicode } from '$svexplib/Games/CoordinationGame/CoordinationGameBase.ts';
+<script lang="ts">
+    import { PUBLIC_ENV } from '$env/static/public';
+    import { goto } from '$app/navigation';
+    import { page } from '$app/state';
+    import * as ccg from '$lib/ccg/ccg.svelte.ts';
+    const debug = ccg.debugBase.extend(`page:${page.data.slug}.svx`);
+    const exp = ccg.getExperimentState();
 
-  import { PUBLIC_ENV } from '$env/static/public';
-  import { gotoNextPermittedRoute } from "$svexplib/Tools/RouteProgression";
-  import { routeOrder } from "../routeOrder";
+    import ComprehensionQuestion from "$svexplib/Questions/ComprehensionQuestion.svelte";
+    import PracticeCoordinationGame from "$svexplib/Games/CoordinationGame/PracticeCoordinationGame.svelte";
+    import { choiceSetSymbols, choiceSetColorsUnicode } from '$svexplib/Games/CoordinationGame/CoordinationGameBase.ts';
 
-  let gameKey = 0;
+    function next() {
+        goto(exp.next(page.data.slug));
+    }
 
-  function restartGame() {
-    gameKey += 1;
-  }
+    let gameKey = 0;
 
-  function next() {
-    gotoNextPermittedRoute("game-intro", routeOrder);
-  }
-
-  function skip() {
-    gotoNextPermittedRoute("game-intro", routeOrder);
-  }
-
+    function restartGame() {
+        gameKey += 1;
+    }
 </script>
 
 # Game Explanation
@@ -84,5 +78,5 @@ Game rounds:
 
 {#if PUBLIC_ENV === 'dev'}
 <br><br>
-<button id="skip-button" onclick={() => skip()}>Skip</button>
+<button id="skip-button" onclick={() => next()}>Skip</button>
 {/if}

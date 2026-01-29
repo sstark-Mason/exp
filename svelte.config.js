@@ -20,6 +20,11 @@ const config = {
     },
   },
   extensions: [".svelte", ".svx"],
+  compilerOptions: {
+    experimental: {
+      async: true
+    }
+  }
 };
 
 export default config;

@@ -1,23 +1,18 @@
+<script lang="ts">
+    import { PUBLIC_ENV } from '$env/static/public';
+    import { goto } from '$app/navigation';
+    import { page } from '$app/state';
+    import * as ccg from '$lib/ccg/ccg.svelte.ts';
+    const debug = ccg.debugBase.extend(`page:${page.data.slug}.svx`);
+    const exp = ccg.getExperimentState();
 
----
-title: "Overview"
----
-<script>
-  import ComprehensionQuestion from "$svexplib/Questions/ComprehensionQuestion.svelte";
-  import RequiredQuestion from "$svexplib/Questions/RequiredQuestion.svelte";
-  import { goto } from "$app/navigation";
-  import { PUBLIC_ENV } from '$env/static/public';
-  import { gotoNextPermittedRoute } from "$svexplib/Tools/RouteProgression";
-  import { routeOrder } from "../routeOrder";
+    import ComprehensionQuestion from "$svexplib/Questions/ComprehensionQuestion.svelte";
+    import RequiredQuestion from "$svexplib/Questions/RequiredQuestion.svelte";
 
-  function next() {
-    gotoNextPermittedRoute("comprehension-intro", routeOrder);
-  }
-
-  function skip() {
-    gotoNextPermittedRoute("comprehension-intro", routeOrder);
-  }
-
+    function next() {
+        goto(exp.next(page.data.slug));
+    }
+    
 </script>
 
 # Overview
@@ -73,5 +68,5 @@ Details:
 
 {#if PUBLIC_ENV === 'dev'}
 <br><br>
-<button id="skip-button" onclick={() => skip()}>Skip</button>
+<button id="skip-button" onclick={() => next()}>Skip</button>
 {/if}

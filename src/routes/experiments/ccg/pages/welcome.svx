@@ -1,106 +1,152 @@
-<script>
-  import ComprehensionQuestion from "$svexplib/Questions/ComprehensionQuestion.svelte";
-  import RequiredQuestion from "$svexplib/Questions/RequiredQuestion.svelte";
-  import { onMount } from "svelte";
-  import { PersistedState } from "runed";
-  import { gotoNextPermittedRoute } from "$svexplib/Tools/RouteProgression";
-  import { routeOrder } from "../routeOrder";
-  import { supabase, db_uid, newDbKey } from "$lib/db/db_ccg_client.ts";
-  import { PUBLIC_ENV } from '$env/static/public';
-  import { enhance } from '$app/forms';
-  import debugLib from "debug";
-  const debug = debugLib("exp:Welcome");
+<script lang="ts">
+    import { PUBLIC_ENV } from '$env/static/public';
+    import { goto, invalidateAll } from '$app/navigation';
+    import { page } from '$app/state';
+    import * as ccg from '$lib/ccg/ccg.svelte.ts';
+    const debug = ccg.debugBase.extend(`page:${page.data.slug}.svx`);
+    const exp = ccg.getExperimentState();
+    exp.updateRoutePermission(page.data.slug, true);
 
-  const pID = new PersistedState("pID");
-  const userRole = new PersistedState("user_role", "unspecified");
+    let { data } = $props();
 
-  onMount(() => {
-    // Assuming prolific ID (pID) is given as url param PROLIFIC_PID
-    if (typeof window === "undefined") return; // SSR guard
-    if (pID.current) return; // pID already set
-    const urlParams = new URLSearchParams(window.location.search);
-    pID.current = urlParams.get("PROLIFIC_PID") || "";
-    userRole.current = urlParams.get("USER_ROLE") || "unspecified";
-  });
+    let pid_input_enabled = $state(false);
+    let selectedRole = $state(exp.userRole);
 
-  async function next() {
-    if (!pID.current || pID.current.trim() === "") {
-      alert("Please enter your Prolific ID before continuing.");
-      return;
+    function assignRandomPID() {
+        const randomPID = 'anon_' + Math.random().toString(36).substring(2, 10);
+        exp.pID = randomPID;
+        pid_input_enabled = true;
     }
-    await submitId();
-    debug(`Prolific ID entered: ${pID.current}, assigned db_uid: ${JSON.stringify(db_uid.current)}`);
-    gotoNextPermittedRoute("welcome", routeOrder);
-  }
 
-  async function skip() {
-    pID.current = "dev-0000";
-    userRole.current = "tester";
-    await submitId();
-    debug(`Skipped with Prolific ID: ${pID.current}, assigned db_uid: ${JSON.stringify(db_uid.current)}`);
-    gotoNextPermittedRoute("welcome", routeOrder);
-  }
+    async function next() {
+        if (!exp.pID) {
+            alert('Please enter your Prolific ID before continuing.');
+            return;
+        }
 
-  function assignRandomId() {
-    pID.current = 'test-' + Math.random().toString(36).substring(2, 10);
-  }
+        if (selectedRole !== exp.userRole) {
+            await resetCookiesAndReturnToOrigin();
+            window.location.href = `/experiments/ccg?role=${selectedRole}&pid=${exp.pID}`;
+            return;
+        }
 
-  async function submitId() {
-    if (!pID.current || pID.current.trim() === "") {
-      alert("Please enter your Prolific ID before submitting.");
-      return;
+        if (pid_input_enabled) {
+            await updatePID();
+        }
+
+        goto(exp.next(page.data.slug));
     }
-    if (!db_uid.current) {
-      db_uid.current = await newDbKey(pID.current, userRole.current);
-      debug(`Prolific ID submitted: ${pID.current}, assigned db_uid: ${JSON.stringify(db_uid.current)}`);
-    } else {
-      debug(`Prolific ID submitted: ${pID.current}, assigned db_uid: ${JSON.stringify(db_uid.current)}`);
+
+    async function updatePID() {
+        pid_input_enabled = !pid_input_enabled;
+        switch (pid_input_enabled) {
+            case true:
+                return;
+            case false:
+                exp.dbUpdateParticipant({ pid: exp.pID });
+        }
+
+        const response = await fetch('api/update-cookies', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ pid: exp.pID, role: exp.userRole }),
+        });
+
+        if (response.ok) {
+            debug('Cookie PID updated successfully via API');
+            await invalidateAll();
+        } else {
+            debug('Failed to update cookie PID via API');
+        }
     }
-  }
+
+    async function resetCookiesAndReturnToOrigin() {
+        const response = await fetch('api/update-cookies', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ pid: null, role: null }),
+        });
+        if (response.ok) {
+            debug('Cookies reset successfully via API');
+            await invalidateAll();
+            
+        } else {
+            debug('Failed to reset cookies via API');
+        }
+
+        window.location.href = `/experiments/ccg?role=${selectedRole}&pid=${exp.pID}`;
+    }
 
 </script>
 
 # Welcome
 
 Before continuing, please confirm your prolific ID below. This is necessary to ensure you receive payment for your participation.
+<input type="text" bind:value={exp.pID} disabled={!pid_input_enabled} class="pid-input" placeholder="Enter your Prolific ID here"/>
 
-<!-- <input type="text" id="prolific-id" placeholder="Enter your Prolific ID here" style="width: 300px; padding: 8px; margin-top: 10px;" /> -->
-<!-- Send to db and return confirmation to ensure it's collected -->
+<button onclick={() => updatePID()} class="pid-button" class:input-enabled={pid_input_enabled}>{#if pid_input_enabled}Confirm ID{:else}Edit ID{/if}</button>
 
-<input type="text" bind:value={pID.current} placeholder="Enter your Prolific ID here" style="width: 300px; padding: 8px; margin-top: 10px;" />
-<button onclick={() => { submitId(); }}>Submit ID</button>
-{#if (db_uid.current)}
-<br><br>
-Your Prolific ID has been recorded. Your participant code is: <strong>{db_uid.current}</strong>.
+Your expected role is **{exp.userRole}**. If this is incorrect, please select the correct role below.
+
+Selected role: {selectedRole}
+
+<!-- Modal selector bound to newRole. If newRole != exp.userRole, then reset cookies and re-enter through /ccg. -->
+<input type="radio" id="participant" name="role" value="participant" bind:group={selectedRole}>
+<label for="participant">Participant</label>
+<br>
+<input type="radio" id="tester" name="role" value="tester" bind:group={selectedRole}>
+<label for="tester">Tester</label>
+
+<div>
+{#if exp.pID && exp.userRole === selectedRole}
+    <br><br>
+    <button onclick={() => next()}>Next</button>
+{:else if !exp.pID}
+    <br>
+    <button onclick={() => assignRandomPID()}>Continue without Prolific ID</button>
+{:else if exp.userRole !== selectedRole}
+    <br><br>
+    <button onclick={() => resetCookiesAndReturnToOrigin()}>Change role to {selectedRole}</button>
 {/if}
+</div>
 
-<br><br>
 
-<details>
-  <summary>I don't have a Prolific ID.</summary>
-  <p>If you're here for testing, click on the button below to use a random identifier.</p>
-  <button onclick={() => assignRandomId()}>Assign Random ID</button>
-</details>
 
-<br><br>
-
-<button id="next-button" onclick={() => next()}>Next</button>
+{#if PUBLIC_ENV === 'dev' || exp.userRole === 'tester'}
+<br>
+<button onclick={() => assignRandomPID()}>Get Random ID</button>
+{/if}
 
 {#if PUBLIC_ENV === 'dev'}
 
-<br><br>
+Page: {page.url.pathname}
 
-<button id="skip-button" onclick={() => skip()}>Skip</button>
+Route: {page.route.id}
 
-<br><br>
+Status: {page.status}
 
-<!-- <form method="POST" action="?/retryUnmatchedRounds" use:enhance={({ result }) => {
-  if (result.type === 'success') {
-    alert('Retry completed successfully.');
-  } else if (result.type === 'failure') {
-    alert(`Error: ${result.data.error}`);
-  }
-}}>
-  <button>Retry Unmatched Rounds</button>
-</form> -->
+Data: {JSON.stringify(page.data)}
+
+Slug: {page.data.slug}
+
+Page.route.id: {page.route.id}
+
 {/if}
+
+<style>
+
+    .pid-button.input-enabled{
+        background-color: lightgreen;
+    }
+
+    .pid-button:not(.input-enabled){
+        background-color: orange;
+    }
+
+
+
+</style>
