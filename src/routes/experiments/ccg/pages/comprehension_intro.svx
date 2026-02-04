@@ -9,6 +9,16 @@
     import ComprehensionQuestion from "$svexplib/Questions/ComprehensionQuestion.svelte";
     import RequiredQuestion from "$svexplib/Questions/RequiredQuestion.svelte";
 
+    import MultipleChoiceQuestion from '$svexplib/Questions/MultipleChoiceQuestion.svelte';
+
+    const qStates = $state([
+        { qid: 'cq_0_1', completed: false, scoreArray: [] },
+        { qid: 'cq_0_2', completed: false, scoreArray: [] },
+        { qid: 'rq_0_1', completed: false, scoreArray: [] },
+    ]);
+
+    const allowNext: boolean = $derived(qStates.every((q) => q.completed));
+
     function next() {
         goto(exp.next(page.data.slug));
     }
@@ -25,48 +35,63 @@ Details:
 - To continue, you must select **all correct answers** and **no incorrect answers**.
 - On future pages, you will **not** be able to reset your answers.
 
-<br>
 
-<ComprehensionQuestion
-  qid="cq0.1"
-  text="What is the purpose of using comprehension questions?"
-  reset={true}
-  answers={[
-    { text: "To make sure I understand the instructions.", isCorrect: true },
-    { text: "To trick me into choosing a wrong answer.", isCorrect: false },
-    { text: "To perform a ritual in the cult of social sciences.", isCorrect: false },
-  ]}
-  continueButtonId="next-button"
-/>
+<MultipleChoiceQuestion
+bind:bindableComplete={qStates[0].completed}
+bind:bindableScoreArray={qStates[0].scoreArray}
+props={{
+    qid: qStates[0].qid,
+    questionText: "What is the purpose of using comprehension questions?",
+    responses: [
+        { text: "To make sure I understand the instructions.", isTrue: true },
+        { text: "To trick me into choosing a wrong answer.", isTrue: false },
+        { text: "To perform a ritual in the cult of social sciences.", isTrue: false },
+    ],
+    required: true,
+    randomize: true,
+    participantSeed: exp.pID,
+    showFeedbackOnSelect: true,
+    showScore: true,
+    allowReset: true,
+}}/>
 
-<ComprehensionQuestion
-  qid="cq0.2"
-  text="Which actions give you a higher bonus payment?"
-  reset={true}
-  answers={[
-    { text: "Selecting only correct answers.", isCorrect: true },
-    { text: "Not selecting any incorrect answers.", isCorrect: true },
-    { text: "Selecting any incorrect answers.", isCorrect: false },
-    { text: "Selecting no answers at all.", isCorrect: false },
-  ]}
-  continueButtonId="next-button"
-/>
+<MultipleChoiceQuestion
+bind:bindableComplete={qStates[1].completed}
+bind:bindableScoreArray={qStates[1].scoreArray}
+props={{
+    qid: qStates[1].qid,
+    questionText: "Which actions give you a higher bonus payment?",
+    responses: [
+        { text: "Selecting only correct answers.", isTrue: true },
+        { text: "Selecting no incorrect answers.", isTrue: true },
+        { text: "Selecting any incorrect answers.", isTrue: false },
+        { text: "Selecting no answers at all.", isTrue: false },
+    ],
+    required: true,
+    randomize: true,
+    participantSeed: exp.pID,
+    showFeedbackOnSelect: true,
+    showScore: true,
+    allowReset: true,
+}}/>
 
-<RequiredQuestion
-  qid="rq1"
-  text="Indicate when you understand and are ready to continue."
-  answers={[
-    { text: "I understand and I'm ready to continue." },
-  ]}
-  checkBoxType="checkbox"
-  continueButtonId="next-button"
-/>
+<MultipleChoiceQuestion
+bind:bindableComplete={qStates[2].completed}
+bind:bindableScoreArray={qStates[2].scoreArray}
+props={{
+    qid: qStates[2].qid,
+    questionText: "Indicate when you understand and are ready to continue.",
+    responses: [
+        { text: "I understand and I'm ready to continue." },
+    ],
+    inputType: 'checkbox',
+    required: true,
+}}/>
 
-<br>
-
-<button id="next-button" onclick={() => next()}>Next</button>
+<button id="next-button" onclick={() => next()} disabled={!allowNext}>Next</button>
 
 {#if PUBLIC_ENV === 'dev'}
 <br><br>
 <button id="skip-button" onclick={() => next()}>Skip</button>
 {/if}
+

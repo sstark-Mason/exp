@@ -291,7 +291,7 @@ export const ccgRoutes: RouteState[] = [
     { route: "welcome", permitted: false, required: true, completed: false, revisitAfterCompleted: true },
     { route: "screening", permitted: false, required: true, completed: false, revisitAfterCompleted: false },
     { route: "comprehension_intro", permitted: false, required: true, completed: false, revisitAfterCompleted: true },
-    { route: "game_intro", permitted: false, required: true, completed: false, revisitAfterCompleted: true },
+    { route: "game_explanation", permitted: false, required: true, completed: false, revisitAfterCompleted: true },
     { route: "game_ready", permitted: false, required: true, completed: false, revisitAfterCompleted: false },
     { route: "game_play", permitted: false, required: true, completed: false, revisitAfterCompleted: false },
     { route: "game_end", permitted: false, required: true, completed: false, revisitAfterCompleted: false },

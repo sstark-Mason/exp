@@ -1,0 +1,76 @@
+<script lang="ts">
+    import { PUBLIC_ENV } from '$env/static/public';
+    import { goto, invalidateAll } from '$app/navigation';
+    import { page } from '$app/state';
+    import * as ccg from '$lib/ccg/ccg.svelte.ts';
+    const debug = ccg.debugBase.extend(`page:${page.data.slug}.svx`);
+    const exp = ccg.getExperimentState();
+    exp.updateRoutePermission(page.data.slug, true);
+
+    import MultipleChoiceQuestion from '$svexplib/Questions/MultipleChoiceQuestion.svelte';
+
+
+</script>
+
+# Multiple Choice Questions
+
+<MultipleChoiceQuestion props={{
+    qid: "cq1",
+    questionText: "Question text?",
+    responses: [
+        { text: "True", isTrue: true },
+        { text: "True", isTrue: true },
+        { text: "False", isTrue: false },
+        { text: "False", isTrue: false },
+        { text: "Giraffe" },
+    ],
+    required: true,
+    randomize: true,
+    participantSeed: exp.pID,
+    showFeedbackOnSelect: true,
+    onComplete: (q) => { debug('Question completed:', q.qid); }
+}}/>
+
+<MultipleChoiceQuestion props={{
+    qid: "cq2",
+    questionText: "Question text?",
+    responses: [
+        { text: "True", isTrue: true },
+        { text: "False", isTrue: false },
+        { text: "Giraffe" },
+    ],
+    required: true,
+    randomize: true,
+    participantSeed: exp.pID,
+    showFeedbackOnSelect: true,
+}}/>
+
+<MultipleChoiceQuestion props={{
+    qid: "cq3",
+    questionText: "Not required",
+    responses: [
+        { text: "Cat" },
+        { text: "Dog" },
+        { text: "Giraffe" },
+    ],
+    inputType: 'checkbox',
+    required: false,
+    randomize: true,
+    participantSeed: exp.pID,
+    showFeedbackOnSelect: true,
+}}/>
+
+<MultipleChoiceQuestion props={{
+    qid: "cq4",
+    questionText: "Required, no feedback",
+    responses: [
+        { text: "True", isTrue: true },
+        { text: "False", isTrue: false },
+        { text: "Giraffe" },
+    ],
+    inputType: 'checkbox',
+    required: true,
+    randomize: true,
+    participantSeed: exp.pID,
+    showFeedbackOnSelect: false,
+}}/>

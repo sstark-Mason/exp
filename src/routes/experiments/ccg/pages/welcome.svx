@@ -121,7 +121,7 @@ Selected role: {selectedRole}
 <button onclick={() => assignRandomPID()}>Get Random ID</button>
 {/if}
 
-{#if PUBLIC_ENV === 'dev'}
+<!-- {#if PUBLIC_ENV === 'dev'}
 
 Page: {page.url.pathname}
 
@@ -135,7 +135,7 @@ Slug: {page.data.slug}
 
 Page.route.id: {page.route.id}
 
-{/if}
+{/if} -->
 
 <style>
 

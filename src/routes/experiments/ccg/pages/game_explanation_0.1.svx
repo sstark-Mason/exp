@@ -1,0 +1,167 @@
+<script lang="ts">
+    import { PUBLIC_ENV } from '$env/static/public';
+    import { goto } from '$app/navigation';
+    import { page } from '$app/state';
+    import * as ccg from '$lib/ccg/ccg.svelte.ts';
+    const debug = ccg.debugBase.extend(`page:${page.data.slug}.svx`);
+    const exp = ccg.getExperimentState();
+
+    import ComprehensionQuestion from "$svexplib/Questions/ComprehensionQuestion.svelte";
+    import PracticeCoordinationGame from "$svexplib/Games/CoordinationGame/PracticeCoordinationGame.svelte";
+    import { choiceSetSymbols, choiceSetColorsUnicode } from '$svexplib/Games/CoordinationGame/CoordinationGameBase.ts';
+
+    import { marked } from 'marked';
+
+    function next() {
+        goto(exp.next(page.data.slug));
+    }
+
+    let gameKey = 0;
+
+    function restartGame() {
+        gameKey += 1;
+    }
+</script>
+
+# Game explanation
+
+You will play a **coordination game** with other participants.
+
+## Overview
+
+- You will play multiple *game rounds*. Each game round has the same setup but different details.
+- Each game round has **two players**: you, and another random participant.
+- Each game round has **two options** to choose from. You will each select **one** of these options.
+- If you both select the **same option**, you both win points. If you select **different options**, you don't win points.
+- Successful coordination on the **first option** will give **you** more points. Successful coordination on the **second option** will give **the other player** more points.
+
+At the end of the experiment, your total points will be calculated and added to your final payment.
+<!-- The past-player mechanism doesn't need to be explained since both forms (past/asymmetric and live/symmetric) are almost completely* strategically equivalent. -->
+<!-- This player's choices can be used to match future participants, so it would be untrue to say that their choices don't affect anyone else's payoffs (unless we use divided samples). -->
+<!-- Language note: "If you *both* choose different options..." implies a possible case where only *one* player chooses different options, which implies that "different options" refers to a single player's choices, not the single choices of two players. -->
+<!-- "...you don't win points" is more accurate than "neither of you win points," since matching isn't symmetric. -->
+<!-- "extra" points vs. "more" points? -->
+
+<br>
+
+## Example game
+
+<PracticeCoordinationGame
+    player1Name={"fem1"}
+    choiceSet={choiceSetColorsUnicode}
+    outcome_c1c1={[2,1]}
+    outcome_c2c2={[1,2]}
+    outcome_c1c2={[0,0]}
+    outcome_c2c1={[0,0]}
+/>
+
+<br>
+
+### The above table is a *normal form game*.
+
+A normal form game is a way to represent the possible choices and outcomes in a game round.
+- Your options are shown in the **left-most column**.
+- The other player's options are shown in the **top row**.
+- The pair of numbers in each cell show the points that you and the other player would receive for that combination of choices.
+  - The **first, <u>underlined</u> number** shows the points **you** would receive.
+  - The **second number** shows the points the **other player** would receive.
+
+<br>
+
+
+## Comprehension questions
+
+<ComprehensionQuestion
+  qid="cq1.1"
+  text="What is the main goal in each round of the game?"
+  reset={false}
+  answers={[
+    { text: "To choose the same option as the other player.", isCorrect: true },
+    { text: "To choose a different option than the other player.", isCorrect: false },
+    { text: "To choose my favorite option.", isCorrect: false },
+  ]}
+  continueButtonId="next-button"
+  dbColumn="cq_game_1"
+/>
+
+<ComprehensionQuestion
+  qid="cq1.2"
+  text="Who is the other player in a game round?"
+  reset={false}
+  answers={[
+    { text: "Another participant in this experiment.", isCorrect: true },
+    { text: "A professional e-sports player.", isCorrect: false },
+    { text: "A computer program.", isCorrect: false },
+  ]}
+  continueButtonId="next-button"
+  dbColumn="cq_game_2"
+/>
+
+<br>
+
+<span style="font-size: 1.2em">
+    {@html marked.parse(
+    "For the following questions, *option 1* and *option 2* refer to the options from **your perspective**. " +
+    "For example, if you choose option 1 and the other player also chose option 1, then you chose the **same** option."
+    )}
+</span>
+
+<ComprehensionQuestion
+  qid="cq1.3"
+  text="If you chose option 2 and the other player chose option 1, how many points would you receive?"
+  reset={false}
+  answers={[
+    { text: "0 points", isCorrect: true },
+    { text: "1 point", isCorrect: false },
+    { text: "2 points", isCorrect: false },
+  ]}
+  continueButtonId="next-button"
+  dbColumn="cq_game_3"
+/>
+
+<ComprehensionQuestion
+  qid="cq1.4"
+  text="If you chose option 1 and the other player chose option 1, how many points would you receive?"
+  reset={false}
+  answers={[
+    { text: "2 points", isCorrect: true },
+    { text: "0 points", isCorrect: false },
+    { text: "1 point", isCorrect: false },
+  ]}
+  continueButtonId="next-button"
+  dbColumn="cq_game_4"
+/>
+
+<ComprehensionQuestion
+  qid="cq1.5"
+  text="If you chose option 2 and the other player chose option 2, how many points would you receive?"
+  reset={false}
+  answers={[
+    { text: "1 point", isCorrect: true },
+    { text: "2 points", isCorrect: false },
+    { text: "0 points", isCorrect: false },
+  ]}
+  continueButtonId="next-button"
+  dbColumn="cq_game_5"
+/>
+
+<ComprehensionQuestion
+  qid="cq1.6"
+  text="If you chose option 1 and the other player chose option 2, how many points would you receive?"
+  reset={false}
+  answers={[
+    { text: "0 points", isCorrect: true },
+    { text: "1 point", isCorrect: false },
+    { text: "2 points", isCorrect: false },
+  ]}
+  continueButtonId="next-button"
+  dbColumn="cq_game_6"
+/>
+
+<br>
+<button id="next-button" onclick={() => next()}>Next</button>
+
+{#if PUBLIC_ENV === 'dev'}
+<br><br>
+<button id="skip-button" onclick={() => next()}>Skip</button>
+{/if}

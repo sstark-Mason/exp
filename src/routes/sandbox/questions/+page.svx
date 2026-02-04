@@ -1,0 +1,24 @@
+<script lang="ts">
+    // import { MultipleChoiceQuestionProps } from '$svexplib/Questions/MultipleChoiceBase.svelte.ts';
+    import * as ccg from '$lib/ccg/ccg.svelte.ts';
+    const exp = ccg.initExperimentState({
+        pID: () => 'sandbox',
+        userRole: () => 'tester',
+    });
+
+    const submitQuestionToDb = (updates: object) => {
+        exp.dbUpdateParticipant(updates);
+    }
+
+
+
+</script>
+
+# Multiple Choice Question Base
+
+<button onclick={() => {
+    submitQuestionToDb({ pid: 'sandbox_question_1' });
+}}>
+    Submit Answer
+</button>
+

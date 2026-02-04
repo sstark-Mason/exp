@@ -308,7 +308,7 @@
 
 <span class="question-text">
   {#if fmt === "markdown"}
-    {@html marked.parse(question.text)}
+    {@html marked.parseInline(question.text)}
     <br>
   {:else if fmt === "html"}
     {@html question.text}
@@ -366,7 +366,7 @@
     class="cq-choice {answerLabelClasses[answer.cid] ? answerLabelClasses[answer.cid].join(' ') : ''}"
   >
   {#if fmt === "markdown"}
-    {@html marked.parse(answer.text)}
+    {@html marked.parseInline(answer.text)}
   {:else if fmt === "html"}
     {@html answer.text}
   {:else}
