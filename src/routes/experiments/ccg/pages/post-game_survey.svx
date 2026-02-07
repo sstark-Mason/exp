@@ -1,10 +1,18 @@
 <script lang="ts">
+    export const prerender = true;
     import { PUBLIC_ENV } from '$env/static/public';
     import { goto } from '$app/navigation';
     import { page } from '$app/state';
     import * as ccg from '$lib/ccg/ccg.svelte.ts';
     const debug = ccg.debugBase.extend(`page:${page.data.slug}.svx`);
     const exp = ccg.getExperimentState();
+
+    import SliderQuestion from '$lib/svexplib/Questions/SliderQuestion.svelte';
+    import AllocationQuestion from '$lib/svexplib/Questions/AllocationQuestion.svelte';
+
+    let val_q_2_1: number | null = $state(null);
+    let val_q_2_2: number | null = $state(null);
+    let val_q_2_3: {name: string, value: number}[] = $state([]);
 
     function next() {
         exp.dbUpdateParticipant({ completed_experiment: true });
@@ -16,5 +24,59 @@
 # Post-Game Survey
 
 Before we finish, we'll ask you a few questions about yourself.
+
+<SliderQuestion
+    bind:bindableValue={val_q_2_1}
+    props={{
+        qid: 'q_2_1',
+        questionText: "How much do you identify as female?",
+        range: [0, 10],
+        rangeLabels: ['Not at all', 'Very strongly'],
+        step: 0.01,
+        tickInterval: 1,
+        required: true
+    }}
+/>
+
+<SliderQuestion
+    bind:bindableValue={val_q_2_2}
+    props={{
+        qid: 'q_2_2',
+        questionText: "How much do you identify as male? (also fem/masc as separate questions?)",
+        range: [0, 10],
+        rangeLabels: ['Not at all', 'Very strongly'],
+        step: 0.01,
+        tickInterval: 2,
+        required: true
+    }}
+/>
+
+
+<AllocationQuestion
+    bind:bindableValues={val_q_2_3}
+    props={{
+        qid: "q_2_4",
+        questionText: "How important are these factors to a person's gender?",
+        subcomponents: [
+            { name: 'Chromosomes', description: "Chromosomes by themselves (XX, XY, etc.)"},
+            { name: 'Hormones', description: "Blood levels of hormones (testosterone, estrogen, etc.)"},
+            { name: 'Socialization', description: "Upbringing, culture, and societal expectations" },
+            { name: 'Identity', description: "Personal sense of self (independent of other people)" },
+        ]
+        ,
+        remainderLabel: 'Other',
+    }}
+/>
+
+The following questions are about your beliefs about the **other participants of this experiment**.
+
+(Questions)
+
+The following questions are about your beliefs about **people in your country generally**.
+
+(Questions)
+
+
+<br><br>
 
 <button id="next-button" onclick={() => next()}>Next</button>
