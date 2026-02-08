@@ -16,7 +16,8 @@
         userRole: () => data.userRole,
     });
 
-    if (data.validExperiment) {
+    // svelte-ignore state_referenced_locally
+        if (data.validExperiment) {
         exp.dbInitSession();
     }
 
@@ -67,7 +68,7 @@
 
 <div class="exp">
 
-    <div class="exp-nav">
+    <div class="sidebar exp-nav">
         <!-- {#each exp.routeStates as route}
             <div>
                 {#if route.permitted}
@@ -81,16 +82,17 @@
                 {/if}
             </div>
         {/each} -->
+        <h3>Pages</h3>
         {#each exp.routeStates as route}
-        <div>
-            {#if route.revisitAfterCompleted}
-                {#if route.route === data.slug}
-                    <strong>{route.route.replace(/_/g, ' ')}</strong>
-                {:else if route.permitted}
-                    <a href='{route.route}'>{route.route.replace(/_/g, ' ')}</a>
-                {/if}
+        {#if route.permitted && route.revisitAfterCompleted}
+        <div class="nav-page-entry">
+            {#if route.route === data.slug}
+                <strong>{route.route.replace(/_/g, ' ')}</strong>
+            {:else if route.permitted}
+                <a href='{route.route}'>{route.route.replace(/_/g, ' ')}</a>
             {/if}
         </div>
+        {/if}
         {/each}
     </div>
 
@@ -98,49 +100,95 @@
         {@render children()}
     </div>
 
-    <div class="exp-info">
+    <div class="sidebar exp-info">
         <h3>Experiment Info</h3>
-        <p>Role: {exp.userRole}</p>
-        <p>pID: {exp.pID}</p>
+        Role: {exp.userRole}
+        <br>
+        pID: {exp.pID}
         {#if PUBLIC_ENV === 'dev'}
             <br><br>
             <p>Route: {page.url.pathname}</p>
-            
             <p>User Role: {exp.userRole}</p>
             <p>dbUID: {exp.dbUID}</p>
             <p>Status: {data.status}</p>
             <p>Slug: {data.slug}</p>
             <button onclick={() =>  debug(exp.getExperimentStateDebugInfo())}>Print Experiment State</button>
-            <!-- <Debug/> -->
         {/if}
     </div>
 
 </div>
 
-<!-- <ToggleDebug/> -->
 
 <Debug/>
 
 
 <style>
+    :global(:root) {
+        --sidebar-bg: #f0f0f0;
+        --sidebar-entry: #d0d0d0;
+        
+    }
+
+    :global(.dark) {
+        --sidebar-bg: #000;
+        --sidebar-entry: #222;
+    }
+
     .exp {
         display: flex;
         flex-direction: row;
+        justify-content: space-between;
+        min-height: 100vh;
     }
-    .exp-nav {
-        width: 200px;
-        border-right: 1px solid #ccc;
-        padding-right: 10px;
+
+    .sidebar {
+        display: flex;
+        flex-direction: column;
+        flex: 0 0 20%;
+        max-width: 200px;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        background-color: var(--sidebar-bg);
+        text-align: center;
+
+        h3 {
+            margin-top: 0;
+            margin-bottom: 10px;
+        }
     }
+
+    .nav-page-entry {
+        margin: 1px;
+        padding: 4px;
+        border: 1px solid black;
+        border-radius: 5px;
+        background-color: var(--sidebar-entry);
+    }
+    
     .page {
         flex: 1;
+        min-width: 0;
+        max-width: 800px;
         padding: 20px;
+        margin: 0 auto;
     }
-    .exp-info {
-        width: 200px;
-        border-left: 1px solid #ccc;
-        padding-left: 10px;
+
+    @media (max-width: 1200px) {
+        .exp {
+            flex-direction: column;
+        }
+        .sidebar {
+            flex: none;
+            width: 100%;
+            border: none;
+            padding: 10px 0;
+        }
+        .page {
+            width: 100%;
+        }
     }
+
 </style>
 
 

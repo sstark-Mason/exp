@@ -35,13 +35,16 @@
 <style>
 
 	:global(:root) {
-		background-color: #ffffff;
+		background-color: #fafafa;
 		color: #000000;
+		color-scheme: light;
+		--sidebar-bg: #fafafa;
 	}
 
 	:global(.dark) {
         background-color: #121212;
         color: #ffffff;
+		color-scheme: dark;
     }
 
 </style>
