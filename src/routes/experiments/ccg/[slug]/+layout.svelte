@@ -1,7 +1,7 @@
 <script lang="ts">
     import { PUBLIC_ENV } from '$env/static/public';
     import { page } from '$app/state';
-    import { beforeNavigate, goto, afterNavigate} from '$app/navigation';
+    import { goto, beforeNavigate, afterNavigate, onNavigate } from '$app/navigation';
     
     // import ToggleDebug from '$svexplib/Tools/ToggleDebug.svelte';
     import Debug from '$svexplib/Tools/Debug.svelte';
@@ -64,28 +64,34 @@
     //     }
     // })
 
+
+    onNavigate((navigation) => {
+        if (!document.startViewTransition) return;
+
+        return new Promise((resolve) => {
+            document.startViewTransition(async () => {
+                resolve();
+                await navigation.complete;
+            });
+        });
+    });
+
+
+
+
 </script>
 
-<div class="exp">
+<div class="layout">
 
-    <div class="sidebar exp-nav">
-        <!-- {#each exp.routeStates as route}
-            <div>
-                {#if route.permitted}
-                    {#if route.route === data.slug}
-                        <strong>{route.route.replace(/-/g, ' ')}</strong>
-                    {:else}
-                        <a href='{route.route}'>{route.route.replace(/-/g, ' ')}</a>
-                    {/if}
-                {:else}
-                    <span style="color: gray;">{route.route.replace(/-/g, ' ')}</span>
-                {/if}
-            </div>
-        {/each} -->
+    <!-- <div class="sidebar left exp-nav">
+        
+    </div> -->
+
+    <aside class="sidebar exp-nav">
         <h3>Pages</h3>
         {#each exp.routeStates as route}
         {#if route.permitted && route.revisitAfterCompleted}
-        <div class="nav-page-entry">
+        <div class="nav-item">
             {#if route.route === data.slug}
                 <strong>{route.route.replace(/_/g, ' ')}</strong>
             {:else if route.permitted}
@@ -94,18 +100,34 @@
         </div>
         {/if}
         {/each}
-    </div>
+
+        <!-- <h3>Pages</h3>
+        {#each exp.routeStates as route}
+        <div class="nav-item">
+            {#if route.route === data.slug}
+                <strong>{route.route.replace(/_/g, ' ')}</strong>
+            {:else if route.permitted}
+                <a href='{route.route}'>{route.route.replace(/_/g, ' ')}</a>
+            {:else}
+                <span style="color: gray;">{route.route.replace(/_/g, ' ')}</span>
+            {/if}
+        </div>
+        {/each} -->
+    </aside>
+
+    
+
 
     <div class="page">
         {@render children()}
     </div>
 
-    <div class="sidebar exp-info">
+    <aside class="sidebar exp-info">
         <h3>Experiment Info</h3>
         Role: {exp.userRole}
         <br>
         pID: {exp.pID}
-        {#if PUBLIC_ENV === 'dev'}
+        <!-- {#if PUBLIC_ENV === 'dev'}
             <br><br>
             <p>Route: {page.url.pathname}</p>
             <p>User Role: {exp.userRole}</p>
@@ -113,9 +135,10 @@
             <p>Status: {data.status}</p>
             <p>Slug: {data.slug}</p>
             <button onclick={() =>  debug(exp.getExperimentStateDebugInfo())}>Print Experiment State</button>
-        {/if}
-    </div>
+        {/if} -->
+    </aside>
 
+    
 </div>
 
 
@@ -123,7 +146,7 @@
 
 
 <style>
-    :global(:root) {
+    /* :global(:root) {
         --sidebar-bg: #f0f0f0;
         --sidebar-entry: #d0d0d0;
         
@@ -132,16 +155,16 @@
     :global(.dark) {
         --sidebar-bg: #000;
         --sidebar-entry: #222;
-    }
+    } */
 
-    .exp {
+    /* .layout {
         display: flex;
         flex-direction: row;
         justify-content: space-between;
         min-height: 100vh;
-    }
+    } */
 
-    .sidebar {
+    /* .sidebar {
         display: flex;
         flex-direction: column;
         flex: 0 0 20%;
@@ -156,25 +179,25 @@
             margin-top: 0;
             margin-bottom: 10px;
         }
-    }
+    } */
 
-    .nav-page-entry {
+    /* .sidebar-page-nav {
         margin: 1px;
         padding: 4px;
         border: 1px solid black;
         border-radius: 5px;
-        background-color: var(--sidebar-entry);
-    }
+        background-color: var(--sidebar-page-nav);
+    } */
     
-    .page {
+    /* .page {
         flex: 1;
         min-width: 0;
         max-width: 800px;
         padding: 20px;
         margin: 0 auto;
-    }
+    } */
 
-    @media (max-width: 1200px) {
+    /* @media (max-width: 1200px) {
         .exp {
             flex-direction: column;
         }
@@ -187,7 +210,7 @@
         .page {
             width: 100%;
         }
-    }
+    } */
 
 </style>
 

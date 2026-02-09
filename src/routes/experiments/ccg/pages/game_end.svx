@@ -8,6 +8,7 @@
     const exp = ccg.getExperimentState();
 
     function next() {
+        exp.updateRoutePermission(page.data.slug, false);
         goto(exp.next(page.data.slug));
     }
 

@@ -248,6 +248,7 @@ export class ExperimentState {
     next(currentRoute: string): string {
         const nextRoute = next(this.#routeStates, currentRoute);
         debug(`Next intended route after ${currentRoute} is ${nextRoute}`);
+        this.updateRouteState(currentRoute, true);
         this.updateRoutePermission(nextRoute, true);
         return nextRoute;
     }

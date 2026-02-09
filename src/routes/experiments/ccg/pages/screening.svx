@@ -24,13 +24,13 @@
                 exp.dbUpdateParticipant({ screening_passed: allCorrect });
                 // exp.dbUpdateParticipant({ completed_experiment: true });
                 exp.updateRouteState('screening', 'completed');
-                exp.updateRoutePermission('screening', false);
+                exp.updateRoutePermission(page.data.slug, false);
                 goto(exp.next(page.data.slug));
                 break;
             case false:
                 exp.dbUpdateParticipant({ screening_passed: false, completed_experiment: false });
                 exp.updateRouteState('screening', 'completed');
-                exp.updateRoutePermission('screening', false);
+                exp.updateRoutePermission(page.data.slug, false);
                 exp.updateRoutePermission('exit', true);
                 goto(exp.next(page.data.slug));
                 break;

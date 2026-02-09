@@ -18,7 +18,9 @@
             alert("Please select a portrait before proceeding.");
             return;
         }
+        
         avatarIsFinalized.current = true;
+        exp.updateRoutePermission(page.data.slug, false);
         goto(exp.next(page.data.slug));
     }
 
@@ -27,6 +29,7 @@
             selectedAvatarName.current = "fem1";
         }
         avatarIsFinalized.current = true;
+        exp.updateRoutePermission(page.data.slug, false);
         goto(exp.next(page.data.slug));
     }
 
