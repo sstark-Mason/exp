@@ -79,19 +79,16 @@
 
 
 
+
 </script>
 
-<div class="layout">
+<div class="exp-layout">
 
-    <!-- <div class="sidebar left exp-nav">
-        
-    </div> -->
-
-    <aside class="sidebar exp-nav">
+    <aside class="exp-sidebar exp-nav">
         <h3>Pages</h3>
         {#each exp.routeStates as route}
         {#if route.permitted && route.revisitAfterCompleted}
-        <div class="nav-item">
+        <div class="exp-nav-item">
             {#if route.route === data.slug}
                 <strong>{route.route.replace(/_/g, ' ')}</strong>
             {:else if route.permitted}
@@ -118,11 +115,11 @@
     
 
 
-    <div class="page">
+    <div class="exp-page">
         {@render children()}
     </div>
 
-    <aside class="sidebar exp-info">
+    <aside class="exp-sidebar exp-info">
         <h3>Experiment Info</h3>
         Role: {exp.userRole}
         <br>
@@ -146,71 +143,6 @@
 
 
 <style>
-    /* :global(:root) {
-        --sidebar-bg: #f0f0f0;
-        --sidebar-entry: #d0d0d0;
-        
-    }
-
-    :global(.dark) {
-        --sidebar-bg: #000;
-        --sidebar-entry: #222;
-    } */
-
-    /* .layout {
-        display: flex;
-        flex-direction: row;
-        justify-content: space-between;
-        min-height: 100vh;
-    } */
-
-    /* .sidebar {
-        display: flex;
-        flex-direction: column;
-        flex: 0 0 20%;
-        max-width: 200px;
-        padding: 10px;
-        border: 1px solid #ccc;
-        border-radius: 5px;
-        background-color: var(--sidebar-bg);
-        text-align: center;
-
-        h3 {
-            margin-top: 0;
-            margin-bottom: 10px;
-        }
-    } */
-
-    /* .sidebar-page-nav {
-        margin: 1px;
-        padding: 4px;
-        border: 1px solid black;
-        border-radius: 5px;
-        background-color: var(--sidebar-page-nav);
-    } */
-    
-    /* .page {
-        flex: 1;
-        min-width: 0;
-        max-width: 800px;
-        padding: 20px;
-        margin: 0 auto;
-    } */
-
-    /* @media (max-width: 1200px) {
-        .exp {
-            flex-direction: column;
-        }
-        .sidebar {
-            flex: none;
-            width: 100%;
-            border: none;
-            padding: 10px 0;
-        }
-        .page {
-            width: 100%;
-        }
-    } */
 
 </style>
 

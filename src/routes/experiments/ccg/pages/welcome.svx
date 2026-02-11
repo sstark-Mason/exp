@@ -12,11 +12,13 @@
 
     let pid_input_enabled = $state(false);
     let selectedRole = $state(exp.userRole);
+    let pidCookieSet = $state(true);
 
     function assignRandomPID() {
         const randomPID = 'anon_' + Math.random().toString(36).substring(2, 10);
         exp.pID = randomPID;
         pid_input_enabled = true;
+        updatePID();
     }
 
     async function next() {
@@ -42,9 +44,11 @@
         pid_input_enabled = !pid_input_enabled;
         switch (pid_input_enabled) {
             case true:
+                pidCookieSet = false;
                 return;
             case false:
                 exp.dbUpdateParticipant({ pid: exp.pID });
+                pidCookieSet = true;
         }
 
         const response = await fetch('api/update-cookies', {
@@ -64,12 +68,17 @@
     }
 
     async function resetCookiesAndReturnToOrigin() {
+        if (selectedRole === 'tester') {
+            assignRandomPID();
+        } else if (selectedRole === 'participant') {
+
+        }
         const response = await fetch('api/update-cookies', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ pid: null, role: null }),
+            body: JSON.stringify({ pid: exp.pID, role: null }),
         });
         if (response.ok) {
             debug('Cookies reset successfully via API');
@@ -84,43 +93,52 @@
     
 </script>
 
-# Welcome
+<div class="exp-page-subsection">
 
-Before continuing, please confirm your prolific ID below. This is necessary to ensure you receive payment for your participation.
-<input type="text" bind:value={exp.pID} disabled={!pid_input_enabled} class="pid-input" placeholder="Enter your Prolific ID here"/>
+    # Welcome
 
-<button onclick={() => updatePID()} class="pid-button" class:input-enabled={pid_input_enabled}>{#if pid_input_enabled}Confirm ID{:else}Edit ID{/if}</button>
+    Before continuing, please confirm your prolific ID below. This is necessary to ensure you receive payment for your participation.
+    <input type="text" bind:value={exp.pID} disabled={!pid_input_enabled} class="pid-input" placeholder="Enter your Prolific ID here"/>
 
-Your expected role is **{exp.userRole}**. If this is incorrect, please select the correct role below.
+    <button onclick={() => updatePID()} class="pid-button" class:input-enabled={pid_input_enabled}>{#if pid_input_enabled}Confirm ID{:else}Edit ID{/if}</button>
 
-Selected role: {selectedRole}
+    Your expected role is **{exp.userRole}**. If this is incorrect, please select the correct role below.
 
-<!-- Modal selector bound to newRole. If newRole != exp.userRole, then reset cookies and re-enter through /ccg. -->
-<input type="radio" id="participant" name="role" value="participant" bind:group={selectedRole}>
-<label for="participant">Participant</label>
-<br>
-<input type="radio" id="tester" name="role" value="tester" bind:group={selectedRole}>
-<label for="tester">Tester</label>
+    Selected role: {selectedRole}
 
-<div>
-{#if exp.pID && exp.userRole === selectedRole}
-    <br><br>
-    <button onclick={() => next()}>Next</button>
-{:else if !exp.pID}
+    <!-- Modal selector bound to newRole. If newRole != exp.userRole, then reset cookies and re-enter through /ccg. -->
+    <input type="radio" id="participant" name="role" value="participant" bind:group={selectedRole}>
+    <label for="participant">Participant</label>
     <br>
-    <button onclick={() => assignRandomPID()}>Continue without Prolific ID</button>
-{:else if exp.userRole !== selectedRole}
+    <input type="radio" id="tester" name="role" value="tester" bind:group={selectedRole}>
+    <label for="tester">Tester</label>
+
+</div>
+
+<div class="page-navigation">
+
+    <!-- {#if PUBLIC_ENV === 'dev' || exp.userRole === 'tester'}
     <br><br>
-    <button onclick={() => resetCookiesAndReturnToOrigin()}>Change role to {selectedRole}</button>
-{/if}
+    <button onclick={() => assignRandomPID()}>Get Random ID</button>
+    {/if} -->
+
+    {#if exp.userRole !== selectedRole}
+        <button onclick={() => resetCookiesAndReturnToOrigin()}>Change role to {selectedRole}</button>
+    {/if}
+    {#if exp.pID && exp.userRole === selectedRole}
+        <button id="next-button" disabled={!pidCookieSet} onclick={() => next()}>Next</button>
+    <!-- {:else if !exp.pID}
+        <button onclick={() => assignRandomPID()}>Assign random ID</button>
+    {:else if exp.userRole !== selectedRole}
+        <button onclick={() => resetCookiesAndReturnToOrigin()}>Change role to {selectedRole}</button> -->
+    {/if}
+
 </div>
 
 
 
-{#if PUBLIC_ENV === 'dev' || exp.userRole === 'tester'}
-<br>
-<button onclick={() => assignRandomPID()}>Get Random ID</button>
-{/if}
+
+
 
 
 <style>

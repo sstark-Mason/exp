@@ -35,29 +35,40 @@
 
 </script>
 
-# Avatar Selection
+<div class="exp-page-subsection">
 
-{#if !avatarIsFinalized.current}
-  <p>Please choose a portrait to represent yourself in the game.</p>
-  <SelectAvatar
-    onAvatarSelection={(avatar) => {
-      debug(`Selected avatar: ${avatar}`);
-      selectedAvatarName.current = avatar;
-    }}
-  />
-  <br><br>
-{/if}
+    # Avatar Selection
 
+    {#if !avatarIsFinalized.current}
+    <p>Please choose a portrait to represent yourself in the game.</p>
+    <SelectAvatar
+        onAvatarSelection={(avatar) => {
+        debug(`Selected avatar: ${avatar}`);
+        selectedAvatarName.current = avatar;
+        }}
+    />
+    <br><br>
+    {/if}
 
-## Game Ready
+</div>
 
-When you're ready to begin the game, please click the "Next" button below.
+<div class="exp-page-subsection">
 
-This is your chosen avatar: {selectedAvatarName.current} (todo: replace with image)
+    ## Game Ready
 
-<button id="next-button" onclick={() => next()}>Next</button>
+    When you're ready to begin the game, please click the "Next" button below.
 
-{#if PUBLIC_ENV === 'dev'}
-<br><br>
-<button id="skip-button" onclick={() => skip()}>Skip</button>
-{/if}
+    This is your chosen avatar: {selectedAvatarName.current} (todo: replace with image)
+
+</div>
+
+<div class="page-navigation">
+
+    {#if PUBLIC_ENV === 'dev'}
+    <button id="skip-button" onclick={() => skip()}>Skip</button>
+    {/if}
+
+    <button id="next-button" onclick={() => next()}>Next</button>
+
+</div>
+

@@ -41,7 +41,7 @@
 
 </script>
 
-<div class="slider-question">
+<div class="exp-question slider-question">
 
     <label for={props.qid} class="question-label">{props.questionText}</label>  
 
@@ -120,6 +120,7 @@
 
     .question-label {
         font-size: 1.2em;
+        /* font-weight: bold; */
     }
 
     .input-container {
@@ -149,6 +150,7 @@
         appearance: none;
         margin: 0;
         cursor: pointer;
+        background: transparent;
 
         /* Chromium shits itself if it sees a firefox specifier */
         &::-webkit-slider-runnable-track {

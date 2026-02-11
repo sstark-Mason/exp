@@ -15,9 +15,16 @@
 
 </script>
 
-# Game end
+<div class="exp-page-subsection">
 
-You've completed all rounds of the coordination game. Continue to the next page when you're ready.
+    # Game end
 
+    You've completed all rounds of the coordination game. Continue to the next page when you're ready.
 
-<button id="next-button" onclick={() => next()}>Next</button>
+</div>
+
+<div class="page-navigation">
+
+    <button id="next-button" onclick={() => next()}>Next</button>
+
+</div>

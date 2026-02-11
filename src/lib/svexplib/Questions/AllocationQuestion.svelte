@@ -59,7 +59,7 @@
 
 </script>
 
-<div class="distribution-bar-builder">
+<div class="exp-question distribution-bar-builder">
 
     <div class="question-label">
         {AQ.questionText}
@@ -77,7 +77,7 @@
                 </span>
                 {/each}
                 {#if AQ.remainderLabel}
-                <span class="cumulative-display-segment" style={`width: ${(100 - AQ.sum)}%; background-color: lightgrey;`}>
+                <span class="cumulative-display-segment" style={`width: ${(100 - AQ.sum)}%; background-color: var(--slider-track-color);`}>
                     {#if 100 - AQ.sum >= 5}
                         {#if 100 - AQ.sum > 10}{AQ.remainderLabel}:{/if}
                         {((100 - AQ.sum))}%
@@ -139,7 +139,7 @@
         --slider-thumb-roundedness: 100%;
         --number-input-width: 3.5em;
         --slider-input-width: calc(100% - var(--number-input-width) - 1em);
-        --slider-track-color: lightgrey;
+        --slider-track-color: oklch(0.8 0 0);
         --slider-thumb-color: rgb(0, 134, 179);
     }
 
@@ -150,7 +150,7 @@
     }
 
     .question-label {
-        font-weight: bold;
+        /* font-weight: bold; */
         font-size: 1.2em;
     }
 
@@ -184,6 +184,7 @@
         appearance: none;
         margin: 0;
         cursor: pointer;
+        background: transparent;
 
         /* Chromium shits itself if it sees a firefox specifier */
         &::-webkit-slider-runnable-track {

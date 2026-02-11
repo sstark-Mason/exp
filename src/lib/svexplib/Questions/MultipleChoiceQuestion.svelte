@@ -66,7 +66,7 @@
 
 </script>
 
-<div class="multiple-choice-question">
+<div class="exp-question multiple-choice-question">
 
     <span class="question-text">
         <span class="question-id"
@@ -105,21 +105,31 @@
 
 <style>
 
+    :root {
+        --color-default: oklch(0.80 0 0);
+        --color-incomplete: oklch(0.85 0.2 100);
+        --color-answered: oklch(0.80 0.5 240);
+        --color-correct: oklch(0.80 0.5 170);
+        --color-incorrect-selected: oklch(0.7 0.2 20 / 1);
+        --color-incorrect-disabled: oklch(0.7 0.2 20 / 0.5);
+    }
+
     .question-id {
         font-weight: bold;
         margin-right: 8px;
-        background-color: lightgrey;
+        background-color: var(--color-default);
         padding: 2px 6px;
         border-radius: 4px;
-        transition: 0.2s ease-in;
+        /* transition: 0.2s ease-in; */
         &.answered {
-            background-color: deepskyblue;
+            background-color: var(--color-answered);
         }
         &.partial {
-            background-color: orange;
+            background-color: var(--color-incomplete);
+            
         }
         &.completed {
-            background-color: springgreen;
+            background-color: var(--color-correct);
             opacity: 0.6;
         }
     }
@@ -127,7 +137,6 @@
     .multiple-choice-question {
         display: flex;
         flex-direction: column;
-        margin: 2em 0;
     }
 
     .question-text {
@@ -169,18 +178,17 @@
         }
 
         &.correct {
-            background-color: springgreen;
+            background-color: var(--color-correct);
             opacity: 1.0;
         }
 
         &.incorrect {
-            background-color: lightcoral;
+            background-color: var(--color-incorrect-selected);
             &:hover {
-                background-color: indianred;
-                /* background-color: coral; */
+                background-color: var(--color-incorrect-disabled);
             }
             &.disabled {
-                background-color: lightpink;
+                background-color: var(--color-incorrect-disabled);
             }
         }
 
@@ -189,7 +197,7 @@
         }
 
         &.disabled:not(.correct) {
-            opacity: 0.6;
+            opacity: 0.5;
         }
     }
 

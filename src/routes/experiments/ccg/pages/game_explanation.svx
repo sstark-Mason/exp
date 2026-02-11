@@ -101,53 +101,97 @@
 
 </script>
 
-# Game explanation
+<div class="exp-page-subsection">
 
-You will play a **coordination game** with other participants.
+    # Game explanation
 
-## Overview
+    You will play a **coordination game** with other participants.
 
-- You will play multiple *game rounds*. Each game round has the same setup but different details.
-- Each game round has **two players**: you, and another random participant.
-- Each game round has **two options** to choose from. You will each select **one** of these options.
-- If you both select the **same option**, you both win points. If you select **different options**, you don't win points.
-- Successful coordination on the **first option** will give **you** more points. Successful coordination on the **second option** will give **the other player** more points.
+    ## Overview
 
-At the end of the experiment, your total points will be calculated and added to your final payment.
-<!-- The past-player mechanism doesn't need to be explained since both forms (past/asymmetric and live/symmetric) are almost completely* strategically equivalent. -->
-<!-- This player's choices can be used to match future participants, so it would be untrue to say that their choices don't affect anyone else's payoffs (unless we use divided samples). -->
-<!-- Language note: "If you *both* choose different options..." implies a possible case where only *one* player chooses different options, which implies that "different options" refers to a single player's choices, not the single choices of two players. -->
-<!-- "...you don't win points" is more accurate than "neither of you win points," since matching isn't symmetric. -->
-<!-- "extra" points vs. "more" points? -->
+    - You will play multiple *game rounds*. Each game round has the same setup but different details.
+    - Each game round has **two players**: you, and another random participant.
+    - Each game round has **two options** to choose from. You will each select **one** of these options.
+    - If you both select the **same option**, you both win points. If you select **different options**, you don't win points.
+    - Successful coordination on the **first option** will give **you** more points. Successful coordination on the **second option** will give **the other player** more points.
 
-<br>
+    At the end of the experiment, your total points will be calculated and added to your final payment.
+    <!-- The past-player mechanism doesn't need to be explained since both forms (past/asymmetric and live/symmetric) are almost completely* strategically equivalent. -->
+    <!-- This player's choices can be used to match future participants, so it would be untrue to say that their choices don't affect anyone else's payoffs (unless we use divided samples). -->
+    <!-- Language note: "If you *both* choose different options..." implies a possible case where only *one* player chooses different options, which implies that "different options" refers to a single player's choices, not the single choices of two players. -->
+    <!-- "...you don't win points" is more accurate than "neither of you win points," since matching isn't symmetric. -->
+    <!-- "extra" points vs. "more" points? -->
 
-## Example game
+</div>
 
-<PracticeCoordinationGame
-    player1Name={"fem1"}
-    choiceSet={choiceSetColorsUnicode}
-    outcome_c1c1={[2,1]}
-    outcome_c2c2={[1,2]}
-    outcome_c1c2={[0,0]}
-    outcome_c2c1={[0,0]}
-/>
+<div class="exp-page-subsection">
 
-<br>
+    ## Example game
 
-### The above table is a *normal form game*.
+    <PracticeCoordinationGame
+        player1Name={"fem1"}
+        choiceSet={choiceSetColorsUnicode}
+        outcome_c1c1={[2,1]}
+        outcome_c2c2={[1,2]}
+        outcome_c1c2={[0,0]}
+        outcome_c2c1={[0,0]}
+    />
 
-A normal form game is how we represent the possible choices and outcomes in a game round.
-- Your options are shown in the **left-most column**.
-- The other player's options are shown in the **top row**.
-- The pair of numbers in each cell show the points that you and the other player would receive for that combination of choices.
-  - The **first, <u>underlined</u> number** shows the points **you** would receive.
-  - The **second number** shows the points the **other player** would receive.
+    ### The above table is a *normal form game*.
 
-<br>
+    A normal form game is how we represent the possible choices and outcomes in a game round.
+    - Your options are shown in the **left-most column**.
+    - The other player's options are shown in the **top row**.
+    - The pair of numbers in each cell show the points that you and the other player would receive for that combination of choices.
+    - The **first, <u>underlined</u> number** shows the points **you** would receive.
+    - The **second number** shows the points the **other player** would receive.
+
+</div>
+
+<div class="exp-page-subsection">
+
+    ## Comprehension questions
+
+    {#each questions.slice(0, 3) as q, i}
+        {@render question(q, i)}
+    {/each}
+
+</div>
+
+<div class="exp-page-subsection">
+
+    ## Comprehension questions
+    
+    <span style="font-size: 1.2em">
+        {@html marked.parse(
+        "For the following questions, *option 1* and *option 2* refer to the options from **your** perspective. " +
+        "For example, if you chose option 1 and the other player also chose option 1, then you chose the **same** option."
+        )}
+    </span>
+
+    {#each questions.slice(3) as q, i}
+        {@render question(q, i + 3)}
+    {/each}
+
+    <!-- {#if incompleteQuestions.length > 0}
+
+    Required questions remaining: {incompleteQuestions.length}
+
+    {/if} -->
+
+</div>
 
 
-## Comprehension questions
+
+<div class="page-navigation">
+
+    {#if PUBLIC_ENV === 'dev'}
+    <button id="skip-button" onclick={() => next()}>Skip</button>
+    {/if}
+
+    <button id="next-button" onclick={() => next()} disabled={!allowNext}>Next</button>
+
+</div>
 
 {#snippet question(q, i)}
     <MultipleChoiceQuestion
@@ -165,34 +209,3 @@ A normal form game is how we represent the possible choices and outcomes in a ga
         exportScoreArray: (qid: string, scoreArray: number[]) => { updateDb(qid, scoreArray); },
     }}/>
 {/snippet}
-
-{#each questions.slice(0, 3) as q, i}
-    {@render question(q, i)}
-{/each}
-
-<br>
-<span style="font-size: 1.2em">
-    {@html marked.parse(
-    "For the following questions, *option 1* and *option 2* refer to the options from **your perspective**. " +
-    "For example, if you choose option 1 and the other player also chose option 1, then you chose the **same** option."
-    )}
-</span>
-
-{#each questions.slice(3) as q, i}
-    {@render question(q, i + 3)}
-{/each}
-
-
-<!-- {#if incompleteQuestions.length > 0}
-
-Required questions remaining: {incompleteQuestions.length}
-
-{/if} -->
-
-<br>
-<button id="next-button" onclick={() => next()} disabled={!allowNext}>Next</button>
-
-{#if PUBLIC_ENV === 'dev'}
-<br><br>
-<button id="skip-button" onclick={() => next()}>Skip</button>
-{/if}

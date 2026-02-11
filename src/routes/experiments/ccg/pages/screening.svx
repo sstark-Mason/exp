@@ -47,6 +47,8 @@
 
 </script>
 
+<div class="exp-page-subsection">
+
 <ScreeningTask
   items={[
     { value: "♂", categories: ["Male"] },
@@ -62,18 +64,17 @@
   numCategories={3}
   onAllCategorized={(val: boolean) => allCategorized = val}
   onAllCorrect={(val: boolean) => allCorrect = val} />
+</div>
 
-<br>
+<div class="page-navigation">
 
-<button disabled={!allCategorized} onclick={() => next()}>Submit</button>
-
-{#if PUBLIC_ENV === 'dev'}
-    <br><br>
+    {#if PUBLIC_ENV === 'dev'}
     <button onclick={() => skip()}>Skip</button>
-    
-
     allCategorized: {allCategorized.toString()}  <button onclick={() => allCategorized = !allCategorized}>Toggle</button>
-
     allCorrect: {allCorrect.toString()}  <button onclick={() => allCorrect = !allCorrect}>Toggle</button>
-    
-{/if}
+    {/if}
+
+    <button id="next-button" disabled={!allCategorized} onclick={() => next()}>Submit</button>
+
+</div>
+

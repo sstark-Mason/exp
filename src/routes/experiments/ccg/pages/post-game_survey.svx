@@ -21,53 +21,56 @@
     
 </script>
 
-# Post-Game Survey
+<div class="exp-page-subsection">
 
-Before we finish, we'll ask you a few questions about yourself.
+    # Post-Game Survey
 
-<SliderQuestion
-    bind:bindableValue={val_q_2_1}
-    props={{
-        qid: 'q_2_1',
-        questionText: "How much do you identify as female?",
-        range: [0, 10],
-        rangeLabels: ['Not at all', 'Very strongly'],
-        step: 0.01,
-        tickInterval: 1,
-        required: true
-    }}
-/>
+    Before we finish, we'll ask you a few questions about yourself.
 
-<SliderQuestion
-    bind:bindableValue={val_q_2_2}
-    props={{
-        qid: 'q_2_2',
-        questionText: "How much do you identify as male? (also fem/masc as separate questions?)",
-        range: [0, 10],
-        rangeLabels: ['Not at all', 'Very strongly'],
-        step: 0.01,
-        tickInterval: 2,
-        required: true
-    }}
-/>
+    <SliderQuestion
+        bind:bindableValue={val_q_2_1}
+        props={{
+            qid: 'q_2_1',
+            questionText: "How much do you identify as female?",
+            range: [0, 10],
+            rangeLabels: ['Not at all', 'Very strongly'],
+            step: 0.01,
+            tickInterval: 1,
+            required: true
+        }}
+    />
+
+    <SliderQuestion
+        bind:bindableValue={val_q_2_2}
+        props={{
+            qid: 'q_2_2',
+            questionText: "How much do you identify as male? (also fem/masc as separate questions?)",
+            range: [0, 10],
+            rangeLabels: ['Not at all', 'Very strongly'],
+            step: 0.01,
+            tickInterval: 2,
+            required: true
+        }}
+    />
 
 
-<AllocationQuestion
-    bind:bindableValues={val_q_2_3}
-    props={{
-        qid: "q_2_4",
-        questionText: "How important are these factors to a person's gender?",
-        subcomponents: [
-            { name: 'Chromosomes', description: "Chromosomes by themselves (XX, XY, etc.)"},
-            { name: 'Hormones', description: "Blood levels of hormones (testosterone, estrogen, etc.)"},
-            { name: 'Socialization', description: "Upbringing, culture, and societal expectations" },
-            { name: 'Identity', description: "Personal sense of self (independent of other people)" },
-        ]
-        ,
-        remainderLabel: 'Other',
-    }}
-/>
+    <AllocationQuestion
+        bind:bindableValues={val_q_2_3}
+        props={{
+            qid: "q_2_4",
+            questionText: "How important are these factors to a person's gender?",
+            subcomponents: [
+                { name: 'Chromosomes', description: "Chromosomes by themselves (XX, XY, etc.)"},
+                { name: 'Hormones', description: "Blood levels of hormones (testosterone, estrogen, etc.)"},
+                { name: 'Socialization', description: "Upbringing, culture, and societal expectations" },
+                { name: 'Identity', description: "Personal sense of self (independent of other people)" },
+            ]
+            ,
+            remainderLabel: 'Other',
+        }}
+    />
 
+</div>
 The following questions are about your beliefs about the **other participants of this experiment**.
 
 (Questions)
@@ -79,4 +82,8 @@ The following questions are about your beliefs about **people in your country ge
 
 <br><br>
 
-<button id="next-button" onclick={() => next()}>Next</button>
+<div class="page-navigation">
+
+    <button id="next-button" onclick={() => next()}>Next</button>
+    
+</div>

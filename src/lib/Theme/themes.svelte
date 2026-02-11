@@ -4,7 +4,12 @@
     import { onMount } from "svelte";
 
 	const theme = new PersistedState("theme", "light");
+	if (typeof window !== "undefined") {
+		applyTheme(theme.current);
+	}
 
+	
+	
 	onMount(() => {
 		applyTheme(theme.current)
 	});
@@ -38,17 +43,25 @@
 	:global {
 
 		:root {
-			color-scheme: light dark;
+			
+			/* color-scheme: light to ignore prefers-color-scheme (otherwise, flash of dark on SSR) */
+			color-scheme: light;
 			--root-bg-inner: light-dark(rgba(250, 250, 250, 0.8), rgba(34, 34, 34, 0.8));
 			--root-bg-outer: light-dark(rgba(208, 208, 208, 0.8), rgba(0, 0, 0, 0.8));
 			--root-bg-far-outer: light-dark(rgba(136, 136, 136, 0.8), rgba(0, 0, 0, 0.8));
+
+
+			--root-bg-0: light-dark(oklch(0.80 0 0), oklch(0 0 0));
+			--root-bg-1: light-dark(oklch(0.85 0 0), oklch(0.1 0 0));
+			--root-bg-2: light-dark(oklch(0.90 0 0), oklch(0.2 0 0));
+			--root-bg-3: light-dark(oklch(0.95 0 0), oklch(0.3 0 0));
 			/* --root-bg-inner: light-dark(green, purple); */
 			/* --root-bg-outer: light-dark(rgba(255, 0, 0, 0.829), rgba(0, 0, 235, 0.818)); */
 			--sidebar-bg: light-dark(#f0f0f0, #000000);
 			--sidebar-page-nav: light-dark(#d0d0d0, #222222);
 			--page-width: 800px;
 			--sidebar-width: 12rem;
-			background-color: var(--root-bg-outer);
+			
 			
 			/* Square shading */
 			/* background:
@@ -101,7 +114,7 @@
 				var(--root-bg-far-outer) 100%
 			); */
 
-			min-height: 100vh;
+			/* min-height: 100vh;
 			background: radial-gradient(
 				ellipse 40% 100% at 50% 50%,
 				var(--root-bg-inner) 0%,
@@ -109,32 +122,65 @@
 				var(--root-bg-outer) 100%,
 				var(--root-bg-far-outer) 200%
 			);
-			background-attachment: fixed;
+			background-attachment: fixed; */
 
 			
 
 			}
 
-		.layout {
+		html, body {
+			margin: 0;
+			box-sizing: border-box;
+			background-color: var(--root-bg-1);
+		}
+
+		.exp-layout {
 			display: grid;
 			grid-template-columns: var(--sidebar-width) auto var(--sidebar-width);
 			grid-template-rows: auto;
+			margin: 1rem;
 			gap: 1rem;
 			align-items: start;
+			/* min-height: 100vh; */
+
+			/* Can use "& > * > *" to target grandchildren { */
+			& > * {
+				border-radius: 10px;
+				background-color: var(--root-bg-1);
+			}
+
+			/* It looks like my .layout div doesn't take up the full document window. Can you find the source of the gap? */
 		}
 
-		.page {
+		.exp-page {
 			grid-column: 2;
 			width: var(--page-width);
 			min-height: 92vh;
-			padding: 20px;
 			justify-self: center;
 			/* background-color: transparent; */
 			/* background-color: rgba(255, 255, 255, 0.8); */
 			/* mix-blend-mode: multiply; */
+			view-transition-name: exp-page;
 		}
 
-		.sidebar {
+		.exp-page-subsection {
+			display: block;
+			padding: 1rem;
+			margin-bottom: 1rem;
+			border-radius: 10px;
+			background-color: var(--root-bg-2);
+
+			& h1, & h2, & h3 {
+				margin: 0.5rem 0;
+			}
+		}
+
+		.exp-question {
+			margin: 2rem 1rem 0rem 1rem;
+		}
+
+
+		.exp-sidebar {
 			grid-column: auto;
 			grid-row: auto;
 			display: flex;
@@ -142,25 +188,30 @@
 			padding: 0.5rem;
 			text-align: center;
 			box-sizing: border-box;
-			border-radius: 10px;
 			position: sticky;
 			height: auto;
 			gap: 0rem;
 			align-items: center;
 			top: 1rem;
-			view-transition-name: sidebar;
+
+			&.exp-nav {
+				view-transition-name: exp-sidebar-nav;
+			}
+
+			&.exp-info {
+				view-transition-name: exp-sidebar-info;
+			}
 
 			& h3 {
 				margin-top: 0;
 				margin-bottom: 10px;
 			}
 
-			.nav-item {
+			.exp-nav-item {
 				font-size: 1.1rem;
 				font-weight: bold;
 				margin: -1px;
 				padding: 0.5rem;
-				/* margin: 0.5rem; */
 				border: 1px solid black;
 				background-color: var(--root-bg-outer);
 				
@@ -176,6 +227,26 @@
 					}
 				}
 			}
+		}
+
+		.page-navigation {
+			display: flex;
+			justify-content: space-between;
+			padding: 0 0.5rem;
+			/* gap: 0.5rem; */
+		}
+
+		#next-button {
+			/* background-color: white; */
+			
+			/* parent is display: block */
+			float: right;
+
+			/* parent is display: flex */
+			margin-left: auto;
+
+			/* parent is display: grid */
+			justify-self: end;
 
 		}
 
@@ -183,12 +254,12 @@
 		}
 
 		@media (max-width: 1280px) and (min-width: 1080px) {
-			.layout {
+			.exp-layout {
 				grid-template-columns: var(--sidebar-width) auto;
 				grid-template-rows: auto;
 			}
 
-			.sidebar {
+			.exp-sidebar {
 				&.exp-nav {
 					grid-column: 1;
 					grid-row: 1;
@@ -204,18 +275,18 @@
 		}
 
 		@media (max-width: 1079px) {
-			.layout {
+			.exp-layout {
 				grid-template-columns: auto;
 				grid-template-rows: auto auto auto;
 			}
 
-			.page {
+			.exp-page {
 				grid-column: auto;
 				grid-row: auto;
 				margin: 0;
 			}
 
-			.sidebar {
+			.exp-sidebar {
 				position: static;
 				grid-column: auto;
 				grid-row: auto;
