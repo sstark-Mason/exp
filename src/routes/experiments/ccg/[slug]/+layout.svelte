@@ -76,9 +76,10 @@
         });
     });
 
-
-
-
+    import { PressedKeys } from 'runed';
+    import { devState } from '$svexplib/Tools/DevState.svelte.ts';
+    const keys = new PressedKeys();
+    keys.onKeys(["d", "e", "v"], () => { devState.ToggleEvent(); });
 
 </script>
 

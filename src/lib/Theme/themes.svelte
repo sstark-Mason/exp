@@ -8,8 +8,6 @@
 		applyTheme(theme.current);
 	}
 
-	
-	
 	onMount(() => {
 		applyTheme(theme.current)
 	});
@@ -43,12 +41,17 @@
 	:global {
 
 		:root {
+
+			
+			font-family: system-ui;
+			color: light-dark(oklch(0 0 0), oklch(0.90 0 0));
+			/* font-family: 'Inter', system-ui; */
 			
 			/* color-scheme: light to ignore prefers-color-scheme (otherwise, flash of dark on SSR) */
 			color-scheme: light;
-			--root-bg-inner: light-dark(rgba(250, 250, 250, 0.8), rgba(34, 34, 34, 0.8));
+			/* --root-bg-inner: light-dark(rgba(250, 250, 250, 0.8), rgba(34, 34, 34, 0.8));
 			--root-bg-outer: light-dark(rgba(208, 208, 208, 0.8), rgba(0, 0, 0, 0.8));
-			--root-bg-far-outer: light-dark(rgba(136, 136, 136, 0.8), rgba(0, 0, 0, 0.8));
+			--root-bg-far-outer: light-dark(rgba(136, 136, 136, 0.8), rgba(0, 0, 0, 0.8)); */
 
 
 			--root-bg-0: light-dark(oklch(0.80 0 0), oklch(0 0 0));
@@ -141,25 +144,19 @@
 			margin: 1rem;
 			gap: 1rem;
 			align-items: start;
-			/* min-height: 100vh; */
 
 			/* Can use "& > * > *" to target grandchildren { */
 			& > * {
 				border-radius: 10px;
 				background-color: var(--root-bg-1);
 			}
-
-			/* It looks like my .layout div doesn't take up the full document window. Can you find the source of the gap? */
 		}
 
 		.exp-page {
 			grid-column: 2;
-			width: var(--page-width);
+			max-width: var(--page-width);
 			min-height: 92vh;
 			justify-self: center;
-			/* background-color: transparent; */
-			/* background-color: rgba(255, 255, 255, 0.8); */
-			/* mix-blend-mode: multiply; */
 			view-transition-name: exp-page;
 		}
 
@@ -231,23 +228,38 @@
 
 		.page-navigation {
 			display: flex;
-			justify-content: space-between;
+			justify-content: space-between;			
 			padding: 0 0.5rem;
 			/* gap: 0.5rem; */
 		}
 
+		#next-button, #skip-button {
+			background-color: light-dark(oklch(0.90 0 0), oklch(0.85 0 0));
+			border: 1px solid grey;
+			border-radius: 2px;
+			color: black;
+		}
+
+		#skip-button {
+			/* parent is display: block */
+			float: left;
+			/* parent is display: flex */
+			margin-right: auto;
+			/* parent is display: grid */
+			justify-self: start;
+		}
+
 		#next-button {
-			/* background-color: white; */
-			
 			/* parent is display: block */
 			float: right;
-
 			/* parent is display: flex */
 			margin-left: auto;
-
 			/* parent is display: grid */
 			justify-self: end;
+		}
 
+		button[disabled] {
+			opacity: 0.5;
 		}
 
 		@media (min-width: 1281px) {

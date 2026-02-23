@@ -51,8 +51,6 @@
         }
         base.setDebugFilters(activeFilters);
     }
-    
-
 
 </script>
 

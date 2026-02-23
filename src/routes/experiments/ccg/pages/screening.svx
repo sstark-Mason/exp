@@ -1,6 +1,7 @@
 <script lang="ts">
     export const prerender = true;
     import { PUBLIC_ENV } from '$env/static/public';
+    import { devState } from '$svexplib/Tools/DevState.svelte.ts';
     import { goto } from '$app/navigation';
     import { page } from '$app/state';
     import * as ccg from '$lib/ccg/ccg.svelte.ts';
@@ -66,15 +67,20 @@
   onAllCorrect={(val: boolean) => allCorrect = val} />
 </div>
 
+
+
 <div class="page-navigation">
-
-    {#if PUBLIC_ENV === 'dev'}
-    <button onclick={() => skip()}>Skip</button>
-    allCategorized: {allCategorized.toString()}  <button onclick={() => allCategorized = !allCategorized}>Toggle</button>
-    allCorrect: {allCorrect.toString()}  <button onclick={() => allCorrect = !allCorrect}>Toggle</button>
+    {#if devState.current === true}
+        <button onclick={() => skip()}>Skip</button>
     {/if}
-
     <button id="next-button" disabled={!allCategorized} onclick={() => next()}>Submit</button>
-
 </div>
 
+{#if devState.current === true}
+<div class="screening-state">
+    <br>
+    <button onclick={() => allCategorized = !allCategorized}>Toggle</button> allCategorized: {allCategorized.toString()}
+    <br>
+    <button onclick={() => allCorrect = !allCorrect}>Toggle</button> allCorrect: {allCorrect.toString()}
+</div>
+{/if}

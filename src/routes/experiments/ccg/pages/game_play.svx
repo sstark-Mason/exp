@@ -1,6 +1,7 @@
 <script lang="ts">
     export const prerender = true;
     import { PUBLIC_ENV } from '$env/static/public';
+    import { devState } from '$svexplib/Tools/DevState.svelte.ts';
     import { goto } from '$app/navigation';
     import { page } from '$app/state';
     import * as ccg from '$lib/ccg/ccg.svelte.ts';
@@ -36,9 +37,7 @@
 </div>
 
 <div class="page-navigation">
-
-    {#if PUBLIC_ENV === 'dev'}
-    <button id="skip-button" onclick={() => next()}>Skip</button>
+    {#if devState.current === true}
+        <button id="skip-button" onclick={() => next()}>Skip</button>
     {/if}
-
 </div>
