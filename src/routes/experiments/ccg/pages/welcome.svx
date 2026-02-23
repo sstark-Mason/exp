@@ -4,6 +4,7 @@
     import { goto, invalidateAll } from '$app/navigation';
     import { page } from '$app/state';
     import * as ccg from '$lib/ccg/ccg.svelte.ts';
+    import { onMount } from 'svelte';
     const debug = ccg.debugBase.extend(`page:${page.data.slug}.svx`);
     const exp = ccg.getExperimentState();
     exp.updateRoutePermission(page.data.slug, true);

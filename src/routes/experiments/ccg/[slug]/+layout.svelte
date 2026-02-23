@@ -1,7 +1,7 @@
 <script lang="ts">
     import { PUBLIC_ENV } from '$env/static/public';
     import { page } from '$app/state';
-    import { goto, beforeNavigate, afterNavigate, onNavigate } from '$app/navigation';
+    import { goto, beforeNavigate, afterNavigate, onNavigate, preloadCode } from '$app/navigation';
     
     // import ToggleDebug from '$svexplib/Tools/ToggleDebug.svelte';
     import Debug from '$svexplib/Tools/Debug.svelte';
@@ -19,6 +19,13 @@
     // svelte-ignore state_referenced_locally
         if (data.validExperiment) {
         exp.dbInitSession();
+    }
+
+    function determinePreloads(currentSlug: string): string[] {
+        const nextRoute = exp.next(currentSlug);
+        const nextNextRoute = exp.next(nextRoute);
+        debug(`Preloading code for next two routes: ${nextRoute}, ${nextNextRoute}`);
+        return [nextRoute, nextNextRoute];
     }
 
     beforeNavigate((nav) => {
@@ -47,7 +54,11 @@
             debug(`Current slug '${currentSlug}' not permitted after navigation. Redirecting to ${nextPermittedRoute}.`);
             goto(nextPermittedRoute);
         } else {
-            debug(`Current slug '${currentSlug}' permitted after navigation.`);
+            // debug(`Current slug '${currentSlug}' permitted after navigation.`);
+            const preloads = determinePreloads(currentSlug);
+            for (const route of preloads) {
+                preloadCode(`/experiments/ccg/${route}`);
+            }
         }
     });
 
