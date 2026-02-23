@@ -18,7 +18,8 @@
         onGameEnd?: () => void
     } = $props();
 
-    let permutations = gameBase.newPermutations(player1Name, choiceSet);
+    // svelte-ignore state_referenced_locally
+        let permutations = gameBase.newPermutations(player1Name, choiceSet);
     let currentGamePermutation: string[] | null = $state(nextGamePermutation());
     const roundCount = new PersistedState("ccg-round-count", 0);
 
@@ -88,5 +89,7 @@
     outcome_c2c1={outcome_c2c1}
     outcome_c2c2={outcome_c2c2}
     onChoiceSelection={onChoiceSelection}
+    roundNumber={roundCount.current + 1}
+    maxRounds={maxRounds}
 />
 {/if}

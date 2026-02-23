@@ -15,6 +15,7 @@
 
     let permutations = ccg.newPermutations(player1Name, choiceSet);
     let currentGamePermutation: string[] = $state(nextGamePermutation());
+    let roundCount = $state(0);
 
     function nextGamePermutation(): string[] {
         const nextPermutation = ccg.popRandomPermutation(permutations);
@@ -30,6 +31,7 @@
 
     function onChoiceSelection(choice: string) {
         debug("Player selected choice in practice:", choice);
+        roundCount++;
         currentGamePermutation = nextGamePermutation();
     }
 
@@ -45,4 +47,6 @@
     outcome_c2c1={outcome_c2c1}
     outcome_c2c2={outcome_c2c2}
     onChoiceSelection={onChoiceSelection}
+    roundNumber={roundCount + 1}
+    maxRounds={Infinity}
 />

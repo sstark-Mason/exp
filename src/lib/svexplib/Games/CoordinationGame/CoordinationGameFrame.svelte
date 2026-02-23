@@ -13,6 +13,8 @@
         outcome_c1c2: [number, number];
         outcome_c2c1: [number, number];
         onChoiceSelection: (choice: string) => void;
+        roundNumber?: number;
+        maxRounds?: number;
     }
 
     let {
@@ -24,7 +26,9 @@
       outcome_c2c2: outcomeC2C2,
       outcome_c1c2: outcomeC1C2,
       outcome_c2c1: outcomeC2C1,
-      onChoiceSelection
+      onChoiceSelection,
+      roundNumber: roundNum,
+      maxRounds: maxRounds,
     }: CoordinationGameFrameProps = $props();
 
 </script>
@@ -61,6 +65,12 @@
             </tbody>
         </table>
     </div>
+
+    {#if roundNum !== undefined && maxRounds !== undefined}
+    <div class="game-round-counter">
+      {roundNum} / {maxRounds === Infinity ? "∞" : maxRounds}
+    </div>
+    {/if}
 
 </div>
 
@@ -131,5 +141,12 @@
 
   .their-payoff {
     font-weight: normal;
+  }
+
+  .game-round-counter {
+    text-align: right;
+    font-size: 1.2em;
+    margin-top: 0.5rem;
+    margin-bottom: -1rem;
   }
 </style>
