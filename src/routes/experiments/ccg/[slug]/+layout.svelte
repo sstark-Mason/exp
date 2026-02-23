@@ -22,8 +22,8 @@
     }
 
     function determinePreloads(currentSlug: string): string[] {
-        const nextRoute = exp.next(currentSlug);
-        const nextNextRoute = exp.next(nextRoute);
+        const nextRoute = exp.nextRoute(currentSlug);
+        const nextNextRoute = exp.nextRoute(nextRoute);
         debug(`Preloading code for next two routes: ${nextRoute}, ${nextNextRoute}`);
         return [nextRoute, nextNextRoute];
     }
@@ -89,8 +89,10 @@
 
     import { PressedKeys } from 'runed';
     import { devState } from '$svexplib/Tools/DevState.svelte.ts';
+    if (PUBLIC_ENV === 'dev') { devState.current = true; }
     const keys = new PressedKeys();
-    keys.onKeys(["d", "e", "v"], () => { devState.ToggleEvent(); });
+    keys.onKeys(["d", "e", "v"], () => { devState.current = !devState.current; });
+    
 
 </script>
 
