@@ -49,7 +49,7 @@
             range: [0, 10],
             rangeLabels: ['Not at all', 'Very strongly'],
             step: 0.01,
-            tickInterval: 2,
+            tickInterval: 1,
             required: true
         }}
     />

@@ -104,8 +104,10 @@
                     step=1
                     bind:value={sc.value}
                     style={`
+                        width: calc(${sc.max}% + var(--slider-thumb-diameter));
                         margin-left: calc(${sc.sumBehind}% - var(--slider-thumb-diameter) / 2);
-                        margin-right: calc(${sc.sumAhead}% - var(--slider-thumb-diameter) / 2);
+                        // margin-left: ${sc.sumBehind}%;
+                        // transform: translateX(calc(var(--slider-thumb-diameter) / -2));
                         --progress: ${(sc.value / sc.max) * 100}%;
                         --slider-thumb-color: ${sc.color};`}
                 />
@@ -158,8 +160,10 @@
         display: grid;
         /* sc.name, numInput, sliderInput */
         grid-template-columns: 10em 3.5em auto;
-        column-gap: 1em;
-        row-gap: 0.5em;
+        /* grid-template-columns: 10rem 3.5rem 1fr; */
+        /* grid-template-columns: 10rem 3.5rem minmax(0, 1fr); */
+        column-gap: 1rem;
+        row-gap: 0.5rem;
     }
 
     .cumulative-display-bar {
@@ -185,6 +189,7 @@
         margin: 0;
         cursor: pointer;
         background: transparent;
+        box-sizing: border-box;
 
         /* Chromium shits itself if it sees a firefox specifier */
         &::-webkit-slider-runnable-track {
