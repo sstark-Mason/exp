@@ -8,11 +8,42 @@
     const debug = ccg.debugBase.extend(`page:${page.data.slug}.svx`);
     const exp = ccg.getExperimentState();
 
-    import LiveCoordinationGame from '$svexplib/Games/CoordinationGame/LiveCoordinationGame.svelte';
-    import { choiceSetSymbols, choiceSetColorsUnicode } from '$svexplib/Games/CoordinationGame/CoordinationGameBase.ts';
+    // import LiveCoordinationGame from '$svexplib/Games/CoordinationGame/LiveCoordinationGame.svelte';
+    // import { choiceSetSymbols, choiceSetColorsUnicode } from '$svexplib/Games/CoordinationGame/CoordinationGameBase.ts';
+
+    import CCG from '$svexplib/Games/ccg/CCG.svelte';
+    import type { Avatar } from '$svexplib/Games/ccg/types.d.ts';
+    import { avatars } from '$svexplib/Games/ccg/avatars.ts';
 
     import { PersistedState } from "runed";
-    const selectedAvatarName = new PersistedState<string | null>("ccg-selected-avatar", null);
+    const selectedAvatar = new PersistedState<Avatar | null>("ccg-selected-avatar", null);
+
+    let gameInstanceRecords = new PersistedState("ccg-game-instance-record", []);
+    let permutationCounts = new PersistedState("ccg-permutation-counts", []);
+
+    let roundsPlayed = $derived(gameInstanceRecords.current.length);
+    let maxRounds = 48;
+
+    $effect(() => {
+        if (roundsPlayed < maxRounds) return;
+        (async () => {
+            await writeToDatabase();
+            debug(`Reached max rounds of ${maxRounds}. Navigating to next page.`);
+            next();
+        })();
+    });
+
+    async function writeToDatabase() {
+        debug("Writing to database with updates:", gameInstanceRecords.current);
+        const insertedRecords = await exp.dbInsertGameRounds(gameInstanceRecords.current);
+        gameInstanceRecords.current = insertedRecords ?? gameInstanceRecords.current;
+    }
+
+    function printDebugInfo() {
+        debug("Current game instance records:", gameInstanceRecords.current);
+        // debug("Current permutation counts:", permutationCounts.current);
+        // debug("Rounds played:", roundsPlayed);
+    }
 
     function next() {
         exp.updateRoutePermission(page.data.slug, false);
@@ -23,15 +54,28 @@
 
 <div class="exp-page-subsection">
 
-    <LiveCoordinationGame
-        player1Name={selectedAvatarName.current ?? "fem1"}
-        choiceSet={choiceSetColorsUnicode}
-        maxRounds={10}
-        outcome_c1c1={[2,1]}
-        outcome_c2c2={[1,2]}
-        outcome_c1c2={[0,0]}
-        outcome_c2c1={[0,0]}
-        onGameEnd={next}
+    <CCG
+    bind:gameInstanceRecords={gameInstanceRecords.current}
+    bind:permutationCounts={permutationCounts.current}
+    props={{
+        player1UID: exp.dbUID,
+        player1Avatar: selectedAvatar.current,
+        possiblePlayer2Avatars: avatars,
+        possibleActions: [
+            { key: "blue", value: "", color: "oklch(0.40 0.2 240)" },
+            { key: "pink", value: "", color: "oklch(0.60 0.2 360)" },
+            { key: "green", value: "", color: "oklch(0.40 0.2 140)" },
+            { key: "yellow", value: "", color: "oklch(0.70 0.2 90)" }
+        ],
+        outcomes: [
+            { key: "outcome_c1c1", value: [2, 1] },
+            { key: "outcome_c2c2", value: [1, 2] },
+            { key: "outcome_c1c2", value: [0, 0] },
+            { key: "outcome_c2c1", value: [0, 0] }
+        ],
+        roundsPlayed: roundsPlayed,
+        maxRounds: maxRounds
+    }}
     />
 
 </div>
@@ -41,3 +85,34 @@
         <button id="skip-button" onclick={() => next()}>Skip</button>
     {/if}
 </div>
+
+{#if devState.current === true}
+
+    <br>
+    <button onclick={() => printDebugInfo()}>Print Debug Info</button>
+
+    <br>
+    <button onclick={() => writeToDatabase()}>Write to Database</button>
+
+    <br>
+    {#key gameInstanceRecords.current.length}
+    {#if gameInstanceRecords.current.length > 0}
+        <div>
+            <strong>Game Instance Records:</strong>
+        </div>
+        {#each [...gameInstanceRecords.current].reverse() as record}
+            <div>
+                Round {record.round_number}: You chose <strong>{record.player_1_chose}</strong> (given choices: {record.choice_option_1}, {record.choice_option_2}). Time: {record.time_elapsed_seconds} seconds.
+            </div>
+        {/each}
+    {/if}
+    {/key}
+
+    <!-- <br>
+    {#each permutationCounts.current as pc, i}
+        <div>
+            {i}: ({pc.permutation.players[0].avatar.key}, {pc.permutation.players[1].avatar.key}), ({pc.permutation.actions[0].key}, {pc.permutation.actions[1].key}): count: {pc.count}.
+        </div>
+    {/each} -->
+
+{/if}

@@ -101,7 +101,8 @@
     <aside class="exp-sidebar exp-nav">
         <h3>Pages</h3>
         {#each exp.routeStates as route}
-        {#if route.permitted && route.revisitAfterCompleted}
+        <!-- {#if route.permitted && route.revisitAfterCompleted} -->
+         {#if route.permitted}
         <div class="exp-nav-item">
             {#if route.route === data.slug}
                 <strong>{route.route.replace(/_/g, ' ')}</strong>

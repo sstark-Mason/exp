@@ -6,6 +6,10 @@
     import { page } from '$app/state';
     import { marked } from 'marked';
     import * as ccg from '$lib/ccg/ccg.svelte.ts';
+    import CCG from '$svexplib/Games/ccg/CCG.svelte';
+    import { avatars } from '$svexplib/Games/ccg/avatars.ts';
+    import { PersistedState } from "runed";
+    
     const debug = ccg.debugBase.extend(`page:${page.data.slug}.svx`);
     const exp = ccg.getExperimentState();
 
@@ -128,14 +132,26 @@
 <div class="exp-page-subsection">
 
     ## Example game
-
-    <PracticeCoordinationGame
-        player1Name={"fem1"}
-        choiceSet={choiceSetColorsUnicode}
-        outcome_c1c1={[2,1]}
-        outcome_c2c2={[1,2]}
-        outcome_c1c2={[0,0]}
-        outcome_c2c1={[0,0]}
+    
+    <CCG
+    props={{
+        player1UID: "example-game",
+        player1Avatar: avatars[Math.floor(Math.random() * avatars.length)],
+        possiblePlayer2Avatars: avatars,
+        possibleActions: [
+            { key: "masc", value: "", color: "oklch(0.40 0.2 240)" },
+            { key: "fem", value: "", color: "oklch(0.60 0.2 360)" },
+            { key: "neutral1", value: "", color: "oklch(0.40 0.2 140)" },
+            { key: "neutral2", value: "", color: "oklch(0.70 0.2 90)" }
+        ],
+        outcomes: [
+            { key: "outcome_c1c1", value: [2, 1] },
+            { key: "outcome_c2c2", value: [1, 2] },
+            { key: "outcome_c1c2", value: [0, 0] },
+            { key: "outcome_c2c1", value: [0, 0] }
+        ],
+        maxRounds: Infinity
+    }}
     />
 
     ### The above table is a *normal form game*.
@@ -144,7 +160,7 @@
     - Your options are shown in the **left-most column**.
     - The other player's options are shown in the **top row**.
     - The pair of numbers in each cell show the points that you and the other player would receive for that combination of choices.
-    - The **first, <u>underlined</u> number** shows the points **you** would receive.
+    - The **first <u>underlined</u> number** shows the points **you** would receive.
     - The **second number** shows the points the **other player** would receive.
 
 </div>

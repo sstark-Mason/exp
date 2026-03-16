@@ -10,6 +10,7 @@ export const supabase = createClient(PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_PUB_KE
 });
 
 import { newDebugger } from '$svexplib/Tools/Debug.svelte.ts';
+import type { GameInstanceRecord } from "../svexplib/Games/ccg/types.d.ts";
 export const debugBase = newDebugger('exp:ccg');
 const debug = debugBase.extend('ccg.svelte.ts');
 
@@ -154,7 +155,7 @@ export class ExperimentState {
 
     #pendingSync: object[] = [];
 
-    dbInsertGameRounds(updates: object, attempt = 1) {
+    dbInsertGameRounds0(updates: object, attempt = 1) {
         if (!this.#dbUID) return;
         supabase
             .from('game_rounds')
@@ -167,7 +168,7 @@ export class ExperimentState {
                         const retryDelay = Math.pow(4, attempt) * 1000;
                         debug(`Retrying in ${retryDelay / 1000} s...`);
                         setTimeout(() => {
-                            this.dbInsertGameRounds(updates, attempt + 1);
+                            this.dbInsertGameRounds0(updates, attempt + 1);
                         }, retryDelay);
                     } else {
                         debug('Max retry attempts reached; giving up on inserting game rounds. Data saved to pending sync queue.');
@@ -178,6 +179,78 @@ export class ExperimentState {
                     this.#pendingSync = this.#pendingSync.filter(u => u !== updates);
                 }
             });
+    }
+    
+    dbInsertGameRounds1(gameRounds: GameInstanceRecord[]) {
+        if (!this.#dbUID) return;
+        debug(`Attempting to insert ${gameRounds.length} game rounds into DB...`);
+        // Each record has PID as UID, so replace player_1_uid with this.#dbUID for each record before insertion
+        gameRounds = gameRounds.map((round) => ({
+            ...round,
+            player_1_uid: this.#dbUID,
+            inserted_at_time: new Date().toISOString(),
+        }));
+
+        
+        supabase
+            .from('game_rounds')
+            .upsert(gameRounds, {
+                onConflict: 'player_1_uid, round_number',
+                ignoreDuplicates: true,
+            })
+            .eq('player_1_uid', this.#dbUID)
+            .select()
+            .then(({ data, error }) => {
+                if (error) {
+                    debug('Error inserting game rounds:', error);
+                    debug('Saving game rounds to pending sync queue for later retry.');
+                    this.#pendingSync.push(...gameRounds);
+                } else {
+                    debug(`Successfully inserted ${data.length} game rounds into DB.`);
+                    this.#pendingSync = this.#pendingSync.filter(u => !gameRounds.includes(u));
+                }
+            });
+    }
+
+    async dbInsertGameRounds(gameRounds: GameInstanceRecord[]): Promise<GameInstanceRecord[]> {
+        if (!this.#dbUID) {
+            debug('Cannot insert game rounds: dbUID is null');
+            return gameRounds;
+        }
+
+        debug(`Attempting to insert ${gameRounds.length} game rounds into DB...`);
+        // Each record has PID as UID, so replace player_1_uid with this.#dbUID for each record before insertion
+        // If a record has an rid, then it has already been inserted, so we should skip it to avoid duplicates. Only insert records that don't have an rid yet.
+        const roundsToInsert = gameRounds.filter((round) => !round.rid).map((round) => ({
+            ...round,
+            player_1_uid: this.#dbUID,
+            inserted_at_time: new Date().toISOString(),
+        }));
+
+        const { data, error } = await supabase
+            .from('game_rounds')
+            .upsert(roundsToInsert, {
+                onConflict: 'player_1_uid, round_number',
+                ignoreDuplicates: true,
+            })
+            .eq('player_1_uid', this.#dbUID)
+            .select();
+
+        if (error) {
+            debug('Error inserting game rounds:', error);
+            debug('Saving game rounds to pending sync queue for later retry.');
+            this.#pendingSync.push(...roundsToInsert);
+            return gameRounds;
+        } else {
+            debug(`Successfully inserted ${data.length} game rounds into DB.`);
+            this.#pendingSync = this.#pendingSync.filter(u => !roundsToInsert.includes(u));
+            // Update the original gameRounds with the full records returned from the DB
+            const updatedGameRounds = gameRounds.map((round) => {
+                const insertedRound = data.find((d) => d.round_number === round.round_number);
+                return insertedRound ? insertedRound : round;
+            });
+            return updatedGameRounds;
+        }
     }
 
     getExperimentStateDebugInfo(): object {

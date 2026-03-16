@@ -53,8 +53,9 @@
             required: true
         }}
     />
+</div>
 
-
+<div class="exp-page-subsection">
     <AllocationQuestion
         bind:bindableValues={val_q_2_3}
         props={{
@@ -70,18 +71,22 @@
             remainderLabel: 'Other',
         }}
     />
+</div>
+<div class="exp-page-subsection">
+
+    The following questions are about your beliefs about the **other participants of this experiment**.
+
+    (Questions)
+    
+</div>
+
+<div class="exp-page-subsection">
+
+    The following questions are about your beliefs about **people in your country generally**.
+
+    (Questions)
 
 </div>
-The following questions are about your beliefs about the **other participants of this experiment**.
-
-(Questions)
-
-The following questions are about your beliefs about **people in your country generally**.
-
-(Questions)
-
-
-<br><br>
 
 <div class="page-navigation">
     {#if devState.current === true}

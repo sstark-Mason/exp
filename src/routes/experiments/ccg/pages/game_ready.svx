@@ -9,13 +9,21 @@
     const exp = ccg.getExperimentState();
 
     import { PersistedState } from "runed";
-    import SelectAvatar from "$svexplib/Games/CoordinationGame/SelectAvatar.svelte";
+    // import SelectAvatar from "$svexplib/Games/CoordinationGame/SelectAvatar.svelte";
+    import type { Avatar } from '$svexplib/Games/ccg/types.d.ts';
+    import { avatars } from '$svexplib/Games/ccg/avatars.ts';
 
-    const selectedAvatarName = new PersistedState<string | null>("ccg-selected-avatar", null);
+    // const selectedAvatarPath = new PersistedState<string | null>("ccg-selected-avatar", null);
+    const selectedAvatar = new PersistedState<Avatar | null>("ccg-selected-avatar", null);
     const avatarIsFinalized = new PersistedState<boolean>("ccg-avatar-selected", false);
 
+    function selectAvatar(avatar: Avatar) {
+        selectedAvatar.current = avatar;
+        debug(`Avatar selected: ${avatar.name} (${avatar.path})`);
+    }
+
     function next() {
-        if (selectedAvatarName.current === null) {
+        if (selectedAvatar.current === null) {
             alert("Please select a portrait before proceeding.");
             return;
         }
@@ -26,8 +34,8 @@
     }
 
     function skip() {
-        if (selectedAvatarName.current === null) {
-            selectedAvatarName.current = "fem1";
+        if (selectedAvatar.current === null) {
+            selectedAvatar.current = avatars[0];
         }
         avatarIsFinalized.current = true;
         exp.updateRoutePermission(page.data.slug, false);
@@ -41,27 +49,36 @@
     # Avatar Selection
 
     {#if !avatarIsFinalized.current}
-    <p>Please choose a portrait to represent yourself in the game.</p>
-    <SelectAvatar
-        onAvatarSelection={(avatar) => {
-        debug(`Selected avatar: ${avatar}`);
-        selectedAvatarName.current = avatar;
-        }}
-    />
-    <br><br>
+
+    Please select an avatar to represent yourself in the game.
+
+    <div class="avatar-grid">
+        {#each avatars as avatar}
+            <button class="avatar-option" class:selected={avatar.name === selectedAvatar.current?.name} onclick={() => selectAvatar(avatar)}>
+                <img class="avatar-image" src={avatar.path} alt={avatar.name} />
+            </button>
+        {/each}
+    </div>
+
     {/if}
 
 </div>
+
+{#if selectedAvatar.current}
 
 <div class="exp-page-subsection">
 
     ## Game Ready
 
-    When you're ready to begin the game, please click the "Next" button below.
+    Your selected avatar:
 
-    This is your chosen avatar: {selectedAvatarName.current} (todo: replace with image)
+    <img src={selectedAvatar.current.path} alt={selectedAvatar.current.name} width="100px" />
+
+    The game will begin on the next page.
 
 </div>
+
+{/if}
 
 <div class="page-navigation">
     {#if devState.current === true}
@@ -70,3 +87,34 @@
     <button id="next-button" onclick={() => next()}>Next</button>
 </div>
 
+<style>
+    .avatar-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 150px);
+        justify-content: center;
+        gap: 10px;
+    }
+
+    button.avatar-option {
+        background: none;
+        border: none; /* 2px solid transparent if you want to keep size consistent */
+        padding: 0;
+        cursor: pointer;
+        width: 100%;
+        height: auto;
+        box-sizing: border-box;
+        &:hover {
+        opacity: 0.9;
+        }
+    }
+
+    button.avatar-option.selected {
+        border: 2px solid blue; /* Border for selected button */
+    }
+
+    img.avatar-image {
+        width: 100%;
+        height: auto;
+        display: block;
+    }
+</style>

@@ -1,4 +1,6 @@
 <script lang="ts">
+    import { onMount } from 'svelte';
+
 
     import type { SliderQuestionProps } from './SliderQuestion/types.d.ts';
     let { props, bindableValue = $bindable(null) }: { props: SliderQuestionProps, bindableValue: number | null } = $props();
