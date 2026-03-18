@@ -8,6 +8,8 @@
     const debug = ccg.debugBase.extend(`page:${page.data.slug}.svx`);
     const exp = ccg.getExperimentState();
 
+    import Feedback from '$svexplib/Tools/Feedback.svelte';
+
     import MultipleChoiceQuestion from '$svexplib/Questions/MultipleChoiceQuestion.svelte';
 
     const qStates = $state([
@@ -35,6 +37,8 @@
     - The fewer incorrect answers you select, the higher your bonus payment will be.
     - To continue, you must select **all correct answers** and **no incorrect answers**.
     - On future pages, you will **not** be able to reset your answers.
+
+    <Feedback target_id={"section-comprehension-explanation"} onClose={(feedbackData) => { exp.dbSubmitFeedback(feedbackData); }} />
 
 </div>
 
@@ -93,6 +97,8 @@
         inputType: 'checkbox',
         required: true,
     }}/>
+
+    <Feedback target_id={"questions-comprehension-explanation"} onClose={(feedbackData) => { exp.dbSubmitFeedback(feedbackData); }} />
 
 </div>
 

@@ -14,6 +14,8 @@ import type { GameInstanceRecord } from "../svexplib/Games/ccg/types.d.ts";
 export const debugBase = newDebugger('exp:ccg');
 const debug = debugBase.extend('ccg.svelte.ts');
 
+import type FeedbackData from '$svexplib/Tools/Feedback.svelte';
+
 export enum UserRole {
     Tester = 'tester',
     Participant = 'participant',
@@ -149,6 +151,29 @@ export class ExperimentState {
                     debug('Error updating participant entry:', error);
                 } else {
                     debug('Participant entry in db updated successfully');
+                }
+            });
+    }
+
+    dbSubmitFeedback(feedbackData: FeedbackData) {
+        if (!this.#dbUID) return;
+        debug('Submitting feedback to DB for target_id:', feedbackData.target_id, 'with metrics:', feedbackData.metrics, 'and comments:', feedbackData.comments);
+        return supabase
+            .from('feedback')
+            .upsert({
+                uid: this.#dbUID,
+                target_id: feedbackData['target_id'],
+                metrics: feedbackData['metrics'],
+                comments: feedbackData['comments'],
+            }, {
+                onConflict: 'uid, target_id',
+            })
+            .eq('uid', this.#dbUID)
+            .then(({ error }) => {
+                if (error) {
+                    debug('Error submitting feedback to DB:', error);
+                } else {
+                    debug('Feedback submitted successfully to DB');
                 }
             });
     }

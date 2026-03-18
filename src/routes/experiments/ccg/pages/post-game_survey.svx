@@ -8,6 +8,8 @@
     const debug = ccg.debugBase.extend(`page:${page.data.slug}.svx`);
     const exp = ccg.getExperimentState();
 
+    import Feedback from '$svexplib/Tools/Feedback.svelte';
+
     import SliderQuestion from '$lib/svexplib/Questions/SliderQuestion.svelte';
     import AllocationQuestion from '$lib/svexplib/Questions/AllocationQuestion.svelte';
 
@@ -53,6 +55,8 @@
             required: true
         }}
     />
+
+    <Feedback target_id={"participant-identity"} onClose={(feedbackData) => { exp.dbSubmitFeedback(feedbackData); }} />
 </div>
 
 <div class="exp-page-subsection">
@@ -66,11 +70,13 @@
                 { name: 'Hormones', description: "Blood levels of hormones (testosterone, estrogen, etc.)"},
                 { name: 'Socialization', description: "Upbringing, culture, and societal expectations" },
                 { name: 'Identity', description: "Personal sense of self (independent of other people)" },
-            ]
-            ,
+            ],
             remainderLabel: 'Other',
         }}
     />
+
+    <Feedback target_id={"gender-factors"} onClose={(feedbackData) => { exp.dbSubmitFeedback(feedbackData); }} />
+
 </div>
 <div class="exp-page-subsection">
 
@@ -94,3 +100,4 @@
     {/if}
     <button id="next-button" onclick={() => next()}>Next</button>
 </div>
+

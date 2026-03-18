@@ -41,6 +41,7 @@
         return Math.round(x * factor) / factor;
     }
 
+
 </script>
 
 <div class="exp-question slider-question">
@@ -70,13 +71,15 @@
                 </div>
             {/if}
 
+            <!-- // bind:value={inputValue} -->
             <input type="range"
                 name={props.qid}
                 min={props.range[0]}
                 max={props.range[1]}
                 step={props.step ?? 1}
                 list="{props.qid}-datalist"
-                bind:value={inputValue}
+                
+                value={inputValue ?? 0}
                 class:is-null={inputValue === null}
                 oninput={(e) => handleInput(e.currentTarget as EventTarget & HTMLInputElement)}
                 onpointerdown={(e) => handleInput(e.currentTarget as EventTarget & HTMLInputElement)}
@@ -118,6 +121,7 @@
         flex-direction: column;
         width: 100%;
         margin: 3em 0;
+        /* TODO: Move this margin to wrapper div in parent */
     }
 
     .question-label {

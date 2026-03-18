@@ -8,6 +8,8 @@
     const debug = ccg.debugBase.extend(`page:${page.data.slug}.svx`);
     const exp = ccg.getExperimentState();
 
+    import Feedback from '$svexplib/Tools/Feedback.svelte';
+
     import { PersistedState } from "runed";
     // import SelectAvatar from "$svexplib/Games/CoordinationGame/SelectAvatar.svelte";
     import type { Avatar } from '$svexplib/Games/ccg/types.d.ts';
@@ -61,6 +63,8 @@
     </div>
 
     {/if}
+
+    <Feedback target_id={"section-avatar-selection"} onClose={(feedbackData) => { exp.dbSubmitFeedback(feedbackData); }} />
 
 </div>
 

@@ -162,6 +162,7 @@
 
 		.exp-page-subsection {
 			display: block;
+			position: relative;
 			padding: 1rem;
 			margin-bottom: 1rem;
 			border-radius: 10px;
