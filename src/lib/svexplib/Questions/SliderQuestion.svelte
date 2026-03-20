@@ -46,7 +46,7 @@
 
 <div class="exp-question slider-question">
 
-    <label for={props.qid} class="question-label">{props.questionText}</label>  
+    <label for={props.qid} class="question-label"><span class="qid">{props.qid}</span> {@html props.questionText}</label>  
 
     <div class="input-container">
 
@@ -66,8 +66,9 @@
         <div class="slider-input-container">
             {#if props.rangeLabels}
                 <div class="range-end-labels">
-                    <span>{props.rangeLabels[0]}</span>
-                    <span>{props.rangeLabels[1]}</span>
+                {#each props.rangeLabels as label, i}
+                    <span>{label}</span>
+                {/each}
                 </div>
             {/if}
 
@@ -206,8 +207,37 @@
     .range-end-labels {
         display: flex;
         justify-content: space-between;
+        padding: 0 calc(var(--slider-thumb-diameter) / 2);
+        margin-bottom: 0.5em;
         user-select: none;
     }
+    
+    .range-end-labels span {
+        display: flex;
+        justify-content: center;
+        width: 0;
+        overflow: visible;
+        white-space: nowrap;
+    }
+
+    .range-end-labels span {
+        flex: 1;
+        display: flex;
+        white-space: nowrap;
+    }
+
+    .range-end-labels span:first-child {
+        justify-content: flex-start;
+        margin-right: calc(var(--slider-thumb-diameter) / -2);
+    }
+
+    .range-end-labels span:last-child {
+        justify-content: flex-end;
+        margin-right: calc(var(--slider-thumb-diameter) / -2);
+    }
+
+    
+    
 
     .range-tick-labels {
         display: flex;
@@ -230,8 +260,13 @@
         font-weight: bold;
     }
 
+    .qid {
+        font-weight: bold;
+        margin-right: 0.5em;
+        background-color: var(--color-default);
+        padding: 2px 6px;
+        border-radius: 4px;
+    }
     
-
-
 
 </style>

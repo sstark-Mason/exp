@@ -13,13 +13,69 @@
     import SliderQuestion from '$lib/svexplib/Questions/SliderQuestion.svelte';
     import AllocationQuestion from '$lib/svexplib/Questions/AllocationQuestion.svelte';
 
-    let val_q_2_1: number | null = $state(null);
-    let val_q_2_2: number | null = $state(null);
-    let val_q_2_3: {name: string, value: number}[] = $state([]);
+    let sq_1: number | null = $state(null);
+    let sq_2: number | null = $state(null);
+    let sq_3: {name: string, value: number}[] = $state([]);
+    let sq_4: number | null = $state(null);
+    let sq_5: number | null = $state(null);
+    let sq_6: number | null = $state(null);
+    let sq_7: number | null = $state(null);
+    let sq_8: number | null = $state(null);
+    let sq_9: number | null = $state(null);
+    let sq_10: {name: string, value: number}[] = $state([]);
+    let sq_11: {name: string, value: number}[] = $state([]);
+    let sq_12: {name: string, value: number}[] = $state([]);
 
     function next() {
-        exp.dbUpdateParticipant({ completed_experiment: true });
+        exp.dbUpdateParticipant({
+            identify_female: sq_1,
+            identify_male: sq_2,
+            gender_factors: sq_3,
+            sq_4: sq_4,
+            sq_5: sq_5,
+            sq_6: sq_6,
+            sq_7: sq_7,
+            sq_8: sq_8,
+            sq_9: sq_9,
+            sq_10: sq_10,
+            sq_11: sq_11,
+            sq_12: sq_12,
+            completed_experiment: true
+        });
         goto(exp.next(page.data.slug));
+    }
+
+    function printState() {
+        console.log("sq_1:", sq_1);
+        console.log("sq_2:", sq_2);
+        console.log("sq_3:", sq_3);
+        console.log("sq_4:", sq_4);
+        console.log("sq_5:", sq_5);
+        console.log("sq_6:", sq_6);
+        console.log("sq_7:", sq_7);
+        console.log("sq_8:", sq_8);
+        console.log("sq_9:", sq_9);
+        console.log("sq_10:", sq_10);
+        console.log("sq_11:", sq_11);
+        console.log("sq_12:", sq_12);
+    }
+
+    function writeToDb() {
+        const data = {
+            sq_1: sq_1,
+            sq_2: sq_2,
+            sq_3: sq_3,
+            sq_4: sq_4,
+            sq_5: sq_5,
+            sq_6: sq_6,
+            sq_7: sq_7,
+            sq_8: sq_8,
+            sq_9: sq_9,
+            sq_10: sq_10,
+            sq_11: sq_11,
+            sq_12: sq_12
+        };
+        exp.dbUpdateParticipant(data);
     }
     
 </script>
@@ -31,9 +87,9 @@
     Before we finish, we'll ask you a few questions about yourself.
 
     <SliderQuestion
-        bind:bindableValue={val_q_2_1}
+        bind:bindableValue={sq_1}
         props={{
-            qid: 'q_2_1',
+            qid: 'SQ-1',
             questionText: "How much do you identify as female?",
             range: [0, 10],
             rangeLabels: ['Not at all', 'Very strongly'],
@@ -44,9 +100,9 @@
     />
 
     <SliderQuestion
-        bind:bindableValue={val_q_2_2}
+        bind:bindableValue={sq_2}
         props={{
-            qid: 'q_2_2',
+            qid: 'SQ-2',
             questionText: "How much do you identify as male? (also fem/masc as separate questions?)",
             range: [0, 10],
             rangeLabels: ['Not at all', 'Very strongly'],
@@ -60,10 +116,11 @@
 </div>
 
 <div class="exp-page-subsection">
+
     <AllocationQuestion
-        bind:bindableValues={val_q_2_3}
+        bind:bindableValues={sq_3}
         props={{
-            qid: "q_2_4",
+            qid: "SQ-3",
             questionText: "How important are these factors to a person's gender?",
             subcomponents: [
                 { name: 'Chromosomes', description: "Chromosomes by themselves (XX, XY, etc.)"},
@@ -72,25 +129,163 @@
                 { name: 'Identity', description: "Personal sense of self (independent of other people)" },
             ],
             remainderLabel: 'Other',
+            randomize: true,
         }}
     />
 
     <Feedback target_id={"gender-factors"} onClose={(feedbackData) => { exp.dbSubmitFeedback(feedbackData); }} />
 
 </div>
+
 <div class="exp-page-subsection">
 
-    The following questions are about your beliefs about the **other participants of this experiment**.
+    The following questions are about **your beliefs and opinions**.
 
-    (Questions)
-    
+    <SliderQuestion
+        bind:bindableValue={sq_4}
+        props={{
+            qid: 'SQ-4',
+            questionText: "People ought to follow their culture's gender norms.",
+            range: [-5, 5],
+            rangeLabels: ['Strongly disagree', 'Neutral', 'Strongly agree'],
+            step: 0.01,
+            tickInterval: 1,
+            required: true
+        }}
+    />
+
+    <SliderQuestion
+        bind:bindableValue={sq_5}
+        props={{
+            qid: 'SQ-5',
+            questionText: "Gender norms are functionally useful on average.",
+            range: [-5, 5],
+            rangeLabels: ['Very inefficient', 'Neutral', 'Very efficient'],
+            step: 0.01,
+            tickInterval: 1,
+            required: true
+        }}
+    />
+
+    <SliderQuestion
+        bind:bindableValue={sq_6}
+        props={{
+            qid: 'SQ-6',
+            questionText: "Gender norms are fair on average.",
+            range: [-5, 5],
+            rangeLabels: ['Very unfair', 'Neutral', 'Very fair'],
+            step: 0.01,
+            tickInterval: 1,
+            required: true
+        }}
+    />
+
 </div>
 
 <div class="exp-page-subsection">
 
-    The following questions are about your beliefs about **people in your country generally**.
+    The following questions are about the beliefs and opinions of **other participants in this study**.
 
-    (Questions)
+    <SliderQuestion
+        bind:bindableValue={sq_7}
+        props={{
+            qid: 'SQ-7',
+            questionText: "People ought to follow their culture's gender norms.",
+            range: [-5, 5],
+            rangeLabels: ['Strongly disagree', 'Neutral', 'Strongly agree'],
+            step: 0.01,
+            tickInterval: 1,
+            required: true
+        }}
+    />
+
+    <SliderQuestion
+        bind:bindableValue={sq_8}
+        props={{
+            qid: 'SQ-8',
+            questionText: "Gender norms are functionally useful on average.",
+            range: [-5, 5],
+            rangeLabels: ['Very inefficient', 'Neutral', 'Very efficient'],
+            step: 0.01,
+            tickInterval: 1,
+            required: true
+        }}
+    />
+
+    <SliderQuestion
+        bind:bindableValue={sq_9}
+        props={{
+            qid: 'SQ-9',
+            questionText: "Gender norms are fair on average.",
+            range: [-5, 5],
+            rangeLabels: ['Very unfair', 'Neutral', 'Very fair'],
+            step: 0.01,
+            tickInterval: 1,
+            required: true
+        }}
+    />
+
+</div>
+
+<div class="exp-page-subsection">
+
+    The following questions are about the beliefs and opinions of **other participants in this study**. 
+    
+    <AllocationQuestion
+        bind:bindableValues={sq_10}
+        props={{
+            qid: "SQ-10",
+            questionText: "People ought to follow their culture's gender norms.",
+            subcomponents: [
+                { name: 'Strongly disagree', description: "Percentage of responses from <strong>-5 to -3</strong>." },
+                { name: 'Somewhat disagree', description: "Percentage of responses from <strong>-3 to -1</strong>." },
+                { name: 'Neutral', description: "Percentage of responses from <strong>-1 to 1</strong>." },
+                { name: 'Somewhat agree', description: "Percentage of responses from <strong>1 to 3</strong>." },
+                { name: 'Strongly agree', description: "Percentage of responses from <strong>3 to 5</strong>." },
+            ],
+            remainderLabel: 'Did not respond',
+            randomize: false
+        }}
+    />
+
+    <br>
+
+    <AllocationQuestion
+        bind:bindableValues={sq_11}
+        props={{
+            qid: "SQ-11",
+            questionText: "Gender norms are functionally useful on average.",
+            subcomponents: [
+                { name: 'Strongly disagree', description: "Percentage of responses from <strong>-5 to -3</strong>." },
+                { name: 'Somewhat disagree', description: "Percentage of responses from <strong>-3 to -1</strong>." },
+                { name: 'Neutral', description: "Percentage of responses from <strong>-1 to 1</strong>." },
+                { name: 'Somewhat agree', description: "Percentage of responses from <strong>1 to 3</strong>." },
+                { name: 'Strongly agree', description: "Percentage of responses from <strong>3 to 5</strong>." },
+            ],
+            remainderLabel: 'Did not respond',
+            randomize: false
+        }}
+    />
+
+    <br>
+
+    <AllocationQuestion
+        bind:bindableValues={sq_12}
+        props={{
+            qid: "SQ-12",
+            questionText: "Gender norms are fair on average.",
+            subcomponents: [
+                { name: 'Strongly disagree', description: "Percentage of responses from <strong>-5 to -3</strong>." },
+                { name: 'Somewhat disagree', description: "Percentage of responses from <strong>-3 to -1</strong>." },
+                { name: 'Neutral', description: "Percentage of responses from <strong>-1 to 1</strong>." },
+                { name: 'Somewhat agree', description: "Percentage of responses from <strong>1 to 3</strong>." },
+                { name: 'Strongly agree', description: "Percentage of responses from <strong>3 to 5</strong>." },
+            ],
+            remainderLabel: 'Did not respond',
+            randomize: false
+        }}
+    />
+
 
 </div>
 
@@ -101,3 +296,7 @@
     <button id="next-button" onclick={() => next()}>Next</button>
 </div>
 
+
+{#if devState.current === true}
+    <button onclick={() => printState()}>Print state to console</button>
+{/if}

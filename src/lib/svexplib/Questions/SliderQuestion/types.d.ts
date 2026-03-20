@@ -5,7 +5,7 @@ export type SliderQuestionProps = {
     step?: number;
     initialValue?: number;
     tickInterval?: number;
-    rangeLabels?: [string, string];
+    rangeLabels?: string[];
     showValueLabel?: boolean;
     required: boolean;
     

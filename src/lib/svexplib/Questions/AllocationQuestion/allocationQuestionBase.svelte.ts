@@ -26,6 +26,7 @@ export type AllocationQuestionProps = {
     questionText: string;
     remainderLabel?: string;
     subcomponents: AllocationSubcomponentProp[];
+    randomize: boolean;
 }
 
 // export type AllocationQuestion = Omit<AllocationQuestionProps, "subcomponents"> & {
@@ -44,7 +45,7 @@ export class AllocationQuestion {
         this.qid = props.qid;
         this.questionText = props.questionText;
         this.remainderLabel = props.remainderLabel;
-        this.#indexSubcomponentProps(props.subcomponents); // Reassigns displayIndex of props in-place
+        this.#indexSubcomponentProps(props.subcomponents, props.randomize); // Reassigns displayIndex of props in-place
         const colorSeed = Math.random() * 360;
         this.subcomponents = props.subcomponents.map(sc => createSubcomponent(sc, this, colorSeed));
     }
@@ -55,30 +56,43 @@ export class AllocationQuestion {
     sumBehind(sc: AllocationSubcomponent): number { return this.subcomponents.filter(s => s.displayIndex < sc.displayIndex).reduce((acc, s) => acc + s.value, 0); }
     resetValues() { for (const sc of this.subcomponents) { sc.value = 0; } }
 
-    #indexSubcomponentProps(props: AllocationSubcomponentProp[]): void {        
-        const maxIndex = Math.max(...props.map(prop => prop.propIndex ?? 0));
-        for (const [i, sc] of props.entries()) {
-            sc.propIndex = sc.propIndex ?? 0;
-            sc.displayIndex = sc.propIndex ?? 0;
-            if (sc.propIndex < 0) { sc.displayIndex = maxIndex - ( 1 / sc.propIndex); } // index wraparound
-        }
-        
-        const counts = new Map<number, number>();
-        for (const sc of props) {
-            counts.set(sc.propIndex!, (counts.get(sc.propIndex!) || 0) + 1);
-        }
-        
-        for (const sc of props) {
-            if (counts.get(sc.propIndex!)! > 1) {
-                sc.displayIndex! += Math.random() * 0.01;
+    #indexSubcomponentProps(props: AllocationSubcomponentProp[], randomize: boolean): void {
+
+        switch (randomize) {
+            case true: {
+                const maxIndex = Math.max(...props.map(prop => prop.propIndex ?? 0));
+                for (const [i, sc] of props.entries()) {
+                    sc.propIndex = sc.propIndex ?? 0;
+                    sc.displayIndex = sc.propIndex ?? 0;
+                    if (sc.propIndex < 0) { sc.displayIndex = maxIndex - ( 1 / sc.propIndex); } // index wraparound
+                }
+                
+                const counts = new Map<number, number>();
+                for (const sc of props) {
+                    counts.set(sc.propIndex!, (counts.get(sc.propIndex!) || 0) + 1);
+                }
+                
+                for (const sc of props) {
+                    if (counts.get(sc.propIndex!)! > 1) {
+                        sc.displayIndex! += Math.random() * 0.01;
+                    }
+                }
+                
+                props.sort((a, b) => a.displayIndex! - b.displayIndex!);
+                for (const [i, sc] of props.entries()) {
+                    sc.displayIndex = i;
+                }
+                break;
+            }
+
+            case false: {
+                for (const [i, sc] of props.entries()) {
+                    sc.propIndex = sc.propIndex ?? i;
+                    sc.displayIndex = sc.propIndex ?? i;
+                }
+                break;
             }
         }
-        
-        props.sort((a, b) => a.displayIndex! - b.displayIndex!);
-        for (const [i, sc] of props.entries()) {
-            sc.displayIndex = i;
-        }
-        
         return;
     }
 

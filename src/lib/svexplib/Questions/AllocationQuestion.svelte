@@ -62,7 +62,7 @@
 <div class="exp-question distribution-bar-builder">
 
     <div class="question-label">
-        {AQ.questionText}
+        <span class="qid">{AQ.qid}</span> {@html AQ.questionText}
     </div>     
 
         <div class="input-container">
@@ -123,7 +123,7 @@
         {#each AQ.subcomponents as sc}
             {#if sc.description}
                 <span class="sc-name" style={`background-color: ${sc.color};`}>{sc.name}</span>
-                <span class="sc-description-text" style={`background-color: ${adjustHslLightness_2(sc.color, 30)};`}>{sc.description}</span>
+                <span class="sc-description-text" style={`background-color: ${adjustHslLightness_2(sc.color, 30)};`}>{@html sc.description}</span>
             {/if}
         {/each}
     </div>
@@ -254,6 +254,14 @@
         justify-self: start;
         padding: 0.2em 0.5em;
         border-radius: 5px;
+    }
+
+    .qid {
+        font-weight: bold;
+        margin-right: 0.5em;
+        background-color: var(--color-default);
+        padding: 2px 6px;
+        border-radius: 4px;
     }
 
 </style>
