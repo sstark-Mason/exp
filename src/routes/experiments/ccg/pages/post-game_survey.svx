@@ -31,15 +31,15 @@
             identify_female: sq_1,
             identify_male: sq_2,
             gender_factors: sq_3,
-            sq_4: sq_4,
-            sq_5: sq_5,
-            sq_6: sq_6,
-            sq_7: sq_7,
-            sq_8: sq_8,
-            sq_9: sq_9,
-            sq_10: sq_10,
-            sq_11: sq_11,
-            sq_12: sq_12,
+            self_gender_norms_follow: sq_4,
+            self_gender_norms_useful: sq_5,
+            self_gender_norms_fair: sq_6,
+            other_gender_norms_follow: sq_7,
+            other_gender_norms_useful: sq_8,
+            other_gender_norms_fair: sq_9,
+            other_gender_norms_follow_alloc: sq_10,
+            other_gender_norms_useful_alloc: sq_11,
+            other_gender_norms_fair_alloc: sq_12,
             completed_experiment: true
         });
         goto(exp.next(page.data.slug));
@@ -62,22 +62,22 @@
 
     function writeToDb() {
         const data = {
-            sq_1: sq_1,
-            sq_2: sq_2,
-            sq_3: sq_3,
-            sq_4: sq_4,
-            sq_5: sq_5,
-            sq_6: sq_6,
-            sq_7: sq_7,
-            sq_8: sq_8,
-            sq_9: sq_9,
-            sq_10: sq_10,
-            sq_11: sq_11,
-            sq_12: sq_12
+            identify_female: sq_1,
+            identify_male: sq_2,
+            gender_factors: sq_3,
+            self_gender_norms_follow: sq_4,
+            self_gender_norms_useful: sq_5,
+            self_gender_norms_fair: sq_6,
+            other_gender_norms_follow: sq_7,
+            other_gender_norms_useful: sq_8,
+            other_gender_norms_fair: sq_9,
+            other_gender_norms_follow_alloc: sq_10,
+            other_gender_norms_useful_alloc: sq_11,
+            other_gender_norms_fair_alloc: sq_12
         };
         exp.dbUpdateParticipant(data);
     }
-    
+
 </script>
 
 <div class="exp-page-subsection">

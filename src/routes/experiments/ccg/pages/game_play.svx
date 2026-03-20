@@ -24,9 +24,12 @@
     let roundsPlayed = $derived(gameInstanceRecords.current.length);
     let maxRounds = 48;
 
+    let awaitingDb = false;
+
     $effect(() => {
         if (roundsPlayed < maxRounds) return;
         (async () => {
+            awaitingDb = true;
             await writeToDatabase();
             debug(`Reached max rounds of ${maxRounds}. Navigating to next page.`);
             next();
@@ -35,8 +38,10 @@
 
     async function writeToDatabase() {
         debug("Writing to database with updates:", gameInstanceRecords.current);
+        awaitingDb = true;
         const insertedRecords = await exp.dbInsertGameRounds(gameInstanceRecords.current);
         gameInstanceRecords.current = insertedRecords ?? gameInstanceRecords.current;
+        awaitingDb = false;
     }
 
     function printDebugInfo() {
@@ -77,6 +82,12 @@
         maxRounds: maxRounds
     }}
     />
+
+    {#if awaitingDb === true}
+        <div class="saving-indicator">
+            Saving data...
+        </div>
+    {/if}
 
 </div>
 

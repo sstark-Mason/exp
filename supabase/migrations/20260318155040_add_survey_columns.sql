@@ -10,6 +10,6 @@ ALTER TABLE public.participants
     ADD COLUMN IF NOT EXISTS other_gender_norms_fair REAL,
     ADD COLUMN IF NOT EXISTS other_gender_norms_follow_alloc JSONB,
     ADD COLUMN IF NOT EXISTS other_gender_norms_useful_alloc JSONB,
-    ADD COLUMN IF NOT EXISTS other_gender_norms_fair_alloc JSONB,
-    ADD COLUMN IF NOT EXISTS
+    ADD COLUMN IF NOT EXISTS other_gender_norms_fair_alloc JSONB;
+
     
