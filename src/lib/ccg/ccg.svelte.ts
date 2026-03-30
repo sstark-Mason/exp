@@ -395,6 +395,7 @@ export const ccgRoutes: RouteState[] = [
     { route: "game_play", permitted: false, required: true, completed: false, revisitAfterCompleted: false },
     { route: "game_end", permitted: false, required: true, completed: false, revisitAfterCompleted: false },
     { route: "post-game_survey", permitted: false, required: true, completed: false, revisitAfterCompleted: true },
+    { route: "optional_questions", permitted: false, required: true, completed: false, revisitAfterCompleted: true },
     { route: "exit", permitted: false, required: true, completed: false, revisitAfterCompleted: true },
 ];
 

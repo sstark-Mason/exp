@@ -6,6 +6,8 @@
     import * as ccg from '$lib/ccg/ccg.svelte.ts';
     import { onMount } from 'svelte';
     import Feedback from '$svexplib/Tools/Feedback.svelte';
+    import { detectUserAgent } from '$svexplib/Tools/UserAgentDetection.ts';
+    
     const debug = ccg.debugBase.extend(`page:${page.data.slug}.svx`);
     const exp = ccg.getExperimentState();
     exp.updateRoutePermission(page.data.slug, true);
@@ -17,7 +19,7 @@
     let pidCookieSet = $state(true);
 
     function assignRandomPID() {
-        const randomPID = 'anon_' + Math.random().toString(36).substring(2, 10);
+        const randomPID = 'test_' + Math.random().toString(36).substring(2, 10);
         exp.pID = randomPID;
         pid_input_enabled = true;
         updatePID();
@@ -92,6 +94,9 @@
 
         window.location.href = `/experiments/ccg?role=${selectedRole}&pid=${exp.pID}`;
     }
+
+    const userAgentInfo = detectUserAgent();
+    exp.dbUpdateParticipant(userAgentInfo);
     
 </script>
 
@@ -109,10 +114,10 @@
     Selected role: {selectedRole}
 
     <!-- Modal selector bound to newRole. If newRole != exp.userRole, then reset cookies and re-enter through /ccg. -->
-    <input type="radio" id="participant" name="role" value="participant" bind:group={selectedRole}>
+    <input type="radio" id="participant" name="role" value="participant" bind:group={selectedRole} onclick={() => resetCookiesAndReturnToOrigin()}>
     <label for="participant">Participant</label>
     <br>
-    <input type="radio" id="tester" name="role" value="tester" bind:group={selectedRole}>
+    <input type="radio" id="tester" name="role" value="tester" bind:group={selectedRole} onclick={() => resetCookiesAndReturnToOrigin()}>
     <label for="tester">Tester</label>
 
     <Feedback target_id={"section-welcome"} onClose={(feedbackData) => { exp.dbSubmitFeedback(feedbackData); }} />
@@ -137,7 +142,9 @@ The contents of this study will be reviewed and approved by the Institutional Re
     <li>You are being asked to participant in this research study.</li>
     <li>Your participation in this study is voluntary and you may choose to exit at any time.</li>
     <li>This study's procedures and use of data are provided in detail below.</li>
-    <li>This study is being conducted by Sven Stark at George Mason University as part of doctoral dissertation research. Questions and concerns should be directed to sstark@gmu.edu. Feedback regarding the study can also be provided within the study itself.</li>
+    <li>This study is being conducted by Sven Stark (sstark@gmu.edu) as part of dissertation research at George Mason University.</li>
+    <li>The principle investigator supervising this study is Johanna Mollerstrom (jmollers@gmu.edu).</li>
+    <li>Questions and concerns should be directed to sstark@gmu.edu. Feedback regarding the study can also be provided within the study itself by clicking on the 🗨️ icons.</li>
 </ol>
 
 <details>

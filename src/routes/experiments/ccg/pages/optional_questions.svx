@@ -1,0 +1,73 @@
+<script lang="ts">
+    export const prerender = true;
+    import { PUBLIC_ENV } from '$env/static/public';
+    import { devState } from '$svexplib/Tools/DevState.svelte.ts';
+    import { goto } from '$app/navigation';
+    import { page } from '$app/state';
+    import * as ccg from '$lib/ccg/ccg.svelte.ts';
+    const debug = ccg.debugBase.extend(`page:${page.data.slug}.svx`);
+    const exp = ccg.getExperimentState();
+
+    import Feedback from '$svexplib/Tools/Feedback.svelte';
+
+    function next() {
+        goto(exp.next(page.data.slug));
+    }
+
+    let q1 = $state('');
+
+</script>
+
+<div class="exp-page-subsection">
+
+    # Text Questions (optional)
+
+    The following questions are optional, but responding to them will increase your final payment.
+
+    Responses are graded for effort and thoughtfulness, with more thoughtful responses receiving more points.
+    
+    You can skip any question by leaving it blank, but you will not receive credit for that question.
+
+    1. Please describe any strategies you used during this study's coordination game.
+
+    <!-- <input type="text"
+        bind:value={q1}
+        placeholder="Enter your response here." 
+        class="text-input-question"
+        maxlength=2000
+    /> -->
+
+    <textarea
+        bind:value={q1}
+        rows=8
+        cols=80
+        class="text-input-question"
+        placeholder="Enter your response here."
+        wrap="hard"
+        maxlength=2000
+    />
+
+</div>
+
+<style>
+    .text-input-question {
+        /* width: 40em;
+        padding: 0.5em;
+        font-size: 0.9em;
+        border: 1px solid #ccc;
+        border-radius: 4px; */
+    }
+
+    textarea {
+        width: 100%;
+        max-width: 500px;
+        min-height: 120px;
+        padding: 12px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        font-family: inherit;
+        font-size: 16px;
+        resize: vertical; /* allows user to resize vertically */
+        box-sizing: border-box;
+    }
+</style>
