@@ -1,0 +1,151 @@
+<script lang="ts">
+    export const prerender = true;
+    import { goto } from '$app/navigation';
+
+    import MultipleChoiceQuestion from '$svexplib/Questions/MultipleChoiceQuestion.svelte';
+
+    const qStates = $state([
+        { qid: 'cq_2_1', completed: false, scoreArray: [] },
+        { qid: 'cq_2_2', completed: false, scoreArray: [] },
+        { qid: 'cq_2_3', completed: false, scoreArray: [] },
+    ]);
+
+</script>
+
+<div class="exp-page-subsection">
+
+    # Previous study
+
+    The previous study had two sections:
+
+    Part 1: Decisions in four social scenarios.
+
+    **Part 2: Performing math tasks and choosing reward schemes for those tasks.**
+
+</div>
+
+<div class="exp-page-subsection">
+
+    ## Previous study, part 2
+
+    In the second part of the previous study, participants performed a series of rounds of math tasks.
+    Participants were given 3 minutes to solve as many math tasks as they could for each round.
+
+    We'll use three hypothetical participants (Alice, Bob, and Charlie) to explain the reward schemes of each round.
+
+</div>
+
+<div class="exp-page-subsection">
+
+    For the **first** round, participants earned $0.50 for each math task they solved correctly.
+    
+    For example, if Alice completes 10 math tasks correctly, then she receives **$0.50 × 10 = $5.00** for that round.
+
+</div>
+
+<div class="exp-page-subsection">
+
+    For the **second** round, participants earned $0 or $1.00 for each math task they solved correctly, conditional on whether they solved more than another randomly-chosen participant.
+    
+    For example, if Alice is randomly matched with Bob, and Bob solves 8 math tasks, then:
+    - If Alice solves more than 8 tasks, she would earn $1.00 per task she solved for that round.
+    - If Alice solves exactly 8 tasks, she would earn $0.50 per task she solved for that round.
+    - If Alice solves fewer than 8 tasks, she would earn $0 for that round.
+    
+    Matching is *independent*, so Alice being matched with Bob has no effect on either Bob or Charlie.
+
+</div>
+
+<div class="exp-page-subsection">
+
+    For the **third** round, participants earned $0 or $1.00 for each math task they solved correctly, conditional on whether they solved more than they did in round 1.
+
+    For example, if Alice solved 10 tasks in round 1, then:
+    - If Alice solves more than 10 tasks in round 3, she would earn $1.00 per task she solved for that round.
+    - If Alice solves exactly 10 tasks in round 3, she would earn $0.50 per task she solved for that round.
+    - If Alice solves fewer than 10 tasks in round 3, she would earn $0 for that round.
+
+</div>
+
+<div class="exp-page-subsection">
+
+    For the **fourth** round, participants chose any combination of the previous reward schemes as percentages summing to 100%.
+    
+    For example, Alice could choose the following combination:
+    - 20% of round 1 reward scheme ($0.50 per correct task, guaranteed)
+    - 40% of round 2 reward scheme ($1.00 or $0 per task, conditional on outperforming a randomly-chosen participant)
+    - 40% of round 3 reward scheme ($1.00 or $0 per task, conditional on outperforming her previous performance)
+
+</div>
+
+<div class="exp-page-subsection">
+
+    <MultipleChoiceQuestion
+    bind:bindableComplete={qStates[0].completed}
+    bind:bindableScoreArray={qStates[0].scoreArray}
+    props={{
+        qid: qStates[0].qid,
+        questionText: "What did participants do in part 2 of the previous study?",
+        responses: [
+            { text: "They performed math tasks.", isTrue: true },
+            { text: "They chose a reward scheme.", isTrue: true },
+            { text: "They made decisions in four social scenarios.", isTrue: false },
+            { text: "They decided which charity to donate earnings to.", isTrue: false },
+        ],
+        required: true,
+        randomize: true,
+        participantSeed: 123,
+        showFeedbackOnSelect: true,
+        showScore: true,
+        allowReset: false,
+    }}/>
+
+    <MultipleChoiceQuestion
+    bind:bindableComplete={qStates[1].completed}
+    bind:bindableScoreArray={qStates[1].scoreArray}
+    props={{
+        qid: qStates[1].qid,
+        questionText: "If Alice solved 12 tasks in round 1, and Bob solved 9 tasks in round 2, how much would Alice earn for round 1?",
+        responses: [
+            { text: "12 × 0.50 = $6.00", isTrue: true },
+            { text: "12 × 1.00 = $12.00", isTrue: false },
+            { text: "12 × 0.00 = $0.00", isTrue: false },
+            { text: "Not enough information to tell.", isTrue: false },
+        ],
+        required: true,
+        randomize: true,
+        participantSeed: 123,
+        showFeedbackOnSelect: true,
+        showScore: true,
+        allowReset: false,
+    }}/>
+
+    <MultipleChoiceQuestion
+    bind:bindableComplete={qStates[2].completed}
+    bind:bindableScoreArray={qStates[2].scoreArray}
+    props={{
+        qid: qStates[2].qid,
+        questionText: "Suppose Alice solved 6 tasks in round 4 and split her earnings 50/50 between two reward schemes. Which of the following could be her earnings?",
+        responses: [
+            { text: "(6 × 0.50 × 50%) + (6 × 1.00 × 50%) = $4.50", isTrue: true },
+            { text: "(6 × 1.00 × 50%) + (6 × 0.00 × 50%) = $3.00", isTrue: true },
+            { text: "(3 × 1.00 × 50%) + (3 × 0.00 × 50%) = $1.50", isTrue: false },
+            { text: "(6 × 0.50 × 100%) = $3.00", isTrue: false },
+            { text: "(6 × 0.50 × 40%) + (6 × 1.00 × 30%) + (6 × 1.00 × 30%) = $4.80", isTrue: false },
+        ],
+        required: true,
+        randomize: true,
+        participantSeed: 123,
+        showFeedbackOnSelect: true,
+        showScore: true,
+        allowReset: false,
+    }}/>
+
+
+</div>
+
+<div class="page-navigation">
+
+    <button id="next-button" onclick={() => goto('predictions_1')}>Continue</button>
+
+</div>

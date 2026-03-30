@@ -1,0 +1,27 @@
+<script lang="ts">
+    export const prerender = true;
+    import { goto } from '$app/navigation';
+
+</script>
+
+<div class="exp-page-subsection">
+
+    # Introduction
+
+    This study procedes as follows:
+
+    1. We will describe a previous study to you.
+
+    2. You will make predictions about the study's results and participants.
+
+
+    This study is incentivized, meaning that your final payment will depend on your responses.
+    Responses that are more accurate will provide higher payments, while responses that are less accurate will provide lower payments.
+
+</div>
+
+<div class="page-navigation">
+
+    <button id="next-button" onclick={() => goto('previous_study_p1')}>Continue</button>
+
+</div>

@@ -1,0 +1,46 @@
+<script lang="ts">
+    export const prerender = true;
+    import { goto } from '$app/navigation';
+
+</script>
+
+<div class="exp-page-subsection">
+
+    # Your predictions
+
+    In the next part of the study, you will be asked to make predictions about the results of the previous study and its participants.
+
+    Your earnings for each prediction depend on how accurate your prediction is. More accurate predictions will earn you more money, while less accurate predictions will earn you less money.
+
+</div>
+
+
+<div class="exp-page-subsection">
+
+    ## Prosociality score and math performance
+
+</div>
+
+<div class="exp-page-subsection">
+
+    ## Prosociality scores and reward scheme choices
+
+</div>
+
+<div class="exp-page-subsection">
+
+    ## Reward scheme choices and math performance?
+
+</div>
+
+<div class="exp-page-subsection">
+
+    ## Predictions by gender
+    
+</div>
+
+<div class="page-navigation">
+
+    <button id="next-button" onclick={() => goto('exit')}>Continue</button>
+
+</div>

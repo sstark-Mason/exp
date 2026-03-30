@@ -155,6 +155,7 @@
 		.exp-page {
 			grid-column: 2;
 			max-width: var(--page-width);
+			min-width: calc(min(var(--page-width), 100% - 2rem));
 			min-height: 92vh;
 			justify-self: center;
 			view-transition-name: exp-page;

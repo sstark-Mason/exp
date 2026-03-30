@@ -1,0 +1,20 @@
+<script lang="ts">
+    export const prerender = true;
+    import { goto } from '$app/navigation';
+
+</script>
+
+<div class="exp-page-subsection">
+
+    # Page
+
+    Page text
+
+</div>
+
+<div class="page-navigation">
+
+    <button id="skip-button" onclick={() => goto('exit')}>Exit Study</button>
+    <button id="next-button" onclick={() => goto('intro')}>Continue</button>
+
+</div>

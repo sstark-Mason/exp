@@ -1,0 +1,150 @@
+<script lang="ts">
+    export const prerender = true;
+    import { PUBLIC_ENV } from '$env/static/public';
+    import { goto, invalidateAll } from '$app/navigation';
+    import { page } from '$app/state';
+    import * as ccg from '$lib/ccg/ccg.svelte.ts';
+    import { onMount } from 'svelte';
+    import Feedback from '$svexplib/Tools/Feedback.svelte';
+    import { detectUserAgent } from '$svexplib/Tools/UserAgentDetection.ts';
+    
+
+    let pID = '';
+</script>
+
+<div class="exp-page-subsection">
+
+
+    # Welcome
+
+    Before continuing, please confirm your prolific ID below. This is necessary to ensure you receive payment for your participation.
+    
+    <input type="text" bind:value={pID} class="pid-input" placeholder="Enter your Prolific ID here"/>
+
+
+</div>
+
+
+<div class="exp-page-subsection">
+
+## Consent
+
+The contents of this study will be reviewed and approved by the Institutional Review Board (IRB) of George Mason University.*
+
+<span class="footnote">*This study is not yet collecting data and is currently in the approval process.</span>
+
+
+<br><br>
+
+### Summary
+
+<ol>
+    <li>You are being asked to participant in this research study.</li>
+    <li>Your participation in this study is voluntary and you may choose to exit at any time.</li>
+    <li>This study's procedures and use of data are provided in detail below.</li>
+    <li>This study is being conducted by Elif Demiral (East Tennessee State University), Johanna Mollerstrom and Sven Stark (George Mason University), and Robert Stüber (University of Warwick).</li>
+    <li>The principle investigator supervising this study is Johanna Mollerstrom (jmollers@gmu.edu).</li>
+    <li>Questions and concerns should be directed to sstark@gmu.edu. Feedback regarding the study can also be provided within the study itself by clicking on the 🗨️ icons.</li>
+</ol>
+
+<details>
+
+    <summary>Transparency in study details</summary>
+
+    The instructions of this study intend to accurately describe the relationship between *your choices* and *your outcomes*. Some choices in this study are incentivized, meaning that these choices will affect your material outcome (your monetary reward) at the end of the study.
+
+    For maximum transparency, the instructions are intended to:
+    <ul>
+        <li>Be as simple and accurate as possible.</li>
+        <li>Not deceive or mislead you.</li>
+    </ul>
+
+    If a choice or response affects your material outcome, then this will be explicitly stated. If a choice or response is not stated to affect your material outcome, then it will not do so.
+
+
+</details>
+
+<details>
+    <summary>Transparency in data</summary>
+
+    This study collects the following data:
+    <ul>
+        <li>Your choices and responses.</li>
+        <li>Study metadata.</li>
+    </ul>
+
+    The data on your choices and responses is being collected for the purpose of scholarly publishing and developing an improved understanding of human behavior. Following standard study practices, specific details regarding the purpose of this study cannot be revealed until after data collection is complete. If you're interested in knowing more, please contact the researchers through the method noted above.
+
+
+    Study metadata is technical information not related to your choices and responses. Metadata is collected in order to improve the experience of participating in this and future studies.
+
+
+    When you complete this study, your data is associated with your Prolific identification. This is required for us to pay you at the end of the study.
+
+
+    After this study's collection of data and payment of rewards is complete, any information that could be used to identify participants will be removed from the data set. The anonymized (de-identifized) data set will be used in this study's analysis and may be used in future studies.
+
+
+    General study details, anonymized data, and analysis results may be provided upon request to this study's researchers after the study's conclusion.
+
+
+</details>
+
+**By continuing, you acknowledge that you have read and understood the above information, and that you voluntarily agree to participate in this study under the terms described above.**
+
+</div>
+
+
+<div class="page-navigation">
+
+    <button id="skip-button" onclick={() => goto('exit')}>Exit Study</button>
+    <button id="next-button" onclick={() => goto('intro')}>Continue</button>
+
+</div>
+
+
+
+
+
+
+
+<style>
+
+    .pid-button.input-enabled{
+        background-color: lightgreen;
+    }
+
+    .pid-button:not(.input-enabled){
+        background-color: orange;
+    }
+
+    details > summary {
+        font-weight: bold;
+        /* margin: 1rem 0rem 0.5rem 0rem; */
+        margin: 0.5rem 0;
+    }
+
+    details > p {
+        margin: 1rem 1rem;
+    }
+
+    details:open {
+        margin-bottom: 2rem;
+    }
+
+    .footnote {
+        font-size: 0.8rem;
+    }
+
+    ol > li {
+        margin: 0.5rem 0.25rem;
+    }
+
+    ul > li {
+        /* margin: 0.25rem; */
+        margin: -0.5rem 0.5rem 0.75rem 0.5rem;
+    }
+
+
+
+</style>

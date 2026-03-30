@@ -1,0 +1,109 @@
+<script lang="ts">
+    export const prerender = true;
+    import { goto } from '$app/navigation';
+    import MultipleChoiceQuestion from '$svexplib/Questions/MultipleChoiceQuestion.svelte';
+
+    const qStates = $state([
+        { qid: 'cq_1_1', completed: false, scoreArray: [] },
+        { qid: 'cq_1_2', completed: false, scoreArray: [] },
+        { qid: 'cq_1_3', completed: false, scoreArray: [] },
+    ]);
+
+</script>
+
+<div class="exp-page-subsection">
+
+    # Previous study
+
+    The previous study had two sections:
+
+    **Part 1: Decisions in four social scenarios.**
+
+    Part 2: Performing math tasks and choosing reward schemes for those tasks.
+
+</div>
+
+<div class="exp-page-subsection">
+
+    ## Previous study, part 1
+
+    In the previous study, participants were given four scenarios and asked to make a decision for each scenario.
+    These scenarios gave participants a choice between a "prosocial" option and a "selfish" option.
+
+    These were the scenarios:
+
+    1. Dictator game: Decide how to split $10.
+        - Prosocial: Participant and partner both receive $5.
+        - Selfish: Participant receives $10, partner receives $0.
+
+    2. Prisoner's dilemma: Decide whether to "cooperate" or "defect" with a partner.
+        - Prosocial: Participants choose to "cooperate," decreasing their own payoff but increasing their partner's payoff.
+        - Selfish: Participants choose to "defect," increasing their own payoff but decreasing their partner's payoff.
+
+    3. Trust game (investor role): Decide whether to "trust" or "distrust" a partner with $10, with trusting increasing the total amount of money that both the participant and their partner can earn together.
+        - Prosocial: Participant chooses to "trust" their partner, giving them $10 with the possibility of the partner sharing back some of the money.
+        - Selfish: Participant chooses to "distrust" their partner, keeping $10 and preventing the partner from having the opportunity to share back money.
+
+    4. Trust game (investee role): Decide whether to "share" or "keep" money from the investor.
+        - Prosocial: Participant chooses to "share" money with the investor, giving them some of the money they received from the experimenter.
+        - Selfish: Participant chooses to "keep" all the money they received from the experimenter, giving the investor nothing.
+
+    Based on their decisions, participants are assigned a "prosociality score" from 0 to 4.
+        - Prosocial decisions increase prosociality score by 1.
+        - Selfish decisions do not increase prosociality score.
+
+</div>
+
+<div class="exp-page-subsection">
+
+    ## Comprehension questions
+
+    <MultipleChoiceQuestion
+    bind:bindableComplete={qStates[0].completed}
+    bind:bindableScoreArray={qStates[0].scoreArray}
+    props={{
+        qid: qStates[0].qid,
+        questionText: "What did participants do in part 1 of the previous study?",
+        responses: [
+            { text: "They made decisions in four social scenarios.", isTrue: true },
+            { text: "They performed math tasks.", isTrue: false },
+            { text: "They chose how they wanted to be paid.", isTrue: false },
+            { text: "They gave us their best kitchen recipes.", isTrue: false },
+        ],
+        required: true,
+        randomize: true,
+        participantSeed: 123,
+        showFeedbackOnSelect: true,
+        showScore: true,
+        allowReset: false,
+    }}/>
+
+    <MultipleChoiceQuestion
+    bind:bindableComplete={qStates[1].completed}
+    bind:bindableScoreArray={qStates[1].scoreArray}
+    props={{
+        qid: qStates[1].qid,
+        questionText: "If a participant made two prosocial decisions and two selfish decisions, what would their prosociality score be?",
+        responses: [
+            { text: "2 points", isTrue: true },
+            { text: "0 points", isTrue: false },
+            { text: "1 point", isTrue: false },
+            { text: "4 points", isTrue: false },
+        ],
+        required: true,
+        randomize: true,
+        participantSeed: 123,
+        showFeedbackOnSelect: true,
+        showScore: true,
+        allowReset: false,
+    }}/>
+
+
+
+</div>
+
+<div class="page-navigation">
+
+    <button id="next-button" onclick={() => goto('previous_study_p2')}>Continue</button>
+
+</div>
