@@ -11,9 +11,9 @@
     // import LiveCoordinationGame from '$svexplib/Games/CoordinationGame/LiveCoordinationGame.svelte';
     // import { choiceSetSymbols, choiceSetColorsUnicode } from '$svexplib/Games/CoordinationGame/CoordinationGameBase.ts';
 
-    import CCG from '$svexplib/Games/ccg/CCG.svelte';
-    import type { Avatar } from '$svexplib/Games/ccg/types.d.ts';
-    import { avatars } from '$svexplib/Games/ccg/avatars.ts';
+    import CCG from '$svexplib/Games/ccg_predict/CCG.svelte';
+    import type { Avatar } from '$svexplib/Games/ccg_predict/types.d.ts';
+    import { avatars } from '$svexplib/Games/ccg_predict/avatars.ts';
 
     import { PersistedState } from "runed";
     const selectedAvatar = new PersistedState<Avatar | null>("ccg-selected-avatar", null);
@@ -24,7 +24,8 @@
     let roundsPlayed = $derived(gameInstanceRecords.current.length);
     let maxRounds = 48;
 
-    let awaitingDb = false;
+    let awaitingDb = $state(false);
+    let lastSavedRound = $state(0);
 
     $effect(() => {
         if (roundsPlayed < maxRounds) return;
@@ -35,6 +36,15 @@
             next();
         })();
     });
+
+    $effect(() => {
+        if (roundsPlayed <= lastSavedRound) return;
+        (async () => {
+            await writeToDatabase();
+            lastSavedRound = roundsPlayed;
+            debug(`Saved to database after round ${roundsPlayed}.`);
+        })();
+    })
 
     async function writeToDatabase() {
         debug("Writing to database with updates:", gameInstanceRecords.current);

@@ -1,0 +1,131 @@
+<script lang="ts">
+    import { PUBLIC_ENV } from '$env/static/public';
+    import { goto } from '$app/navigation';
+    import { page } from '$app/state';
+    import { onMount } from 'svelte';
+    import { devState } from '$svexplib/Tools/DevState.svelte.ts';
+    import * as ccg from '$lib/ccg/ccg.svelte.ts';
+    const debug = ccg.debugBase.extend(`page:${page.data.slug}.svx`);
+    const exp = ccg.getExperimentState();
+
+    import CCG from '$svexplib/Games/ccg_predict/CCG.svelte';
+    import { avatars } from '$svexplib/Games/ccg_predict/avatars.ts';
+    import Feedback from '$svexplib/Tools/Feedback.svelte';
+    import MultipleChoiceQuestion from '$svexplib/Questions/MultipleChoiceQuestion.svelte';
+
+    // const MathJax = {
+    //     tex: {
+    //         inlineMath: [['$', '$'], ['\\(', '\\)']],
+    //         displayMath: [['$$', '$$'], ['\\[', '\\]']]
+    //     }
+    // };
+
+    // onMount(() => {
+    //     if (!document.getElementById('mathjax-script')) {
+    //         const script = document.createElement('script');
+    //         script.id = 'mathjax-script';
+    //         script.src = "https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js";
+    //         script.async = true;
+    //         document.head.appendChild(script);
+    //     }
+    // });
+
+    import 'katex/dist/katex.min.css';
+    import katex from 'katex';
+
+    function latex(node: HTMLElement, formula: string) {
+        katex.render(formula, node, {
+            throwOnError: false,
+            displayMode: node.tagName === 'DIV'
+        });
+    }
+
+
+    function next() {
+        goto(exp.next(page.data.slug));
+    }
+
+    let allowNext = $state(true);
+    
+</script>
+
+<div class="exp-page-subsection">
+    
+    
+    <h2>Your predictions</h2>
+
+
+    For each game round, you'll be asked to predict the proportion of players that choose each option.
+
+    <ul>
+        <li>Each prediction gives you a chance to earn a <em>prediction bonus</em>.</li>
+        <li>The more accurate your predictions, the higher your chances of earning these bonuses.</li>
+        <li>You will maximize your total bonus payments by reporting your true predictions.</li>
+        <li>You should not try to hedge your predictions in either direction.</li>
+    </ul>
+
+
+    <details>
+        <summary>How are prediction bonuses rewarded?</summary>
+
+        Prediction bonuses are rewarded using a **binarized scoring rule**.
+        For each prediction, your chance of earning the bonus depends on the **difference between your prediction and the true value**.
+        The closer your prediction, the greater your chance of earning the bonus.
+
+        ### Scoring rule
+
+        Let <span use:latex={"θ"}></span> be the true proportion of players that choose option 1, and <span use:latex={"x_i"}></span> be your prediction for that round.
+
+        <!-- This line works as intended -->
+        <div use:latex={"\\text{Probability of earning bonus: } p = 10\\% - (θ - x_i)^2"}></div>
+
+
+        <!-- This line works as intended -->
+        <!-- Probability of earning bonus <span use:latex={"= 10\\\% - (θ - x_i)^2"}></span> -->
+
+        <div use:latex={"\\text{Expected payoff: } E[π_i] = p \\cdot b = 10\\% - (θ - x_i)^2"}></div>
+
+        <div use:latex={"\\text{First order condition: } \\frac{∂E[π_i]}{∂x_i} = 2 \\cdot (θ - x_i) = 0"}></div>
+
+        <div use:latex={"\\text{Best response: } x_i = θ"}></div>
+
+    </details>
+
+</div>
+
+<div class="exp-page-subsection">
+
+    ## Example game
+
+    <CCG
+    props={{
+        player1UID: "example-game",
+        player1Avatar: avatars[Math.floor(Math.random() * avatars.length)],
+        possiblePlayer2Avatars: avatars,
+        possibleActions: [
+            { key: "masc", value: "", color: "oklch(0.40 0.2 240)" },
+            { key: "fem", value: "", color: "oklch(0.60 0.2 360)" },
+            { key: "neutral1", value: "", color: "oklch(0.40 0.2 140)" },
+            { key: "neutral2", value: "", color: "oklch(0.70 0.2 90)" }
+        ],
+        outcomes: [
+            { key: "outcome_c1c1", value: [2, 1] },
+            { key: "outcome_c2c2", value: [1, 2] },
+            { key: "outcome_c1c2", value: [0, 0] },
+            { key: "outcome_c2c1", value: [0, 0] }
+        ],
+        maxRounds: Infinity
+    }}
+    />
+
+    <Feedback target_id={"prediction-example"} onClose={(feedbackData) => { exp.dbSubmitFeedback(feedbackData); }} />
+
+</div>
+
+
+<div class="page-navigation">
+    {#if devState.current === true}
+        <button id="skip-button" onclick={() => next()}>Skip</button>
+    {/if}
+    <button id="next-button" onclick={() => next()} disabled={!allowNext}>Next</button>
+</div>

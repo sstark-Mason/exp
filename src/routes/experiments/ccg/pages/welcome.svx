@@ -208,7 +208,7 @@ The contents of this study will be reviewed and approved by the Institutional Re
         <button onclick={() => resetCookiesAndReturnToOrigin()}>Change role to {selectedRole}</button>
     {/if}
     {#if exp.pID && exp.userRole === selectedRole}
-        <button id="next-button" disabled={!pidCookieSet} onclick={() => next()}>Next</button>
+        <button id="next-button" disabled={!pidCookieSet} onclick={() => next()}>I consent</button>
     <!-- {:else if !exp.pID}
         <button onclick={() => assignRandomPID()}>Assign random ID</button>
     {:else if exp.userRole !== selectedRole}

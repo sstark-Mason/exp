@@ -101,7 +101,7 @@
         <SliderQuestion
             bind:bindableValue={feedbackData.current.metrics.clarity}
             props={{
-                qid: 'feedback_welcome_clarity',
+                qid: 'clarity',
                 questionText: "Clarity",
                 range: [0, 5],
                 rangeLabels: ['', ''],
@@ -116,7 +116,7 @@
         <SliderQuestion
             bind:bindableValue={feedbackData.current.metrics.verbosity}
             props={{
-                qid: 'feedback_welcome_verbosity',
+                qid: 'verbosity',
                 questionText: "Verbosity",
                 range: [0, 5],
                 rangeLabels: ['', ''],
@@ -131,7 +131,7 @@
         <SliderQuestion
             bind:bindableValue={feedbackData.current.metrics.appropriateness}
             props={{
-                qid: 'feedback_welcome_appropriateness',
+                qid: 'appropriateness',
                 questionText: "Appropriateness",
                 range: [0, 5],
                 rangeLabels: ['', ''],
