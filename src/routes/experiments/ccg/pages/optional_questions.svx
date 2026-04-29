@@ -49,6 +49,14 @@
 
 </div>
 
+
+<div class="page-navigation">
+    {#if devState.current === true}
+        <button id="skip-button" onclick={() => next()}>Skip</button>
+    {/if}
+    <button id="next-button" onclick={() => next()}>Finish</button>
+</div>
+
 <style>
     .text-input-question {
         /* width: 40em;

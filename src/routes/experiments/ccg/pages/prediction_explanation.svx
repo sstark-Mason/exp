@@ -60,8 +60,8 @@
     <ul>
         <li>Each prediction gives you a chance to earn a <em>prediction bonus</em>.</li>
         <li>The more accurate your predictions, the higher your chances of earning these bonuses.</li>
-        <li>You will maximize your total bonus payments by reporting your true predictions.</li>
-        <li>You should not try to hedge your predictions in either direction.</li>
+        <li>You will maximize your expected bonus payments by reporting your true predictions.</li>
+        <li>You should <em>not</em> try to hedge your predictions in either direction.</li>
     </ul>
 
 
@@ -103,10 +103,10 @@
         player1Avatar: avatars[Math.floor(Math.random() * avatars.length)],
         possiblePlayer2Avatars: avatars,
         possibleActions: [
-            { key: "masc", value: "", color: "oklch(0.40 0.2 240)" },
-            { key: "fem", value: "", color: "oklch(0.60 0.2 360)" },
-            { key: "neutral1", value: "", color: "oklch(0.40 0.2 140)" },
-            { key: "neutral2", value: "", color: "oklch(0.70 0.2 90)" }
+            { key: "blue", value: "", color: "oklch(0.5 0.12 240)" },
+            { key: "pink", value: "", color: "oklch(0.6 0.2 360)" },
+            { key: "green", value: "", color: "oklch(0.6 0.16 140)" },
+            { key: "orange", value: "", color: "oklch(0.7 0.16 65)" }
         ],
         outcomes: [
             { key: "outcome_c1c1", value: [2, 1] },
@@ -119,6 +119,14 @@
     />
 
     <Feedback target_id={"prediction-example"} onClose={(feedbackData) => { exp.dbSubmitFeedback(feedbackData); }} />
+
+    <br>
+
+
+    **Testers:** Which slider direction do you find more intuitive or prefer overall?
+    
+    (Please click on the feedback icon and say which.)
+
 
 </div>
 

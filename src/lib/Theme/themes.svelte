@@ -307,6 +307,26 @@
 				width: 100%;
 			}
 		}
+
+		details {
+			border-radius: 5px;
+			
+			&[open] {
+				background-color: var(--root-bg-2);
+			}
+
+			&[open]::details-content {
+				padding: 0 0.5rem 0.5rem 0.5rem;
+			}
+		}
+
+		summary {
+			padding: 0.5rem;
+			background-color: var(--root-bg-0);
+			border-radius: 5px;
+		}
+
+
 	}
 
 </style>

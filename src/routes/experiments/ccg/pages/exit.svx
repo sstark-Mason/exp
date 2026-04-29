@@ -6,6 +6,10 @@
     import * as ccg from '$lib/ccg/ccg.svelte.ts';
     const debug = ccg.debugBase.extend(`page:${page.data.slug}.svx`);
     const exp = ccg.getExperimentState();
+
+    (() => { exp.dbUpdateParticipant({ end_time: new Date().toISOString() }); })();
+
+
 </script>
 
 # Thank you for your participation!

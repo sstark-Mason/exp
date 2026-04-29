@@ -103,7 +103,7 @@
         bind:bindableValue={sq_2}
         props={{
             qid: 'SQ-2',
-            questionText: "How much do you identify as male? (also fem/masc as separate questions?)",
+            questionText: "How much do you identify as male?",
             range: [0, 10],
             rangeLabels: ['Not at all', 'Very strongly'],
             step: 0.01,

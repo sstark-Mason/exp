@@ -390,11 +390,11 @@
         }
 
         &::-moz-range-thumb {
-            width: 2rem;
+            width: 0.5rem;
             height: 2rem;
             background: white;
-            border: 3px solid var(--slider-thumb-color);
-            border-radius: 50%;
+            border: 2px solid black;
+            border-radius: 10%;
             cursor: pointer;
             box-shadow: 0 2px 4px rgba(0,0,0,0.2);
         }
