@@ -77,6 +77,15 @@
 
     }
 
+    function EnterKeyHandler(e: KeyboardEvent) {
+        if (e.key === "Enter") {
+            e.preventDefault();
+            if (selectedChoice) {
+                handleSubmission(selectedChoice);
+            }
+        }
+    }
+
     function handlePredictionInput(choice: string, value: number) {
         // Manual handling of prediction inputs to prevent inputs from locking up
         // Update: Still locking up. Might be an issue with the browser or range input itself.
@@ -95,7 +104,8 @@
 </script>
 
 
-<div class="ccg-wrapper">
+<!-- svelte-ignore a11y_no_static_element_interactions -->
+<div class="ccg-wrapper" onkeydown={EnterKeyHandler} >
 
 <div class="ccg" transition:fade={{ duration: 300 }}>
 

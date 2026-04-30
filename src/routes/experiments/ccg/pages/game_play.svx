@@ -16,6 +16,7 @@
     import { avatars } from '$svexplib/Games/ccg_predict/avatars.ts';
 
     import { PersistedState } from "runed";
+    import { isTemplateSpan } from 'typescript';
     const selectedAvatar = new PersistedState<Avatar | null>("ccg-selected-avatar", null);
 
     let gameInstanceRecords = new PersistedState("ccg-game-instance-record", []);
@@ -26,25 +27,33 @@
 
     let awaitingDb = $state(false);
     let lastSavedRound = $state(0);
+    const saveInterval = 4;
 
     $effect(() => {
-        if (roundsPlayed < maxRounds) return;
-        (async () => {
-            awaitingDb = true;
-            await writeToDatabase();
-            debug(`Reached max rounds of ${maxRounds}. Navigating to next page.`);
-            next();
-        })();
-    });
-
-    $effect(() => {
-        if (roundsPlayed <= lastSavedRound) return;
-        (async () => {
-            await writeToDatabase();
-            lastSavedRound = roundsPlayed;
-            debug(`Saved to database after round ${roundsPlayed}.`);
-        })();
+        if (roundsPlayed === 0 || roundsPlayed == lastSavedRound) return;
+        if (roundsPlayed >= maxRounds) {
+            // Save rounds, then navigate to next page
+            (async () => {
+                awaitingDb = true;
+                await writeToDatabase();
+                lastSavedRound = roundsPlayed;
+                debug(`Reached max rounds of ${maxRounds}. Navigating to next page.`);
+                awaitingDb = false;
+                next();
+            })();
+            return;
+        } else if (roundsPlayed % saveInterval === 0) {
+            if (awaitingDb) return; // Don't start another save if one is already in progress
+            (async () => {
+                await writeToDatabase();
+                lastSavedRound = roundsPlayed;
+                debug(`Saved to database after round ${roundsPlayed}.`);
+                awaitingDb = false;
+            })();
+        };
     })
+
+    
 
     async function writeToDatabase() {
         debug("Writing to database with updates:", gameInstanceRecords.current);
